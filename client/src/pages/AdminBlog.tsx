@@ -68,7 +68,7 @@ export default function AdminBlog() {
     excerpt: '',
     content: '',
     imageUrl: '',
-    publishedAt: new Date().toISOString()
+    publishedAt: new Date()
   });
   
   const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
@@ -160,7 +160,7 @@ export default function AdminBlog() {
       excerpt: '',
       content: '',
       imageUrl: '',
-      publishedAt: new Date().toISOString()
+      publishedAt: new Date()
     });
     setCurrentPostId(null);
     setEditMode(false);
@@ -180,7 +180,7 @@ export default function AdminBlog() {
       excerpt: post.excerpt,
       content: post.content,
       imageUrl: post.imageUrl,
-      publishedAt: new Date(post.publishedAt).toISOString()
+      publishedAt: post.publishedAt instanceof Date ? post.publishedAt : new Date(post.publishedAt)
     });
     setEditMode(true);
     setIsDialogOpen(true);
@@ -207,7 +207,9 @@ export default function AdminBlog() {
       excerpt: formData.excerpt!,
       content: formData.content!,
       imageUrl: formData.imageUrl!,
-      publishedAt: formData.publishedAt || new Date().toISOString()
+      publishedAt: formData.publishedAt instanceof Date 
+        ? formData.publishedAt 
+        : (formData.publishedAt ? new Date(formData.publishedAt) : new Date())
     };
     
     if (editMode && currentPostId) {

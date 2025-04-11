@@ -25,9 +25,19 @@ export const blogPosts = pgTable("blog_posts", {
   publishedAt: timestamp("published_at").notNull(),
 });
 
-export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
-  id: true,
-});
+export const insertBlogPostSchema = createInsertSchema(blogPosts)
+  .omit({
+    id: true,
+  })
+  .transform((data) => {
+    return {
+      ...data,
+      // Ensure publishedAt is always a Date object
+      publishedAt: data.publishedAt instanceof Date 
+        ? data.publishedAt 
+        : new Date(data.publishedAt)
+    };
+  });
 
 // Project schema
 export const projects = pgTable("projects", {

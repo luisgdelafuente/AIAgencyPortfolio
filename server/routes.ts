@@ -52,17 +52,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/blog", isAuthenticated, async (req, res) => {
     try {
-      // Make sure publishedAt is properly handled as a Date
-      let body = {...req.body};
-      if (typeof body.publishedAt === 'string') {
-        body.publishedAt = new Date(body.publishedAt);
-      } else if (!body.publishedAt) {
-        body.publishedAt = new Date();
-      }
+      const bodyWithDefaults = {
+        ...req.body,
+        // Set default publishedAt if not provided
+        publishedAt: req.body.publishedAt || new Date()
+      };
       
       const postData = insertBlogPostSchema.parse({
-        ...body,
-        slug: slugify(body.title)
+        ...bodyWithDefaults,
+        slug: slugify(bodyWithDefaults.title)
       });
       const post = await storage.createBlogPost(postData);
       res.status(201).json(post);
@@ -81,15 +79,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid ID" });
       }
       
-      // Make sure publishedAt is properly handled as a Date
-      let body = {...req.body};
-      if (typeof body.publishedAt === 'string') {
-        body.publishedAt = new Date(body.publishedAt);
-      }
-      
       const postData = insertBlogPostSchema.parse({
-        ...body,
-        slug: body.slug || slugify(body.title)
+        ...req.body,
+        slug: req.body.slug || slugify(req.body.title)
       });
       
       const post = await storage.updateBlogPost(id, postData);

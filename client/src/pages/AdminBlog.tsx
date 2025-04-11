@@ -68,7 +68,7 @@ export default function AdminBlog() {
     excerpt: '',
     content: '',
     imageUrl: '',
-    publishedAt: new Date()
+    publishedAt: new Date().toISOString()
   });
   
   const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
@@ -160,7 +160,7 @@ export default function AdminBlog() {
       excerpt: '',
       content: '',
       imageUrl: '',
-      publishedAt: new Date()
+      publishedAt: new Date().toISOString()
     });
     setCurrentPostId(null);
     setEditMode(false);
@@ -180,7 +180,7 @@ export default function AdminBlog() {
       excerpt: post.excerpt,
       content: post.content,
       imageUrl: post.imageUrl,
-      publishedAt: post.publishedAt instanceof Date ? post.publishedAt : new Date(post.publishedAt)
+      publishedAt: typeof post.publishedAt === 'string' ? post.publishedAt : new Date(post.publishedAt).toISOString()
     });
     setEditMode(true);
     setIsDialogOpen(true);
@@ -208,8 +208,8 @@ export default function AdminBlog() {
       content: formData.content!,
       imageUrl: formData.imageUrl!,
       publishedAt: formData.publishedAt instanceof Date 
-        ? formData.publishedAt 
-        : (formData.publishedAt ? new Date(formData.publishedAt) : new Date())
+        ? formData.publishedAt.toISOString() 
+        : (formData.publishedAt ? new Date(formData.publishedAt).toISOString() : new Date().toISOString())
     };
     
     if (editMode && currentPostId) {
@@ -379,7 +379,7 @@ export default function AdminBlog() {
                             // Convert string to Date directly in the form data
                             setFormData(prev => ({
                               ...prev,
-                              publishedAt: new Date(e.target.value)
+                              publishedAt: new Date(e.target.value).toISOString()
                             }));
                           }}
                         />

@@ -22,21 +22,12 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url").notNull(),
-  publishedAt: timestamp("published_at").notNull(),
+  publishedAt: text("published_at").notNull(), // Change to text to avoid Date issues
 });
 
 export const insertBlogPostSchema = createInsertSchema(blogPosts)
   .omit({
     id: true,
-  })
-  .transform((data) => {
-    return {
-      ...data,
-      // Ensure publishedAt is always a Date object
-      publishedAt: data.publishedAt instanceof Date 
-        ? data.publishedAt 
-        : new Date(data.publishedAt)
-    };
   });
 
 // Project schema

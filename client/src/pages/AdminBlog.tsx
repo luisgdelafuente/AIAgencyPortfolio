@@ -53,10 +53,19 @@ import type { BlogPost, InsertBlogPost } from '@shared/schema';
 import { formatDate, slugify } from '@shared/utils';
 
 export default function AdminBlog() {
-  const auth = useContext(AuthContext) as AuthContextType;
+  const auth = useContext(AuthContext);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Guard against auth being null
+  if (!auth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <p>Loading authentication...</p>
+      </div>
+    );
+  }
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

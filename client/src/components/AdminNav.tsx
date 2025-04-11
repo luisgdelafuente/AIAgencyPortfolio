@@ -22,8 +22,17 @@ const HAL149Logo = () => (
 
 export default function AdminNav() {
   const [location] = useLocation();
-  const auth = useContext(AuthContext) as AuthContextType;
+  const auth = useContext(AuthContext);
   const { toast } = useToast();
+  
+  // Guard against auth being null
+  if (!auth) {
+    return (
+      <div className="flex h-screen border-r border-neutral-200 w-64 p-6">
+        <div>Loading navigation...</div>
+      </div>
+    );
+  }
   
   const handleLogout = async () => {
     try {

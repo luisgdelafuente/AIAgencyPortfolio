@@ -26,8 +26,17 @@ import { formatDate } from '@shared/utils';
 import type { WaitlistEntry } from '@shared/schema';
 
 export default function AdminWaitlist() {
-  const auth = useContext(AuthContext) as AuthContextType;
+  const auth = useContext(AuthContext);
   const [, setLocation] = useLocation();
+  
+  // Guard against auth being null
+  if (!auth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <p>Loading authentication...</p>
+      </div>
+    );
+  }
   
   useEffect(() => {
     if (!auth.user && !auth.isLoading) {

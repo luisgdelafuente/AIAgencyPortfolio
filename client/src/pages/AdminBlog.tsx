@@ -376,8 +376,11 @@ export default function AdminBlog() {
                               : new Date().toISOString().split('T')[0]
                           }
                           onChange={(e) => {
-                            const date = new Date(e.target.value);
-                            handleInputChange('publishedAt', date);
+                            // Convert string to Date directly in the form data
+                            setFormData(prev => ({
+                              ...prev,
+                              publishedAt: new Date(e.target.value)
+                            }));
                           }}
                         />
                       </div>

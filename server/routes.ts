@@ -1,76 +1,17 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import session from "express-session";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
 import { slugify } from "../shared/utils";
 import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema } from "@shared/schema";
-import MemoryStore from "memorystore";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-
-const MemoryStoreSession = MemoryStore(session);
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure session
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET || "hal149-secret-key",
-      resave: false,
-      saveUninitialized: false,
-      store: new MemoryStoreSession({
-        checkPeriod: 86400000, // prune expired entries every 24h
-      }),
-      cookie: {
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      },
-    })
-  );
+  // Set up authentication
+  setupAuth(app);
 
-  // Initialize passport
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  // Configure passport
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await storage.getUserByUsername(username);
-        if (!user || user.password !== password) {
-          return done(null, false, { message: "Incorrect username or password" });
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error);
-      }
-    })
-  );
-
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(async (id: number, done) => {
-    try {
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
-  });
-
-  // Auth routes
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.json({ message: "Login successful", user: req.user });
-  });
-
-  app.post("/api/logout", (req, res) => {
-    req.logout(() => {
-      res.json({ message: "Logout successful" });
-    });
-  });
-
+  // Auth check endpoint
   app.get("/api/auth/check", (req, res) => {
     if (req.isAuthenticated()) {
       res.json({ authenticated: true, user: req.user });

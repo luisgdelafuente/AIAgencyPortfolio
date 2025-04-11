@@ -54,13 +54,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const bodyWithDefaults = {
         ...req.body,
-        // Set default publishedAt if not provided
-        publishedAt: req.body.publishedAt || new Date()
+        // Set default publishedAt if not provided as ISO string
+        publishedAt: req.body.publishedAt || new Date().toISOString()
       };
       
       const postData = insertBlogPostSchema.parse({
         ...bodyWithDefaults,
-        slug: slugify(bodyWithDefaults.title)
+        slug: req.body.slug || slugify(bodyWithDefaults.title)
       });
       const post = await storage.createBlogPost(postData);
       res.status(201).json(post);
@@ -256,7 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           excerpt: "Exploring how artificial intelligence is reshaping business operations and strategy.",
           content: "Artificial intelligence is rapidly transforming how businesses operate across all sectors. From automating routine tasks to providing deep insights from data analysis, AI technologies are helping enterprises become more efficient and competitive. This post explores the current state of AI adoption in enterprise settings and looks ahead to future developments that could further revolutionize business operations.",
           imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-          publishedAt: new Date("2024-03-10")
+          publishedAt: new Date("2024-03-10").toISOString()
         },
         {
           title: "Understanding Neural Networks",
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           excerpt: "A deep dive into the architecture of modern neural networks and their applications.",
           content: "Neural networks form the backbone of many modern AI systems, enabling complex pattern recognition and decision-making capabilities. This post provides an accessible introduction to how neural networks function, explaining key concepts like layers, neurons, activation functions, and training processes. We'll also explore different types of neural networks and their specific applications in various domains.",
           imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-          publishedAt: new Date("2024-03-08")
+          publishedAt: new Date("2024-03-08").toISOString()
         },
         {
           title: "AI Ethics and Responsibility",
@@ -272,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           excerpt: "Discussing the importance of ethical considerations in AI development and deployment.",
           content: "As AI systems become more powerful and pervasive, ethical considerations surrounding their development and use grow increasingly important. This post examines key ethical issues in AI, including bias in algorithms, privacy concerns, transparency in decision-making, and the broader societal impacts of automation. We also explore frameworks and best practices for responsible AI development that balances innovation with ethical considerations.",
           imageUrl: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-          publishedAt: new Date("2024-03-05")
+          publishedAt: new Date("2024-03-05").toISOString()
         }
       ];
       

@@ -207,9 +207,9 @@ export default function AdminBlog() {
       excerpt: formData.excerpt!,
       content: formData.content!,
       imageUrl: formData.imageUrl!,
-      publishedAt: formData.publishedAt instanceof Date 
-        ? formData.publishedAt.toISOString() 
-        : (formData.publishedAt ? new Date(formData.publishedAt).toISOString() : new Date().toISOString())
+      publishedAt: typeof formData.publishedAt === 'string'
+        ? formData.publishedAt
+        : new Date().toISOString()
     };
     
     if (editMode && currentPostId) {
@@ -369,11 +369,9 @@ export default function AdminBlog() {
                         <input 
                           type="date" 
                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                          value={formData.publishedAt instanceof Date 
-                            ? formData.publishedAt.toISOString().split('T')[0]
-                            : typeof formData.publishedAt === 'string'
-                              ? new Date(formData.publishedAt).toISOString().split('T')[0]
-                              : new Date().toISOString().split('T')[0]
+                          value={typeof formData.publishedAt === 'string'
+                            ? new Date(formData.publishedAt).toISOString().split('T')[0]
+                            : new Date().toISOString().split('T')[0]
                           }
                           onChange={(e) => {
                             // Convert string to Date directly in the form data
@@ -416,11 +414,9 @@ export default function AdminBlog() {
                         <div className="bg-neutral-50 p-6 rounded-lg mb-6">
                           <h2 className="text-3xl font-bold mb-2">{formData.title}</h2>
                           <div className="flex items-center gap-2 text-sm text-neutral-500 mb-3">
-                            <span>Published: {formData.publishedAt instanceof Date 
-                              ? formData.publishedAt.toLocaleDateString()
-                              : typeof formData.publishedAt === 'string'
-                                ? new Date(formData.publishedAt).toLocaleDateString()
-                                : new Date().toLocaleDateString()
+                            <span>Published: {typeof formData.publishedAt === 'string'
+                              ? new Date(formData.publishedAt).toLocaleDateString()
+                              : new Date().toLocaleDateString()
                             }</span>
                           </div>
                           {formData.excerpt && <p className="text-neutral-600">{formData.excerpt}</p>}

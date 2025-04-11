@@ -12,7 +12,16 @@ export default function LoginForm() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const auth = useContext(AuthContext) as AuthContextType;
+  const auth = useContext(AuthContext);
+  
+  // Guard against auth being null
+  if (!auth) {
+    return (
+      <div className="text-center py-4">
+        <p>Authentication service is loading...</p>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

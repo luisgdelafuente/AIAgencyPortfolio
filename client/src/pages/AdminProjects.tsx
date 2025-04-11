@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Helmet } from "react-helmet";
 import AdminNav from '@/components/AdminNav';
-import { useLocation } from 'wouter';
-import { AuthContext, AuthContextType } from '@/App';
+import { useAuth } from '@/hooks/use-auth';
 import { 
   Card, 
   CardContent, 
@@ -56,19 +55,9 @@ import type { Project, InsertProject } from '@shared/schema';
 import { slugify } from '@shared/utils';
 
 export default function AdminProjects() {
-  const auth = useContext(AuthContext);
-  const [, setLocation] = useLocation();
+  const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  // Guard against auth being null
-  if (!auth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <p>Loading authentication...</p>
-      </div>
-    );
-  }
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -86,15 +75,9 @@ export default function AdminProjects() {
     isFeatured: false
   });
   
-  useEffect(() => {
-    if (!auth.user && !auth.isLoading) {
-      setLocation('/admin');
-    }
-  }, [auth.user, auth.isLoading, setLocation]);
-  
-  const { data: projects, isLoading } = useQuery<Project[]>({
+  const { data: projects, isLoading: isLoadingProjects } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
-    enabled: !!auth.user
+    enabled: !!user
   });
   
   const createMutation = useMutation({
@@ -249,12 +232,12 @@ export default function AdminProjects() {
     }
   };
   
-  if (auth.isLoading) {
-    return <p>Loading...</p>;
-  }
-  
-  if (!auth.user) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <p>Loading projects...</p>
+      </div>
+    );
   }
   
   return (
@@ -281,7 +264,7 @@ export default function AdminProjects() {
                 <CardTitle>All Projects</CardTitle>
               </CardHeader>
               <CardContent>
-                {isLoading ? (
+                {isLoadingProjects ? (
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
                       <div key={i} className="flex items-center space-x-4">

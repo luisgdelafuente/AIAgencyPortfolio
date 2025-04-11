@@ -1,53 +1,36 @@
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import { Helmet } from "react-helmet";
 import AdminNav from '@/components/AdminNav';
-import { useLocation } from 'wouter';
-import { AuthContext, AuthContextType } from '@/App';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart3, FileText, Users } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function AdminDashboard() {
-  const auth = useContext(AuthContext);
-  const [, setLocation] = useLocation();
-  
-  // Guard against auth being null
-  if (!auth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <p>Loading authentication...</p>
-      </div>
-    );
-  }
-
-  useEffect(() => {
-    if (!auth.user && !auth.isLoading) {
-      setLocation('/admin');
-    }
-  }, [auth.user, auth.isLoading, setLocation]);
+  const { user, isLoading } = useAuth();
 
   const { data: blogPosts, isLoading: isLoadingPosts } = useQuery({
     queryKey: ['/api/blog'],
-    enabled: !!auth.user
+    enabled: !!user
   });
 
   const { data: projects, isLoading: isLoadingProjects } = useQuery({
     queryKey: ['/api/projects'],
-    enabled: !!auth.user
+    enabled: !!user
   });
 
   const { data: waitlistEntries, isLoading: isLoadingWaitlist } = useQuery({
     queryKey: ['/api/waitlist'],
-    enabled: !!auth.user
+    enabled: !!user
   });
 
-  if (auth.isLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!auth.user) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <p>Loading dashboard...</p>
+      </div>
+    );
   }
 
   return (

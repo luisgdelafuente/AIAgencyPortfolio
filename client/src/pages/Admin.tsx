@@ -1,6 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Helmet } from "react-helmet";
-import { AuthContext, AuthContextType } from '@/App';
+import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
 import LoginForm from '@/components/LoginForm';
 import { 
@@ -17,27 +17,18 @@ import {
  * Redirects to dashboard if authenticated or shows login form if not
  */
 export default function Admin() {
-  const auth = useContext(AuthContext);
+  const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
-  
-  // Guard against auth being null
-  if (!auth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <p>Loading authentication...</p>
-      </div>
-    );
-  }
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
-    if (auth.user) {
+    if (user) {
       setLocation('/admin/dashboard');
     }
-  }, [auth.user, setLocation]);
+  }, [user, setLocation]);
 
   // Show loading state while checking authentication
-  if (auth.isLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <p className="text-center text-neutral-600">Loading...</p>

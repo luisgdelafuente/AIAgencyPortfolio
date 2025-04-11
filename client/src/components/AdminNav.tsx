@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { 
@@ -6,11 +6,9 @@ import {
   FileText, 
   FolderKanban, 
   LogOut, 
-  Mail, 
-  Settings, 
   Users 
 } from 'lucide-react';
-import { AuthContext, AuthContextType } from '@/App';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
 const HAL149Logo = () => (
@@ -22,24 +20,25 @@ const HAL149Logo = () => (
 
 export default function AdminNav() {
   const [location] = useLocation();
-  const auth = useContext(AuthContext);
+  const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  
-  // Guard against auth being null
-  if (!auth) {
-    return (
-      <div className="flex h-screen border-r border-neutral-200 w-64 p-6">
-        <div>Loading navigation...</div>
-      </div>
-    );
-  }
   
   const handleLogout = async () => {
     try {
-      await auth.logout();
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out"
+      logoutMutation.mutate(undefined, {
+        onSuccess: () => {
+          toast({
+            title: "Logged out",
+            description: "You have been successfully logged out"
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Error",
+            description: "Failed to log out. Please try again.",
+            variant: "destructive"
+          });
+        }
       });
     } catch (error) {
       toast({
@@ -98,7 +97,7 @@ export default function AdminNav() {
           </Button>
           <div className="px-4 py-2 bg-neutral-50 rounded-md text-sm">
             <div className="text-neutral-500">Logged in as</div>
-            <div className="font-medium">{auth.user?.username || 'Admin'}</div>
+            <div className="font-medium">{user?.username || 'Admin'}</div>
           </div>
         </div>
       </div>

@@ -144,11 +144,11 @@ export default function AdminBlog() {
     }
   });
   
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | Date) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     
     // Auto-generate slug from title if not manually edited
-    if (field === 'title' && !formData.slug) {
+    if (field === 'title' && !formData.slug && typeof value === 'string') {
       setFormData((prev) => ({ ...prev, slug: slugify(value) }));
     }
   };
@@ -353,13 +353,35 @@ export default function AdminBlog() {
                       />
                     </div>
                     
-                    <FormField
-                      label="Image URL"
-                      name="imageUrl"
-                      value={formData.imageUrl || ''}
-                      onChange={(value) => handleInputChange('imageUrl', value)}
-                      required
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Image URL"
+                        name="imageUrl"
+                        value={formData.imageUrl || ''}
+                        onChange={(value) => handleInputChange('imageUrl', value)}
+                        required
+                      />
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Published Date <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                          type="date" 
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                          value={formData.publishedAt instanceof Date 
+                            ? formData.publishedAt.toISOString().split('T')[0]
+                            : typeof formData.publishedAt === 'string'
+                              ? new Date(formData.publishedAt).toISOString().split('T')[0]
+                              : new Date().toISOString().split('T')[0]
+                          }
+                          onChange={(e) => {
+                            const date = new Date(e.target.value);
+                            handleInputChange('publishedAt', date);
+                          }}
+                        />
+                      </div>
+                    </div>
                     
                     <div>
                       <FormField
@@ -390,6 +412,14 @@ export default function AdminBlog() {
                       <>
                         <div className="bg-neutral-50 p-6 rounded-lg mb-6">
                           <h2 className="text-3xl font-bold mb-2">{formData.title}</h2>
+                          <div className="flex items-center gap-2 text-sm text-neutral-500 mb-3">
+                            <span>Published: {formData.publishedAt instanceof Date 
+                              ? formData.publishedAt.toLocaleDateString()
+                              : typeof formData.publishedAt === 'string'
+                                ? new Date(formData.publishedAt).toLocaleDateString()
+                                : new Date().toLocaleDateString()
+                            }</span>
+                          </div>
                           {formData.excerpt && <p className="text-neutral-600">{formData.excerpt}</p>}
                         </div>
                         

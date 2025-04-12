@@ -59,7 +59,7 @@ export default function AdminNav() {
 
   return (
     <div className="flex h-screen border-r border-neutral-200">
-      <div className="w-64 p-6">
+      <div className="w-64 p-6 flex flex-col h-full">
         <div className="mb-8">
           <Link href="/" className="inline-block">
             <HAL149Logo />
@@ -84,7 +84,7 @@ export default function AdminNav() {
           ))}
         </nav>
 
-        <div className="absolute bottom-6 left-6 right-6 space-y-4">
+        <div className="mt-auto pt-6 space-y-4">
           <Button 
             variant="outline" 
             size="sm" 

@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 
 export default function Hero() {
   return (
-    <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="container mx-auto">
+    <section className="pt-32 pb-16 bg-white">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <div className="inline-flex items-center justify-center px-4 py-1 mb-6 rounded-full bg-gray-100 text-gray-900">
             <span className="text-sm font-medium">Coming Soon</span>

@@ -33,10 +33,10 @@ export default function Blog() {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
               {isLoading ? (
                 // Skeleton loaders while data is loading
-                Array(6).fill(0).map((_, i) => (
+                Array(4).fill(0).map((_, i) => (
                   <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
                     <Skeleton className="w-full h-48" />
                     <div className="p-6">
@@ -52,7 +52,7 @@ export default function Blog() {
                   <BlogCard key={post.id} post={post} />
                 ))
               ) : (
-                <div className="col-span-3 text-center py-12">
+                <div className="col-span-2 text-center py-12">
                   <p className="text-gray-500">No blog posts available yet.</p>
                 </div>
               )}

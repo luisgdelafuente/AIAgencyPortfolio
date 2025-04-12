@@ -39,11 +39,8 @@ export default function AdminLogin() {
           </div>
           
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>Admin Login</CardTitle>
-              <CardDescription>
-                Sign in to access the admin dashboard
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <LoginForm />

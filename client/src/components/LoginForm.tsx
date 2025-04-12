@@ -71,9 +71,6 @@ export default function LoginForm() {
       <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
         {loginMutation.isPending ? "Logging in..." : "Login"}
       </Button>
-      <div className="text-center text-sm text-neutral-500">
-        <p>Default credentials: admin / admin123</p>
-      </div>
     </form>
   );
 }

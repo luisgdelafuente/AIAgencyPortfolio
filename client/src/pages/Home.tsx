@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import BlogSection from '@/components/BlogSection';
+import ProjectsSection from '@/components/ProjectsSection';
 import Waitlist from '@/components/Waitlist';
 import { Helmet } from "react-helmet";
 
@@ -22,6 +23,7 @@ export default function Home() {
         <main className="flex-grow">
           <Hero />
           <Features />
+          <ProjectsSection />
           <BlogSection />
           <Waitlist />
         </main>

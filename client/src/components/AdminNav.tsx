@@ -136,7 +136,7 @@ export default function AdminNav() {
 
   // Desktop view
   return (
-    <div className="hidden lg:flex h-screen border-r border-neutral-200">
+    <div className="hidden lg:block h-screen border-r border-neutral-200 fixed">
       <div className="w-64 p-6 flex flex-col h-full">
         <SidebarContent />
       </div>

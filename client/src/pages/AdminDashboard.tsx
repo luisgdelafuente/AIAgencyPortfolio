@@ -10,17 +10,17 @@ import { useAuth } from '@/hooks/use-auth';
 export default function AdminDashboard() {
   const { user, isLoading } = useAuth();
 
-  const { data: blogPosts, isLoading: isLoadingPosts } = useQuery({
+  const { data: blogPosts, isLoading: isLoadingPosts } = useQuery<any[]>({
     queryKey: ['/api/blog'],
     enabled: !!user
   });
 
-  const { data: projects, isLoading: isLoadingProjects } = useQuery({
+  const { data: projects, isLoading: isLoadingProjects } = useQuery<any[]>({
     queryKey: ['/api/projects'],
     enabled: !!user
   });
 
-  const { data: waitlistEntries, isLoading: isLoadingWaitlist } = useQuery({
+  const { data: waitlistEntries, isLoading: isLoadingWaitlist } = useQuery<any[]>({
     queryKey: ['/api/waitlist'],
     enabled: !!user
   });
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
                   {isLoadingPosts ? (
                     <Skeleton className="h-8 w-20" />
                   ) : (
-                    <div className="text-2xl font-bold">{blogPosts?.length || 0}</div>
+                    <div className="text-2xl font-bold">{Array.isArray(blogPosts) ? blogPosts.length : 0}</div>
                   )}
                 </CardContent>
               </Card>
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
                   {isLoadingProjects ? (
                     <Skeleton className="h-8 w-20" />
                   ) : (
-                    <div className="text-2xl font-bold">{projects?.length || 0}</div>
+                    <div className="text-2xl font-bold">{Array.isArray(projects) ? projects.length : 0}</div>
                   )}
                 </CardContent>
               </Card>
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
                   {isLoadingWaitlist ? (
                     <Skeleton className="h-8 w-20" />
                   ) : (
-                    <div className="text-2xl font-bold">{waitlistEntries?.length || 0}</div>
+                    <div className="text-2xl font-bold">{Array.isArray(waitlistEntries) ? waitlistEntries.length : 0}</div>
                   )}
                 </CardContent>
               </Card>

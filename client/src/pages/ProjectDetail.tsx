@@ -60,7 +60,7 @@ export default function ProjectDetailPage() {
             </div>
           ) : project ? (
             <>
-              <div className="bg-neutral-50 py-16">
+              <div className="bg-neutral-50 py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                   <Link href="/projects" className="inline-flex items-center text-neutral-600 hover:text-neutral-900 mb-6">
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back to projects
@@ -73,11 +73,11 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
               
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <img 
                   src={project.imageUrl} 
                   alt={project.title} 
-                  className="w-full h-auto rounded-lg mb-8"
+                  className="w-full h-auto rounded-lg mb-6"
                 />
                 <div className="prose max-w-none">
                   {/* In a real app, you would use a markdown renderer here */}

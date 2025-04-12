@@ -4,23 +4,22 @@ import { Button } from '@/components/ui/button';
 
 export default function Hero() {
   return (
-    <section className="py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="mb-4 text-gray-500">
-          <span className="text-sm">Coming Soon</span>
+    <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto text-center">
+        <div className="inline-flex items-center justify-center px-4 py-1 mb-6 rounded-full bg-gray-100 text-gray-900">
+          <span className="text-sm font-medium">Coming Soon</span>
         </div>
-        <h1 className="text-4xl font-bold tracking-tight mb-5">
-          Industry-Specific AI Applications
+        <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 tracking-tight">
+          Industry-Specific <span className="text-gray-900">AI Applications</span>
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-8 text-base">
-          Transform data into insights, automate workflows, and stay ahead
-          <br />of the competition.
+        <p className="mt-6 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
+          Transform data into insights, automate workflows, and stay ahead of the competition.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="default" className="bg-black text-white hover:bg-neutral-800 rounded">
+        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+          <Button asChild size="lg" className="px-8 py-3 bg-gray-900 text-white hover:bg-gray-800 rounded-lg">
             <Link href="/blog">Read Our Blog</Link>
           </Button>
-          <Button asChild variant="outline" size="default" className="text-black border-gray-200 hover:bg-gray-50 rounded">
+          <Button asChild variant="outline" size="lg" className="px-8 py-3 rounded-lg border border-gray-300 text-gray-700 hover:border-gray-400">
             <a href="#waitlist">Join Waitlist</a>
           </Button>
         </div>

@@ -5,10 +5,7 @@ import { Globe } from 'lucide-react';
 
 const HAL149Logo = () => (
   <div className="flex items-center">
-    <svg className="h-6 w-6 mr-1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 5v14M19 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-    <span className="font-bold text-xl tracking-tight">HAL149</span>
+    <img src="/hallogoblack480.webp" alt="HAL149" className="h-8 w-auto" />
   </div>
 );
 

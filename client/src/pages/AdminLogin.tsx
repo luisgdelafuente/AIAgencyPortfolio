@@ -34,10 +34,7 @@ export default function AdminLogin() {
         <div className="w-full max-w-md px-4">
           <div className="mb-8 text-center">
             <a href="/" className="inline-block">
-              <svg className="h-10 w-auto mx-auto" viewBox="0 0 120 40" fill="currentColor">
-                <path d="M30,10 L30,30 M10,10 L10,30 M10,20 L30,20 M40,10 Q50,10 50,20 Q50,30 40,30" stroke="currentColor" strokeWidth="4" fill="none" />
-                <text x="60" y="25" fontFamily="Arial" fontSize="15" fontWeight="bold">HAL149</text>
-              </svg>
+              <img src="/hallogoblack480.webp" alt="HAL149" className="h-10 w-auto mx-auto" />
             </a>
           </div>
           

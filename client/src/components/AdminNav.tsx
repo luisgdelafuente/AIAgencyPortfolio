@@ -64,7 +64,6 @@ export default function AdminNav() {
           <Link href="/" className="inline-block">
             <HAL149Logo />
           </Link>
-          <div className="mt-2 text-sm font-medium">Admin Panel</div>
         </div>
 
         <nav className="space-y-1">

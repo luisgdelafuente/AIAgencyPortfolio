@@ -45,7 +45,7 @@ export default function BlogPostPage() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow pt-28">
+        <main className="flex-grow pt-16">
           {isLoading ? (
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Skeleton className="h-8 w-3/4 mb-4" />

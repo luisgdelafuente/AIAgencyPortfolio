@@ -64,8 +64,7 @@ export default function AuthPage() {
       <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
         <Card className="shadow-md w-full max-w-md">
           <CardHeader className="flex items-center justify-center pb-6">
-            <img src="/hallogoblack480.webp" alt="HAL149" className="h-12 w-auto mb-2" />
-            <h2 className="text-xl font-semibold text-center">HAL149 Admin</h2>
+            <img src="/hallogoblack480.webp" alt="HAL149" className="h-12 w-auto" />
           </CardHeader>
           <CardContent>
             <Form {...loginForm}>

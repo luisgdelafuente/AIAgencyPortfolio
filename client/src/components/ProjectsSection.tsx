@@ -12,9 +12,9 @@ export default function ProjectsSection() {
   });
 
   return (
-    <section className="py-20 md:py-32 bg-white">
+    <section className="py-12 md:py-16 bg-white">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             Featured Projects
           </h2>
@@ -49,7 +49,7 @@ export default function ProjectsSection() {
           )}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-10 text-center">
           <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
             <Link href="/projects">View All Projects</Link>
           </Button>

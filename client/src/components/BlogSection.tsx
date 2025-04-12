@@ -13,9 +13,9 @@ export default function BlogSection() {
   });
 
   return (
-    <section className="py-20 md:py-28 bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-16">
+    <section className="py-12 md:py-16 bg-gray-50">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             Latest from Our Blog
           </h2>
@@ -50,7 +50,7 @@ export default function BlogSection() {
           )}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-10 text-center">
           <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
             <Link href="/blog">View All Posts</Link>
           </Button>

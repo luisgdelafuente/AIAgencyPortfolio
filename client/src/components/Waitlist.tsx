@@ -54,44 +54,48 @@ export default function Waitlist() {
 
   return (
     <section id="waitlist" className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-2xl font-bold mb-2">Join the Waitlist</h2>
-        <p className="text-gray-600 text-sm max-w-xl mx-auto mb-8">
-          Be the first to experience the future of AI. Sign up for early access.
-        </p>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-md mx-auto">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="flex-grow">
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your email"
-                        className="px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-black"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-left text-red-500 text-xs mt-1" />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="bg-black text-white hover:bg-gray-800 rounded"
-                disabled={waitlistMutation.isPending}
-              >
-                {waitlistMutation.isPending ? "Joining..." : "Join Waitlist"}
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              By signing up, you agree to our <Link href="/legal" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link>.
-            </p>
-          </form>
-        </Form>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            Join the Waitlist
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Be the first to experience the future of AI. Sign up for early access.
+          </p>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="flex-grow max-w-md">
+                      <FormControl>
+                        <Input
+                          placeholder="Enter your email"
+                          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-left text-red-500 text-xs mt-1" />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+                  disabled={waitlistMutation.isPending}
+                >
+                  {waitlistMutation.isPending ? "Joining..." : "Join Waitlist"}
+                </Button>
+              </div>
+              <p className="text-sm text-gray-500 mt-4">
+                By signing up, you agree to our <Link href="/legal" className="underline hover:text-gray-700">Privacy Policy</Link>
+              </p>
+            </form>
+          </Form>
+        </div>
       </div>
     </section>
   );

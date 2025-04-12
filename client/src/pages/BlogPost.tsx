@@ -21,8 +21,8 @@ export default function BlogPostPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow pt-28">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <main className="flex-grow">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 text-center">
             <h1 className="text-2xl font-bold mb-4">Blog post not found</h1>
             <p className="mb-6">The blog post you are looking for does not exist.</p>
             <Link href="/blog" className="inline-flex items-center text-neutral-600 hover:text-neutral-900">
@@ -45,7 +45,7 @@ export default function BlogPostPage() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow pt-28">
+        <main className="flex-grow">
           {isLoading ? (
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Skeleton className="h-8 w-3/4 mb-4" />
@@ -61,7 +61,7 @@ export default function BlogPostPage() {
             </div>
           ) : post ? (
             <>
-              <div className="bg-neutral-50 py-16">
+              <div className="bg-neutral-50 py-8 sm:py-10 md:py-12">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                   <Link href="/blog" className="inline-flex items-center text-neutral-600 hover:text-neutral-900 mb-6">
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back to blog

@@ -20,7 +20,7 @@ export default function ProjectDetailPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow py-16">
+        <main className="flex-grow pt-28">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Project not found</h1>
             <p className="mb-6">The project you are looking for does not exist.</p>
@@ -44,9 +44,9 @@ export default function ProjectDetailPage() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow">
+        <main className="flex-grow pt-28">
           {isLoading ? (
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <Skeleton className="h-8 w-3/4 mb-4" />
               <Skeleton className="h-4 w-1/4 mb-6" />
               <Skeleton className="h-64 w-full mb-6" />

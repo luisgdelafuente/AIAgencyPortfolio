@@ -21,7 +21,7 @@ export default function BlogPostPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow py-16">
+        <main className="flex-grow pt-28">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Blog post not found</h1>
             <p className="mb-6">The blog post you are looking for does not exist.</p>

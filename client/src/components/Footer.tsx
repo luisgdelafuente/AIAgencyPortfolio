@@ -5,7 +5,7 @@ import { Globe } from 'lucide-react';
 
 const HAL149Logo = () => (
   <div className="flex items-center">
-    <img src="/hallogoblack480.webp" alt="HAL149" className="h-8 w-auto" />
+    <img src="/hallogoblack480.webp" alt="HAL149" className="h-9 sm:h-10 w-auto" />
   </div>
 );
 

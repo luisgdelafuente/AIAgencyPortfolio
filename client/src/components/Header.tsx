@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const HAL149Logo = () => (
   <div className="flex items-center">
-    <img src="/hallogoblack480.webp" alt="HAL149" className="h-8 w-auto" />
+    <img src="/hallogoblack480.webp" alt="HAL149" className="h-9 sm:h-10 w-auto" />
   </div>
 );
 
@@ -68,7 +68,10 @@ export default function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[280px] border-l border-gray-200">
-                <div className="flex flex-col gap-6 mt-8">
+                <div className="flex flex-col gap-6 mt-4">
+                  <Link href="/" className="flex items-center mb-2" onClick={() => setOpen(false)}>
+                    <img src="/hallogoblack480.webp" alt="HAL149" className="h-8 w-auto" />
+                  </Link>
                   {navLinks.map((link) => (
                     <Link 
                       key={link.href} 

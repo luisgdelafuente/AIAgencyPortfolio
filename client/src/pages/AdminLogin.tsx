@@ -34,7 +34,7 @@ export default function AdminLogin() {
         <div className="w-full max-w-md px-4">
           <div className="mb-8 text-center">
             <a href="/" className="inline-block">
-              <img src="/hallogoblack480.webp" alt="HAL149" className="h-10 w-auto mx-auto" />
+              <img src="/hallogoblack480.webp" alt="HAL149" className="h-10 sm:h-12 w-auto mx-auto" />
             </a>
           </div>
           

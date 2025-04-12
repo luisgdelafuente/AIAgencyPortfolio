@@ -63,153 +63,147 @@ export default function Contact() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow pt-16">
-          <section className="py-20 md:py-28 bg-white border-b border-gray-100">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="max-w-3xl mx-auto text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                  Contact Us
-                </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Have questions about our AI solutions? We'd love to hear from you.
-                </p>
-              </div>
+        <main className="flex-grow pt-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                Contact Us
+              </h1>
+              <p className="text-lg text-gray-600">
+                Have questions about our AI solutions? We'd love to hear from you.
+              </p>
             </div>
-          </section>
-          
-          <section className="py-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div className="md:col-span-1">
-                  <div className="space-y-8">
-                    <Card className="border border-gray-200 shadow-sm">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="bg-gray-100 p-2 rounded-full">
-                            <MapPin className="h-5 w-5 text-gray-700" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium text-gray-900 mb-1">Address</h3>
-                            <p className="text-gray-600 text-sm">
-                              1234 AI Boulevard<br />
-                              San Francisco, CA 94107
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="border border-gray-200 shadow-sm">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="bg-gray-100 p-2 rounded-full">
-                            <Mail className="h-5 w-5 text-gray-700" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium text-gray-900 mb-1">Email</h3>
-                            <p className="text-gray-600 text-sm">
-                              info@hal149.com<br />
-                              support@hal149.com
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="border border-gray-200 shadow-sm">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="bg-gray-100 p-2 rounded-full">
-                            <Phone className="h-5 w-5 text-gray-700" />
-                          </div>
-                          <div>
-                            <h3 className="font-medium text-gray-900 mb-1">Phone</h3>
-                            <p className="text-gray-600 text-sm">
-                              +1 (555) 123-4567<br />
-                              Mon-Fri, 9AM-6PM PST
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-                
-                <div className="md:col-span-2">
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div className="md:col-span-1">
+                <div className="space-y-8">
                   <Card className="border border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-bold text-gray-900">Send us a message</CardTitle>
-                      <CardDescription className="text-gray-600">
-                        Fill out the form below and we'll get back to you as soon as possible.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="name" className="text-gray-700">Name</Label>
-                            <Input 
-                              id="name"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleChange}
-                              className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                              required
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="email" className="text-gray-700">Email</Label>
-                            <Input 
-                              id="email"
-                              name="email"
-                              type="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                              required
-                            />
-                          </div>
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-gray-100 p-2 rounded-full">
+                          <MapPin className="h-5 w-5 text-gray-700" />
                         </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="subject" className="text-gray-700">Subject</Label>
-                          <Input 
-                            id="subject"
-                            name="subject"
-                            value={formData.subject}
-                            onChange={handleChange}
-                            className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                            required
-                          />
+                        <div>
+                          <h3 className="font-medium text-gray-900 mb-1">Address</h3>
+                          <p className="text-gray-600 text-sm">
+                            1234 AI Boulevard<br />
+                            San Francisco, CA 94107
+                          </p>
                         </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="message" className="text-gray-700">Message</Label>
-                          <Textarea 
-                            id="message"
-                            name="message"
-                            value={formData.message}
-                            onChange={handleChange}
-                            className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                            rows={6}
-                            required
-                          />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-gray-100 p-2 rounded-full">
+                          <Mail className="h-5 w-5 text-gray-700" />
                         </div>
-                        
-                        <Button 
-                          type="submit" 
-                          className="w-full bg-black hover:bg-gray-900 text-white py-2"
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? 'Sending...' : 'Send Message'}
-                        </Button>
-                      </form>
+                        <div>
+                          <h3 className="font-medium text-gray-900 mb-1">Email</h3>
+                          <p className="text-gray-600 text-sm">
+                            info@hal149.com<br />
+                            support@hal149.com
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-gray-200 shadow-sm">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="bg-gray-100 p-2 rounded-full">
+                          <Phone className="h-5 w-5 text-gray-700" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900 mb-1">Phone</h3>
+                          <p className="text-gray-600 text-sm">
+                            +1 (555) 123-4567<br />
+                            Mon-Fri, 9AM-6PM PST
+                          </p>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
               </div>
+              
+              <div className="md:col-span-2">
+                <Card className="border border-gray-200 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-bold text-gray-900">Send us a message</CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Fill out the form below and we'll get back to you as soon as possible.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="name" className="text-gray-700">Name</Label>
+                          <Input 
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email" className="text-gray-700">Email</Label>
+                          <Input 
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="subject" className="text-gray-700">Subject</Label>
+                        <Input 
+                          id="subject"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="message" className="text-gray-700">Message</Label>
+                        <Textarea 
+                          id="message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          rows={6}
+                          required
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-black hover:bg-gray-900 text-white py-2"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </section>
+          </div>
         </main>
         
         <Footer />

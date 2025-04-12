@@ -14,23 +14,19 @@ export default function About() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow pt-16">
-          <section className="py-20 md:py-28 bg-white border-b border-gray-100">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="max-w-3xl mx-auto text-center">
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                  About HAL149
-                </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Pioneering the future of AI with industry-specific solutions
-                </p>
-              </div>
+        <main className="flex-grow pt-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                About HAL149
+              </h1>
+              <p className="text-lg text-gray-600">
+                Pioneering the future of AI with industry-specific solutions
+              </p>
             </div>
-          </section>
-          
-          <section className="py-20">
-            <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="prose prose-lg prose-gray max-w-none">
+            
+            <div className="max-w-3xl mx-auto">
+              <div className="prose prose-gray max-w-none">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
                 <p className="text-gray-600 mb-10 leading-relaxed">
                   At HAL149, our mission is to democratize access to cutting-edge artificial intelligence solutions by creating tailored applications for specific industries. We believe that the transformative power of AI should be accessible to businesses of all sizes, not just tech giants with vast resources.
@@ -105,7 +101,7 @@ export default function About() {
                 </p>
               </div>
             </div>
-          </section>
+          </div>
         </main>
         
         <Footer />

@@ -13,26 +13,26 @@ export default function BlogSection() {
   });
 
   return (
-    <section className="py-16 md:py-24 bg-neutral-50">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Latest from Our Blog</h2>
-          <p className="text-neutral-600 max-w-2xl mx-auto">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold mb-2">Latest from Our Blog</h2>
+          <p className="text-gray-600 text-sm max-w-2xl mx-auto">
             Stay updated with the latest insights in AI and technology
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {isLoading ? (
             // Skeleton loaders while data is loading
             Array(3).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                <Skeleton className="w-full h-48" />
-                <div className="p-6">
-                  <Skeleton className="h-4 w-1/4 mb-2" />
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-full mb-4" />
-                  <Skeleton className="h-4 w-1/3" />
+              <div key={i} className="bg-white rounded overflow-hidden border border-gray-100">
+                <Skeleton className="w-full h-44" />
+                <div className="p-4">
+                  <Skeleton className="h-3 w-1/4 mb-1" />
+                  <Skeleton className="h-5 w-3/4 mb-1" />
+                  <Skeleton className="h-3 w-full mb-3" />
+                  <Skeleton className="h-3 w-1/3" />
                 </div>
               </div>
             ))
@@ -42,17 +42,17 @@ export default function BlogSection() {
               <BlogCard key={post.id} post={post} />
             ))
           ) : (
-            <div className="col-span-3 text-center py-12">
-              <p className="text-neutral-500">No blog posts available yet.</p>
+            <div className="col-span-3 text-center py-10">
+              <p className="text-gray-500 text-sm">No blog posts available yet.</p>
             </div>
           )}
         </div>
 
-        <div className="text-center mt-12">
-          <Button asChild variant="ghost" className="text-black hover:text-neutral-600">
+        <div className="text-center mt-8">
+          <Button asChild variant="link" className="text-black text-sm font-normal p-0 h-auto">
             <Link href="/blog" className="inline-flex items-center">
               View All Posts
-              <ChevronRight className="w-4 h-4 ml-1" />
+              <ChevronRight className="w-3 h-3 ml-1" />
             </Link>
           </Button>
         </div>

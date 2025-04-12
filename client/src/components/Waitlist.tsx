@@ -53,10 +53,10 @@ export default function Waitlist() {
   }
 
   return (
-    <section id="waitlist" className="py-16 md:py-24 bg-neutral-900 text-white">
+    <section id="waitlist" className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl font-bold mb-4">Join the Waitlist</h2>
-        <p className="text-neutral-300 max-w-2xl mx-auto mb-8">
+        <h2 className="text-2xl font-bold mb-2">Join the Waitlist</h2>
+        <p className="text-gray-600 text-sm max-w-xl mx-auto mb-8">
           Be the first to experience the future of AI. Sign up for early access.
         </p>
         
@@ -71,24 +71,24 @@ export default function Waitlist() {
                     <FormControl>
                       <Input
                         placeholder="Enter your email"
-                        className="px-4 py-3 rounded-md bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent text-white"
+                        className="px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-black"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-left text-red-300 text-sm mt-1" />
+                    <FormMessage className="text-left text-red-500 text-xs mt-1" />
                   </FormItem>
                 )}
               />
               <Button
                 type="submit"
-                className="bg-white text-black hover:bg-neutral-200 transition-colors"
+                className="bg-black text-white hover:bg-gray-800 rounded"
                 disabled={waitlistMutation.isPending}
               >
                 {waitlistMutation.isPending ? "Joining..." : "Join Waitlist"}
               </Button>
             </div>
-            <p className="text-xs text-neutral-400 mt-4">
-              By signing up, you agree to our <Link href="/legal" className="underline hover:text-white transition-colors">Privacy Policy</Link>.
+            <p className="text-xs text-gray-500 mt-3">
+              By signing up, you agree to our <Link href="/legal" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link>.
             </p>
           </form>
         </Form>

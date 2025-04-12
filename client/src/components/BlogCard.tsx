@@ -10,27 +10,27 @@ interface BlogCardProps {
 
 export default function BlogCard({ post }: BlogCardProps) {
   return (
-    <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <article className="bg-white overflow-hidden border border-gray-100 rounded">
       <img 
         src={post.imageUrl} 
         alt={post.title} 
-        className="w-full h-48 object-cover"
+        className="w-full h-44 object-cover"
       />
-      <div className="p-6">
-        <div className="text-sm text-neutral-500 mb-2">{formatDate(post.publishedAt)}</div>
-        <h3 className="text-xl font-semibold mb-2">
-          <Link href={`/blog/${post.slug}`} className="hover:text-neutral-600">
+      <div className="p-4">
+        <div className="text-xs text-gray-500 mb-1">{formatDate(post.publishedAt)}</div>
+        <h3 className="text-base font-medium mb-1">
+          <Link href={`/blog/${post.slug}`}>
             {post.title}
           </Link>
         </h3>
-        <p className="text-neutral-600 mb-4">
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
           {post.excerpt}
         </p>
         <Link 
           href={`/blog/${post.slug}`} 
-          className="text-black inline-flex items-center hover:underline"
+          className="text-sm text-black inline-flex items-center"
         >
-          Read More <ChevronRight className="w-4 h-4 ml-1" />
+          Read More <ChevronRight className="w-3 h-3 ml-1" />
         </Link>
       </div>
     </article>

@@ -9,12 +9,12 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <div className="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-900">
+    <div className="p-8 bg-white rounded-xl border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col">
+      <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center text-gray-900 mb-5">
         {icon}
       </div>
-      <h3 className="mt-4 text-xl font-semibold text-gray-900">{title}</h3>
-      <p className="mt-2 text-gray-600">
+      <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
+      <p className="text-gray-600 text-sm leading-relaxed">
         {description}
       </p>
     </div>
@@ -41,8 +41,17 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="container mx-auto">
+    <section className="py-20 md:py-28 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            Key Features
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Our AI-powered platform offers these powerful capabilities
+          </p>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <FeatureCard

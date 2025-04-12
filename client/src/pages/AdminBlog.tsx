@@ -68,7 +68,7 @@ export default function AdminBlog() {
     excerpt: '',
     content: '',
     imageUrl: '',
-    publishedAt: new Date()
+    publishedAt: new Date().toISOString()
   });
   
   const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
@@ -144,11 +144,11 @@ export default function AdminBlog() {
     }
   });
   
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | Date) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     
     // Auto-generate slug from title if not manually edited
-    if (field === 'title' && !formData.slug) {
+    if (field === 'title' && !formData.slug && typeof value === 'string') {
       setFormData((prev) => ({ ...prev, slug: slugify(value) }));
     }
   };
@@ -160,7 +160,7 @@ export default function AdminBlog() {
       excerpt: '',
       content: '',
       imageUrl: '',
-      publishedAt: new Date()
+      publishedAt: new Date().toISOString()
     });
     setCurrentPostId(null);
     setEditMode(false);
@@ -180,7 +180,7 @@ export default function AdminBlog() {
       excerpt: post.excerpt,
       content: post.content,
       imageUrl: post.imageUrl,
-      publishedAt: post.publishedAt instanceof Date ? post.publishedAt : new Date(post.publishedAt)
+      publishedAt: typeof post.publishedAt === 'string' ? post.publishedAt : new Date(post.publishedAt).toISOString()
     });
     setEditMode(true);
     setIsDialogOpen(true);
@@ -207,9 +207,9 @@ export default function AdminBlog() {
       excerpt: formData.excerpt!,
       content: formData.content!,
       imageUrl: formData.imageUrl!,
-      publishedAt: formData.publishedAt instanceof Date 
-        ? formData.publishedAt 
-        : (formData.publishedAt ? new Date(formData.publishedAt) : new Date())
+      publishedAt: typeof formData.publishedAt === 'string'
+        ? formData.publishedAt
+        : new Date().toISOString()
     };
     
     if (editMode && currentPostId) {
@@ -353,13 +353,36 @@ export default function AdminBlog() {
                       />
                     </div>
                     
-                    <FormField
-                      label="Image URL"
-                      name="imageUrl"
-                      value={formData.imageUrl || ''}
-                      onChange={(value) => handleInputChange('imageUrl', value)}
-                      required
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Image URL"
+                        name="imageUrl"
+                        value={formData.imageUrl || ''}
+                        onChange={(value) => handleInputChange('imageUrl', value)}
+                        required
+                      />
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Published Date <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                          type="date" 
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                          value={typeof formData.publishedAt === 'string'
+                            ? new Date(formData.publishedAt).toISOString().split('T')[0]
+                            : new Date().toISOString().split('T')[0]
+                          }
+                          onChange={(e) => {
+                            // Convert string to Date directly in the form data
+                            setFormData(prev => ({
+                              ...prev,
+                              publishedAt: new Date(e.target.value).toISOString()
+                            }));
+                          }}
+                        />
+                      </div>
+                    </div>
                     
                     <div>
                       <FormField
@@ -390,6 +413,12 @@ export default function AdminBlog() {
                       <>
                         <div className="bg-neutral-50 p-6 rounded-lg mb-6">
                           <h2 className="text-3xl font-bold mb-2">{formData.title}</h2>
+                          <div className="flex items-center gap-2 text-sm text-neutral-500 mb-3">
+                            <span>Published: {typeof formData.publishedAt === 'string'
+                              ? new Date(formData.publishedAt).toLocaleDateString()
+                              : new Date().toLocaleDateString()
+                            }</span>
+                          </div>
                           {formData.excerpt && <p className="text-neutral-600">{formData.excerpt}</p>}
                         </div>
                         

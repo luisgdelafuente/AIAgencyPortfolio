@@ -22,12 +22,13 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url").notNull(),
-  publishedAt: timestamp("published_at").notNull(),
+  publishedAt: text("published_at").notNull(), // Change to text to avoid Date issues
 });
 
-export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
-  id: true,
-});
+export const insertBlogPostSchema = createInsertSchema(blogPosts)
+  .omit({
+    id: true,
+  });
 
 // Project schema
 export const projects = pgTable("projects", {

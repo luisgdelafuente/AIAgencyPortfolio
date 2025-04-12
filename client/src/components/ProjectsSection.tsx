@@ -12,21 +12,23 @@ export default function ProjectsSection() {
   });
 
   return (
-    <section className="py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Featured Projects</h2>
-          <p className="text-neutral-600 max-w-2xl mx-auto">
+    <section className="py-12 md:py-16 bg-white">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            Featured Projects
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
             See how our AI solutions are transforming industries
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
           {isLoading ? (
             // Skeleton loaders while data is loading
             Array(2).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg overflow-hidden border border-neutral-200">
-                <Skeleton className="w-full h-56" />
+              <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm">
+                <Skeleton className="w-full h-64" />
                 <div className="p-6">
                   <Skeleton className="h-4 w-1/4 mb-4" />
                   <Skeleton className="h-6 w-3/4 mb-2" />
@@ -42,13 +44,13 @@ export default function ProjectsSection() {
             ))
           ) : (
             <div className="col-span-2 text-center py-12">
-              <p className="text-neutral-500">No projects available yet.</p>
+              <p className="text-gray-500">No projects available yet.</p>
             </div>
           )}
         </div>
 
-        <div className="text-center mt-12">
-          <Button asChild variant="outline" className="border-neutral-300 text-black hover:bg-neutral-100">
+        <div className="mt-10 text-center">
+          <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
             <Link href="/projects">View All Projects</Link>
           </Button>
         </div>

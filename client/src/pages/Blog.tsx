@@ -22,47 +22,42 @@ export default function Blog() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow">
-          <section className="bg-neutral-50 py-16 md:py-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+        <main className="flex-grow pt-28">
+          <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6">
                 Our Blog
               </h1>
-              <p className="text-neutral-600 text-lg md:text-xl max-w-3xl mx-auto">
+              <p className="text-lg text-gray-600">
                 Insights and updates from the cutting edge of AI technology
               </p>
             </div>
-          </section>
-          
-          <section className="py-16 md:py-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {isLoading ? (
-                  // Skeleton loaders while data is loading
-                  Array(6).fill(0).map((_, i) => (
-                    <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                      <Skeleton className="w-full h-48" />
-                      <div className="p-6">
-                        <Skeleton className="h-4 w-1/4 mb-2" />
-                        <Skeleton className="h-6 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-full mb-4" />
-                        <Skeleton className="h-4 w-1/3" />
-                      </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+              {isLoading ? (
+                // Skeleton loaders while data is loading
+                Array(4).fill(0).map((_, i) => (
+                  <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
+                    <Skeleton className="w-full h-48" />
+                    <div className="p-6">
+                      <Skeleton className="h-4 w-1/4 mb-3" />
+                      <Skeleton className="h-6 w-3/4 mb-3" />
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <Skeleton className="h-4 w-1/3" />
                     </div>
-                  ))
-                ) : posts && posts.length > 0 ? (
-                  // Display posts
-                  posts.map((post) => (
-                    <BlogCard key={post.id} post={post} />
-                  ))
-                ) : (
-                  <div className="col-span-3 text-center py-12">
-                    <p className="text-neutral-500">No blog posts available yet.</p>
                   </div>
-                )}
-              </div>
+                ))
+              ) : posts && posts.length > 0 ? (
+                posts.map((post) => (
+                  <BlogCard key={post.id} post={post} />
+                ))
+              ) : (
+                <div className="col-span-2 text-center py-12">
+                  <p className="text-gray-500">No blog posts available yet.</p>
+                </div>
+              )}
             </div>
-          </section>
+          </div>
         </main>
         
         <Footer />

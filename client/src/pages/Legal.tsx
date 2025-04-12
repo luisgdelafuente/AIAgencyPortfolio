@@ -15,20 +15,18 @@ export default function Legal() {
       <div className="min-h-screen flex flex-col">
         <Header />
         
-        <main className="flex-grow">
-          <section className="bg-neutral-50 py-16 md:py-24">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+        <main className="flex-grow pt-28">
+          <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-6">
                 Legal Documents
               </h1>
-              <p className="text-neutral-600 text-lg md:text-xl max-w-3xl mx-auto">
+              <p className="text-lg text-gray-600">
                 Our privacy policy, terms of service, and other legal information
               </p>
             </div>
-          </section>
-          
-          <section className="py-16 md:py-24">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div>
               <Tabs defaultValue="privacy">
                 <TabsList className="grid w-full grid-cols-2 mb-8">
                   <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>
@@ -131,7 +129,7 @@ export default function Legal() {
                 </TabsContent>
               </Tabs>
             </div>
-          </section>
+          </div>
         </main>
         
         <Footer />

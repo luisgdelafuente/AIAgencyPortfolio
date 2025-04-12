@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Globe, Menu, X } from 'lucide-react';
+import { Globe, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const HAL149Logo = () => (
-  <svg className="h-8 w-auto" viewBox="0 0 120 40" fill="currentColor">
-    <path d="M30,10 L30,30 M10,10 L10,30 M10,20 L30,20 M40,10 Q50,10 50,20 Q50,30 40,30" stroke="currentColor" strokeWidth="4" fill="none" />
-    <text x="60" y="25" fontFamily="Arial" fontSize="15" fontWeight="bold">HAL149</text>
-  </svg>
+  <div className="flex items-center">
+    <img src="/hallogoblack480.webp" alt="HAL149" className="h-9 sm:h-10 w-auto" />
+  </div>
 );
 
 export default function Header() {
@@ -28,11 +27,11 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+    <header className="fixed w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 py-1">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center" aria-label="HAL149 home">
+            <Link href="/" className="flex items-center hover:opacity-90 transition-opacity" aria-label="HAL149 home">
               <HAL149Logo />
             </Link>
           </div>
@@ -43,44 +42,55 @@ export default function Header() {
               <Link 
                 key={link.href} 
                 href={link.href}
-                className={`text-neutral-600 hover:text-neutral-900 transition-colors ${
-                  isActive(link.href) ? 'font-medium text-neutral-900' : ''
+                className={`text-sm font-medium ${
+                  isActive(link.href) 
+                    ? 'text-gray-900' 
+                    : 'text-gray-600 hover:text-gray-900 transition-colors duration-200'
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <Button variant="ghost" size="sm" className="text-neutral-600 hover:text-neutral-900">
-              <Globe className="h-4 w-4 mr-2" /> EN
-            </Button>
+            <div className="pl-2 border-l border-gray-200">
+              <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium">
+                <Globe className="h-4 w-4 mr-1.5" /> EN
+              </Button>
+            </div>
           </nav>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="sm" className="hover:bg-gray-100 rounded-lg">
+                  <Menu className="h-5 w-5" />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[240px] sm:w-[300px]">
-                <div className="flex flex-col gap-6 mt-6">
+              <SheetContent side="right" className="w-[280px] border-l border-gray-200">
+                <div className="flex flex-col gap-6 mt-4">
+                  <Link href="/" className="flex items-center mb-2" onClick={() => setOpen(false)}>
+                    <img src="/hallogoblack480.webp" alt="HAL149" className="h-8 w-auto" />
+                  </Link>
                   {navLinks.map((link) => (
                     <Link 
                       key={link.href} 
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-neutral-600 hover:text-neutral-900 transition-colors ${
-                        isActive(link.href) ? 'font-medium text-neutral-900' : ''
+                      className={`text-base font-medium ${
+                        isActive(link.href) 
+                          ? 'text-gray-900' 
+                          : 'text-gray-600 hover:text-gray-900'
                       }`}
                     >
                       {link.label}
                     </Link>
                   ))}
-                  <Button variant="ghost" size="sm" className="text-neutral-600 hover:text-neutral-900 justify-start px-0">
-                    <Globe className="h-4 w-4 mr-2" /> EN
-                  </Button>
+                  <div className="pt-4 mt-2 border-t border-gray-200">
+                    <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-gray-900 justify-start px-0 font-medium">
+                      <Globe className="h-4 w-4 mr-1.5" /> English
+                    </Button>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

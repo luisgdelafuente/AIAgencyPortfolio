@@ -13,11 +13,13 @@ export default function BlogSection() {
   });
 
   return (
-    <section className="py-16 md:py-24 bg-neutral-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Latest from Our Blog</h2>
-          <p className="text-neutral-600 max-w-2xl mx-auto">
+    <section className="py-12 md:py-16 bg-gray-50">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+            Latest from Our Blog
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
             Stay updated with the latest insights in AI and technology
           </p>
         </div>
@@ -26,11 +28,11 @@ export default function BlogSection() {
           {isLoading ? (
             // Skeleton loaders while data is loading
             Array(3).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm">
                 <Skeleton className="w-full h-48" />
                 <div className="p-6">
-                  <Skeleton className="h-4 w-1/4 mb-2" />
-                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-1/4 mb-3" />
+                  <Skeleton className="h-6 w-3/4 mb-3" />
                   <Skeleton className="h-4 w-full mb-4" />
                   <Skeleton className="h-4 w-1/3" />
                 </div>
@@ -43,17 +45,14 @@ export default function BlogSection() {
             ))
           ) : (
             <div className="col-span-3 text-center py-12">
-              <p className="text-neutral-500">No blog posts available yet.</p>
+              <p className="text-gray-500">No blog posts available yet.</p>
             </div>
           )}
         </div>
 
-        <div className="text-center mt-12">
-          <Button asChild variant="ghost" className="text-black hover:text-neutral-600">
-            <Link href="/blog" className="inline-flex items-center">
-              View All Posts
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Link>
+        <div className="mt-10 text-center">
+          <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
+            <Link href="/blog">View All Posts</Link>
           </Button>
         </div>
       </div>

@@ -15,7 +15,7 @@ const HAL149Logo = () => (
 export default function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-gray-100 py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10 lg:gap-16 mb-14">
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center mb-5 hover:opacity-90 transition-opacity">

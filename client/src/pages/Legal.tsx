@@ -16,8 +16,8 @@ export default function Legal() {
         <Header />
         
         <main className="flex-grow pt-20">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto mb-12">
+          <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12">
               <h1 className="text-4xl font-bold text-gray-900 mb-6">
                 Legal Documents
               </h1>
@@ -26,7 +26,7 @@ export default function Legal() {
               </p>
             </div>
             
-            <div className="max-w-4xl mx-auto">
+            <div>
               <Tabs defaultValue="privacy">
                 <TabsList className="grid w-full grid-cols-2 mb-8">
                   <TabsTrigger value="privacy">Privacy Policy</TabsTrigger>

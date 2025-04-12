@@ -4,22 +4,23 @@ import { Button } from '@/components/ui/button';
 
 export default function Hero() {
   return (
-    <section className="bg-neutral-50 py-16 md:py-24">
+    <section className="py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="mb-2 text-neutral-500">
-          <span className="bg-neutral-100 px-3 py-1 rounded-full text-sm">Coming Soon</span>
+        <div className="mb-4 text-gray-500">
+          <span className="text-sm">Coming Soon</span>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+        <h1 className="text-4xl font-bold tracking-tight mb-5">
           Industry-Specific AI Applications
         </h1>
-        <p className="text-neutral-600 text-lg md:text-xl max-w-3xl mx-auto mb-8">
-          Transform data into insights, automate workflows, and stay ahead of the competition.
+        <p className="text-gray-600 max-w-2xl mx-auto mb-8 text-base">
+          Transform data into insights, automate workflows, and stay ahead
+          <br />of the competition.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" className="bg-black text-white hover:bg-neutral-800">
+          <Button asChild size="default" className="bg-black text-white hover:bg-neutral-800 rounded">
             <Link href="/blog">Read Our Blog</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="bg-white text-black border-neutral-300 hover:bg-neutral-100">
+          <Button asChild variant="outline" size="default" className="text-black border-gray-200 hover:bg-gray-50 rounded">
             <a href="#waitlist">Join Waitlist</a>
           </Button>
         </div>

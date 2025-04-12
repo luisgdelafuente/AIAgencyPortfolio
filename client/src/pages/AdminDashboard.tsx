@@ -40,14 +40,14 @@ export default function AdminDashboard() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="flex h-screen bg-neutral-50">
+      <div className="min-h-screen bg-neutral-50">
         <AdminNav />
         
-        <div className="flex-1 overflow-auto">
-          <div className="p-8">
-            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        <div className="lg:ml-64 h-full">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 pt-2 lg:pt-0">Dashboard</h1>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
@@ -76,7 +76,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="sm:col-span-2 lg:col-span-1">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Waitlist Subscribers</CardTitle>
                   <Users className="h-4 w-4 text-neutral-500" />
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
               </Card>
             </div>
             
-            <Card className="mb-8">
+            <Card className="mb-6 sm:mb-8">
               <CardHeader>
                 <CardTitle>Welcome to the Admin Dashboard</CardTitle>
               </CardHeader>
@@ -99,8 +99,8 @@ export default function AdminDashboard() {
                 <p className="mb-4">
                   From here, you can manage your website content including blog posts, projects, and view waitlist subscribers.
                 </p>
-                <p>
-                  Use the navigation panel on the left to access different sections of the admin dashboard.
+                <p className="hidden sm:block">
+                  Use the navigation panel to access different sections of the admin dashboard.
                 </p>
               </CardContent>
             </Card>

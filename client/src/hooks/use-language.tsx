@@ -21,12 +21,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (savedLanguage === 'en' || savedLanguage === 'es') {
       setLanguageState(savedLanguage);
     } else {
-      // Try to detect browser language
-      const browserLang = navigator.language.split('-')[0];
-      if (browserLang === 'es') {
-        setLanguageState('es');
-      }
-      // Default is already 'en'
+      // Always default to English
+      setLanguageState('en');
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, 'en');
     }
   }, []);
   

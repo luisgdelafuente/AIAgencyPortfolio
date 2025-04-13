@@ -180,7 +180,7 @@ export default function AdminBlog() {
       excerpt: post.excerpt,
       content: post.content,
       imageUrl: post.imageUrl,
-      publishedAt: typeof post.publishedAt === 'string' ? post.publishedAt : new Date(post.publishedAt).toISOString()
+      publishedAt: post.publishedAt
     });
     setEditMode(true);
     setIsDialogOpen(true);

@@ -26,8 +26,18 @@ export default function Hero() {
         const response = await fetch('/api/page-contents/home');
         if (response.ok) {
           const data = await response.json();
-          const parsedContent = JSON.parse(data.content);
-          setContent(parsedContent);
+          // Handle both JSON string and object formats
+          if (typeof data.content === 'string') {
+            try {
+              const parsedContent = JSON.parse(data.content);
+              setContent(parsedContent);
+            } catch (e) {
+              console.error('Error parsing JSON content:', e);
+            }
+          } else if (typeof data.content === 'object') {
+            // Content is already an object (JSONB from Supabase)
+            setContent(data.content);
+          }
         }
       } catch (error) {
         console.log('Error fetching home content:', error);

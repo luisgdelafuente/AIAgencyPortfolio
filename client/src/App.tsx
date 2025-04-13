@@ -16,6 +16,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProjects from "@/pages/AdminProjects";
 import AdminBlog from "@/pages/AdminBlog";
 import AdminWaitlist from "@/pages/AdminWaitlist";
+import AdminContent from "@/pages/AdminContent";
 import React from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -35,6 +36,7 @@ function Router() {
       <ProtectedRoute path="/admin/dashboard" component={AdminDashboard} />
       <ProtectedRoute path="/admin/projects" component={AdminProjects} />
       <ProtectedRoute path="/admin/blog" component={AdminBlog} />
+      <ProtectedRoute path="/admin/content" component={AdminContent} />
       <ProtectedRoute path="/admin/waitlist" component={AdminWaitlist} />
       <Route component={NotFound} />
     </Switch>

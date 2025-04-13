@@ -1,4 +1,7 @@
--- SQL to create the page_contents table in Supabase
+-- SQL to create page_contents table in Supabase
+-- Copy this entire file and run it in the Supabase SQL Editor
+
+-- Create the page_contents table with the exact schema that matches our app
 CREATE TABLE IF NOT EXISTS page_contents (
   id SERIAL PRIMARY KEY,
   page TEXT NOT NULL UNIQUE,
@@ -22,3 +25,14 @@ VALUES
    '{"title":"Legal Information","sections":[{"title":"Privacy Policy","content":"We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you."},{"title":"Terms of Service","content":"By accessing our website and services, you agree to these terms of service. Please read them carefully. If you do not agree with these terms, you should not use our website or services."},{"title":"Cookie Policy","content":"Our website uses cookies to distinguish you from other users of our website. This helps us to provide you with a good experience when you browse our website and also allows us to improve our site."}]}',
    CURRENT_TIMESTAMP)
 ON CONFLICT (page) DO NOTHING;
+
+-- Enable RLS but allow public access
+ALTER TABLE page_contents ENABLE ROW LEVEL SECURITY;
+
+-- Create policy that allows all operations for now
+CREATE POLICY "Public Access" ON page_contents
+  USING (true)
+  WITH CHECK (true);
+
+-- Verify that the table exists and has data
+SELECT * FROM page_contents;

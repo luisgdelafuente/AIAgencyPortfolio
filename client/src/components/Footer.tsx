@@ -71,6 +71,7 @@ export default function Footer() {
             © {new Date().getFullYear()} HAL149. All rights reserved.
           </p>
           <div className="flex space-x-8 mt-4 md:mt-0">
+            <span className="text-gray-500 text-sm">v.0.1.0</span>
             <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Privacy Policy</Link>
             <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Terms of Service</Link>
           </div>

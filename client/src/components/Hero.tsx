@@ -64,7 +64,7 @@ export default function Hero() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="px-6 py-3 bg-black text-white rounded-md font-medium">
-              <Link href="/blog">Read Our Blog</Link>
+              <Link href="/blog/">Read Our Blog</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="px-6 py-3 rounded-md border border-gray-300 text-gray-700 hover:border-gray-400">
               <a href="#waitlist">{content.heroCta}</a>

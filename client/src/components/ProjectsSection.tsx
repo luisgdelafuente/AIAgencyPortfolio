@@ -90,7 +90,7 @@ export default function ProjectsSection() {
 
         <div className="mt-10 text-center">
           <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
-            <Link href="/projects">{content.projectsCta || "View All Projects"}</Link>
+            <Link href="/projects/">{content.projectsCta || "View All Projects"}</Link>
           </Button>
         </div>
       </div>

@@ -25,19 +25,19 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/projects" component={Projects} />
-      <Route path="/projects/:slug" component={ProjectDetail} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:slug" component={BlogPost} />
-      <Route path="/about" component={About} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/legal" component={Legal} />
-      <Route path="/admin" component={AuthPage} />
-      <ProtectedRoute path="/admin/dashboard" component={AdminDashboard} />
-      <ProtectedRoute path="/admin/projects" component={AdminProjects} />
-      <ProtectedRoute path="/admin/blog" component={AdminBlog} />
-      <ProtectedRoute path="/admin/content" component={AdminContent} />
-      <ProtectedRoute path="/admin/waitlist" component={AdminWaitlist} />
+      <Route path="/projects/" component={Projects} />
+      <Route path="/projects/:slug/" component={ProjectDetail} />
+      <Route path="/blog/" component={Blog} />
+      <Route path="/blog/:slug/" component={BlogPost} />
+      <Route path="/about/" component={About} />
+      <Route path="/contact/" component={Contact} />
+      <Route path="/legal/" component={Legal} />
+      <Route path="/admin/" component={AuthPage} />
+      <ProtectedRoute path="/admin/dashboard/" component={AdminDashboard} />
+      <ProtectedRoute path="/admin/projects/" component={AdminProjects} />
+      <ProtectedRoute path="/admin/blog/" component={AdminBlog} />
+      <ProtectedRoute path="/admin/content/" component={AdminContent} />
+      <ProtectedRoute path="/admin/waitlist/" component={AdminWaitlist} />
       <Route component={NotFound} />
     </Switch>
   );

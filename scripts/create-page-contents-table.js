@@ -1,5 +1,5 @@
 // Script to create the page_contents table in Supabase
-import { supabase } from '../server/supabase.js';
+import { supabase } from '../server/supabase';
 
 async function createPageContentsTable() {
   console.log('Creating page_contents table in Supabase...');

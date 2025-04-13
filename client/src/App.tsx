@@ -19,7 +19,7 @@ import AdminWaitlist from "@/pages/AdminWaitlist";
 import AdminContent from "@/pages/AdminContent";
 import React from "react";
 import { AuthProvider } from "@/hooks/use-auth";
-import { ProtectedRoute } from "@/lib/protected-route";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (

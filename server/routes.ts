@@ -254,9 +254,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/page-contents", async (req, res) => {
     try {
       const contents = await storage.getAllPageContents();
-      res.json(contents);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch page contents", error });
+      res.json(contents || []);
+    } catch (error: any) {
+      console.error('Error getting all page contents:', error);
+      res.status(500).json({ 
+        message: `Failed to fetch page contents: ${error.message}`,
+        error: error.toString()
+      });
     }
   });
 
@@ -264,11 +268,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const content = await storage.getPageContent(req.params.page);
       if (!content) {
-        return res.status(404).json({ message: "Page content not found" });
+        return res.status(404).json({ 
+          message: "Page content not found",
+          page: req.params.page
+        });
       }
       res.json(content);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch page content", error });
+    } catch (error: any) {
+      console.error(`Error getting page content for ${req.params.page}:`, error);
+      res.status(500).json({ 
+        message: `Failed to fetch page content: ${error.message}`,
+        page: req.params.page,
+        error: error.toString()
+      });
     }
   });
 
@@ -280,13 +292,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Page name and content are required" });
       }
       
+      console.log(`Updating content for page: ${page}`);
       const pageContent = await storage.upsertPageContent(page, content);
       res.status(201).json(pageContent);
-    } catch (error) {
+    } catch (error: any) {
+      console.error(`Error updating page content:`, error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: "Validation error", error: fromZodError(error) });
       }
-      res.status(500).json({ message: "Failed to create/update page content", error });
+      res.status(500).json({ 
+        message: `Failed to create/update page content: ${error.message}`,
+        error: error.toString()
+      });
     }
   });
 

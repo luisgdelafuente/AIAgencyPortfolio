@@ -541,83 +541,136 @@ export class SupabaseStorage implements IStorage {
   }
   
   // Page content methods
+  private inMemoryPageContents: Map<string, PageContent> = new Map();
+  
   async getPageContent(page: string): Promise<PageContent | undefined> {
-    const { data, error } = await supabase
-      .from('page_contents')
-      .select('*')
-      .eq('page', page)
-      .single();
-    
-    if (error || !data) return undefined;
-    
-    // Map snake_case to camelCase
-    return {
-      ...data,
-      updatedAt: data.updated_at
-    } as PageContent;
+    try {
+      const { data, error } = await supabase
+        .from('page_contents')
+        .select('*')
+        .eq('page', page)
+        .single();
+      
+      if (error) {
+        console.log(`Error fetching page content from DB: ${error.message}`);
+        console.log(`Using in-memory content for ${page}`);
+        return this.inMemoryPageContents.get(page);
+      }
+      
+      // Map snake_case to camelCase
+      return {
+        ...data,
+        updatedAt: data.updated_at
+      } as PageContent;
+    } catch (error) {
+      console.log(`Error in getPageContent: ${error}`);
+      return this.inMemoryPageContents.get(page);
+    }
   }
   
   async getAllPageContents(): Promise<PageContent[]> {
-    const { data, error } = await supabase
-      .from('page_contents')
-      .select('*')
-      .order('updated_at', { ascending: false });
-    
-    if (error) throw new Error(`Failed to fetch page contents: ${error.message}`);
-    
-    // Map snake_case to camelCase
-    return data.map(content => ({
-      ...content,
-      updatedAt: content.updated_at
-    })) as PageContent[];
+    try {
+      const { data, error } = await supabase
+        .from('page_contents')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      
+      if (error) {
+        console.log(`Error fetching all page contents: ${error.message}`);
+        console.log('Using in-memory page contents');
+        return Array.from(this.inMemoryPageContents.values());
+      }
+      
+      // Map snake_case to camelCase
+      return data.map(content => ({
+        ...content,
+        updatedAt: content.updated_at
+      })) as PageContent[];
+    } catch (error) {
+      console.log(`Error in getAllPageContents: ${error}`);
+      return Array.from(this.inMemoryPageContents.values());
+    }
   }
   
   async upsertPageContent(page: string, content: string): Promise<PageContent> {
-    // Check if the page content already exists
-    const existingContent = await this.getPageContent(page);
-    
-    if (existingContent) {
-      // Update existing content
-      const contentData = {
-        content,
-        updated_at: new Date().toISOString()
-      };
+    try {
+      // Check if the page content already exists
+      const existingContent = await this.getPageContent(page);
       
-      const { data, error } = await supabase
-        .from('page_contents')
-        .update(contentData)
-        .eq('id', existingContent.id)
-        .select()
-        .single();
+      if (existingContent && !this.inMemoryPageContents.has(page)) {
+        // Update existing content in DB
+        const contentData = {
+          content,
+          updated_at: new Date().toISOString()
+        };
+        
+        const { data, error } = await supabase
+          .from('page_contents')
+          .update(contentData)
+          .eq('id', existingContent.id)
+          .select()
+          .single();
+        
+        if (error || !data) {
+          throw new Error(`Failed to update page content: ${error?.message}`);
+        }
+        
+        // Map snake_case to camelCase
+        const updatedContent = {
+          ...data,
+          updatedAt: data.updated_at
+        } as PageContent;
+        
+        return updatedContent;
+      } else {
+        try {
+          // Try to create new content in DB
+          const contentData = {
+            page,
+            content,
+            updated_at: new Date().toISOString()
+          };
+          
+          const { data, error } = await supabase
+            .from('page_contents')
+            .insert(contentData)
+            .select()
+            .single();
+          
+          if (error) {
+            throw new Error(`Failed to create page content in DB: ${error.message}`);
+          }
+          
+          // Map snake_case to camelCase
+          const newContent = {
+            ...data,
+            updatedAt: data.updated_at
+          } as PageContent;
+          
+          return newContent;
+        } catch (error) {
+          console.log(`Error creating page content in DB: ${error}`);
+          console.log(`Storing page content for "${page}" in memory`);
+          
+          // Fallback to in-memory storage
+          const id = this.inMemoryPageContents.size + 1;
+          const updatedAt = new Date();
+          const newContent: PageContent = { id, page, content, updatedAt };
+          
+          this.inMemoryPageContents.set(page, newContent);
+          return newContent;
+        }
+      }
+    } catch (error) {
+      console.log(`Error in upsertPageContent: ${error}`);
       
-      if (error || !data) throw new Error(`Failed to update page content: ${error?.message}`);
+      // Fallback to in-memory storage
+      const id = this.inMemoryPageContents.size + 1;
+      const updatedAt = new Date();
+      const newContent: PageContent = { id, page, content, updatedAt };
       
-      // Map snake_case to camelCase
-      return {
-        ...data,
-        updatedAt: data.updated_at
-      } as PageContent;
-    } else {
-      // Create new content
-      const contentData = {
-        page,
-        content,
-        updated_at: new Date().toISOString()
-      };
-      
-      const { data, error } = await supabase
-        .from('page_contents')
-        .insert(contentData)
-        .select()
-        .single();
-      
-      if (error) throw new Error(`Failed to create page content: ${error.message}`);
-      
-      // Map snake_case to camelCase
-      return {
-        ...data,
-        updatedAt: data.updated_at
-      } as PageContent;
+      this.inMemoryPageContents.set(page, newContent);
+      return newContent;
     }
   }
 }

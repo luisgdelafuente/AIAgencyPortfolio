@@ -334,9 +334,15 @@ export class SupabaseStorage implements IStorage {
   }
 
   async createProject(project: InsertProject): Promise<Project> {
+    // Ensure isFeatured is explicitly set to handle the null case
+    const projectData = {
+      ...project,
+      isFeatured: project.isFeatured === undefined ? false : project.isFeatured
+    };
+    
     const { data, error } = await supabase
       .from('projects')
-      .insert(project)
+      .insert(projectData)
       .select()
       .single();
     
@@ -345,9 +351,15 @@ export class SupabaseStorage implements IStorage {
   }
 
   async updateProject(id: number, project: InsertProject): Promise<Project | undefined> {
+    // Ensure isFeatured is explicitly set to handle the null case
+    const projectData = {
+      ...project,
+      isFeatured: project.isFeatured === undefined ? false : project.isFeatured
+    };
+    
     const { data, error } = await supabase
       .from('projects')
-      .update(project)
+      .update(projectData)
       .eq('id', id)
       .select()
       .single();

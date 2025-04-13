@@ -57,6 +57,19 @@ export const insertWaitlistSchema = createInsertSchema(waitlist).pick({
   email: true,
 });
 
+// Page content schema for static pages
+export const pageContents = pgTable("page_contents", {
+  id: serial("id").primaryKey(),
+  page: text("page").notNull().unique(), // home, about, legal, contact
+  content: text("content").notNull(), // JSON stringified content
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+export const insertPageContentSchema = createInsertSchema(pageContents).omit({
+  id: true,
+  updatedAt: true
+});
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -69,3 +82,6 @@ export type InsertProject = z.infer<typeof insertProjectSchema>;
 
 export type WaitlistEntry = typeof waitlist.$inferSelect;
 export type InsertWaitlistEntry = z.infer<typeof insertWaitlistSchema>;
+
+export type PageContent = typeof pageContents.$inferSelect;
+export type InsertPageContent = z.infer<typeof insertPageContentSchema>;

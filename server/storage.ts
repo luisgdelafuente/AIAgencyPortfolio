@@ -2,7 +2,8 @@ import {
   users, type User, type InsertUser,
   blogPosts, type BlogPost, type InsertBlogPost,
   projects, type Project, type InsertProject,
-  waitlist, type WaitlistEntry, type InsertWaitlistEntry
+  waitlist, type WaitlistEntry, type InsertWaitlistEntry,
+  pageContents, type PageContent, type InsertPageContent
 } from "@shared/schema";
 
 export interface IStorage {
@@ -31,6 +32,11 @@ export interface IStorage {
   // Waitlist methods
   addToWaitlist(entry: InsertWaitlistEntry): Promise<WaitlistEntry>;
   getWaitlistEntries(): Promise<WaitlistEntry[]>;
+  
+  // Page content methods
+  getPageContent(page: string): Promise<PageContent | undefined>;
+  getAllPageContents(): Promise<PageContent[]>;
+  upsertPageContent(page: string, content: string): Promise<PageContent>;
 }
 
 export class MemStorage implements IStorage {
@@ -188,6 +194,46 @@ export class MemStorage implements IStorage {
   async getWaitlistEntries(): Promise<WaitlistEntry[]> {
     return Array.from(this.waitlistEntries.values())
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  }
+  
+  // Page content methods
+  private pageContents: Map<string, PageContent> = new Map();
+  
+  async getPageContent(page: string): Promise<PageContent | undefined> {
+    return Array.from(this.pageContents.values()).find(
+      (content) => content.page === page
+    );
+  }
+  
+  async getAllPageContents(): Promise<PageContent[]> {
+    return Array.from(this.pageContents.values())
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }
+  
+  async upsertPageContent(page: string, content: string): Promise<PageContent> {
+    const existingContent = await this.getPageContent(page);
+    
+    if (existingContent) {
+      // Update existing content
+      const updatedContent: PageContent = {
+        ...existingContent,
+        content,
+        updatedAt: new Date()
+      };
+      this.pageContents.set(existingContent.id.toString(), updatedContent);
+      return updatedContent;
+    } else {
+      // Create new content
+      const id = this.pageContents.size + 1;
+      const newContent: PageContent = {
+        id,
+        page,
+        content,
+        updatedAt: new Date()
+      };
+      this.pageContents.set(id.toString(), newContent);
+      return newContent;
+    }
   }
 }
 
@@ -492,6 +538,87 @@ export class SupabaseStorage implements IStorage {
     
     if (error) throw new Error(`Failed to fetch waitlist entries: ${error.message}`);
     return data as WaitlistEntry[];
+  }
+  
+  // Page content methods
+  async getPageContent(page: string): Promise<PageContent | undefined> {
+    const { data, error } = await supabase
+      .from('page_contents')
+      .select('*')
+      .eq('page', page)
+      .single();
+    
+    if (error || !data) return undefined;
+    
+    // Map snake_case to camelCase
+    return {
+      ...data,
+      updatedAt: data.updated_at
+    } as PageContent;
+  }
+  
+  async getAllPageContents(): Promise<PageContent[]> {
+    const { data, error } = await supabase
+      .from('page_contents')
+      .select('*')
+      .order('updated_at', { ascending: false });
+    
+    if (error) throw new Error(`Failed to fetch page contents: ${error.message}`);
+    
+    // Map snake_case to camelCase
+    return data.map(content => ({
+      ...content,
+      updatedAt: content.updated_at
+    })) as PageContent[];
+  }
+  
+  async upsertPageContent(page: string, content: string): Promise<PageContent> {
+    // Check if the page content already exists
+    const existingContent = await this.getPageContent(page);
+    
+    if (existingContent) {
+      // Update existing content
+      const contentData = {
+        content,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { data, error } = await supabase
+        .from('page_contents')
+        .update(contentData)
+        .eq('id', existingContent.id)
+        .select()
+        .single();
+      
+      if (error || !data) throw new Error(`Failed to update page content: ${error?.message}`);
+      
+      // Map snake_case to camelCase
+      return {
+        ...data,
+        updatedAt: data.updated_at
+      } as PageContent;
+    } else {
+      // Create new content
+      const contentData = {
+        page,
+        content,
+        updated_at: new Date().toISOString()
+      };
+      
+      const { data, error } = await supabase
+        .from('page_contents')
+        .insert(contentData)
+        .select()
+        .single();
+      
+      if (error) throw new Error(`Failed to create page content: ${error.message}`);
+      
+      // Map snake_case to camelCase
+      return {
+        ...data,
+        updatedAt: data.updated_at
+      } as PageContent;
+    }
   }
 }
 

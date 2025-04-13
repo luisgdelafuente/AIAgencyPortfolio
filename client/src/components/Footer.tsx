@@ -11,7 +11,7 @@ const HAL149Logo = () => (
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-50 border-t border-gray-100 py-16">
+    <footer className="bg-gray-50 border-t border-gray-100 py-16 mt-16">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10 lg:gap-16 mb-14">
           <div className="md:col-span-2">
@@ -43,17 +43,17 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">Company</h3>
             <ul className="space-y-3">
-              <li><Link href="/about" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">About</Link></li>
-              <li><Link href="/blog" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Blog</Link></li>
-              <li><Link href="/legal" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Legal</Link></li>
+              <li><Link href="/about/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">About</Link></li>
+              <li><Link href="/blog/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Blog</Link></li>
+              <li><Link href="/legal/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Legal</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">Resources</h3>
             <ul className="space-y-3">
-              <li><Link href="/projects" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Projects</Link></li>
-              <li><Link href="/contact" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Contact</Link></li>
+              <li><Link href="/projects/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Projects</Link></li>
+              <li><Link href="/contact/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Contact</Link></li>
               <li><a href="#" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Documentation</a></li>
             </ul>
           </div>
@@ -71,8 +71,8 @@ export default function Footer() {
             © {new Date().getFullYear()} HAL149. All rights reserved.
           </p>
           <div className="flex space-x-8 mt-4 md:mt-0">
-            <Link href="/legal" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Privacy Policy</Link>
-            <Link href="/legal" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Terms of Service</Link>
+            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Privacy Policy</Link>
+            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

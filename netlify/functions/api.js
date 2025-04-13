@@ -9,6 +9,11 @@ const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
+// Log status of environment variables (without revealing values)
+console.log('Environment variables check:');
+console.log('SUPABASE_URL present:', !!supabaseUrl);
+console.log('SUPABASE_KEY present:', !!supabaseKey);
+
 // Initialize Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -24,14 +29,20 @@ app.get('/api/auth/check', async (req, res) => {
 // Blog routes
 app.get('/api/blog', async (req, res) => {
   try {
+    console.log('Fetching blog posts...');
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*')
       .order('published_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching blog posts:', error);
+      throw error;
+    }
+    console.log('Blog posts retrieved:', data?.length || 0);
     res.json(data);
   } catch (error) {
+    console.error('Blog request failed:', error.message);
     res.status(500).json({ error: error.message });
   }
 });

@@ -12,7 +12,12 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
+  // Adjust URL for Netlify deployment if needed
+  const adjustedUrl = process.env.NODE_ENV === 'production' && url.startsWith('/api/') 
+    ? `/.netlify/functions/api${url.substring(4)}` 
+    : url;
+  
+  const res = await fetch(adjustedUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -29,7 +34,13 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
+    // Adjust URL for Netlify deployment if needed
+    const url = queryKey[0] as string;
+    const adjustedUrl = process.env.NODE_ENV === 'production' && url.startsWith('/api/') 
+      ? `/.netlify/functions/api${url.substring(4)}` 
+      : url;
+      
+    const res = await fetch(adjustedUrl, {
       credentials: "include",
     });
 
@@ -46,12 +57,12 @@ export const queryClient = new QueryClient({
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
-      refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      refetchOnWindowFocus: true,  // Enable refetch on window focus
+      staleTime: 5 * 60 * 1000,    // 5 minutes instead of Infinity
+      retry: 1,                    // Allow 1 retry on failure
     },
     mutations: {
-      retry: false,
+      retry: 1,                    // Allow 1 retry on failure
     },
   },
 });

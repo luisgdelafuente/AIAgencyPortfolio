@@ -410,5 +410,141 @@ export class SupabaseStorage implements IStorage {
   }
 }
 
-// Change to use Supabase storage
+// Initial implementation using Supabase with fallback to MemStorage
+class HybridStorage implements IStorage {
+  private supabaseStorage: SupabaseStorage;
+  private memStorage: MemStorage;
+  private useSupabase: boolean = true;
+  
+  constructor() {
+    this.supabaseStorage = new SupabaseStorage();
+    this.memStorage = new MemStorage();
+    
+    // Check if Supabase tables exist and switch to memory storage if not
+    this.checkSupabaseTables();
+  }
+  
+  private async checkSupabaseTables() {
+    try {
+      // Try to access users table to check if Supabase is configured
+      await this.supabaseStorage.getUser(1);
+      console.log('✅ Supabase connection successful - using Supabase storage');
+    } catch (error) {
+      console.log('⚠️ Supabase tables not available - falling back to memory storage');
+      console.log('ℹ️ To complete Supabase integration, see instructions in SUPABASE_SETUP.md');
+      this.useSupabase = false;
+    }
+  }
+  
+  // Implement all IStorage methods with conditional routing
+  async getUser(id: number): Promise<User | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getUser(id) 
+      : this.memStorage.getUser(id);
+  }
+  
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getUserByUsername(username) 
+      : this.memStorage.getUserByUsername(username);
+  }
+  
+  async createUser(user: InsertUser): Promise<User> {
+    return this.useSupabase 
+      ? this.supabaseStorage.createUser(user) 
+      : this.memStorage.createUser(user);
+  }
+  
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getAllBlogPosts() 
+      : this.memStorage.getAllBlogPosts();
+  }
+  
+  async getBlogPostById(id: number): Promise<BlogPost | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getBlogPostById(id) 
+      : this.memStorage.getBlogPostById(id);
+  }
+  
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getBlogPostBySlug(slug) 
+      : this.memStorage.getBlogPostBySlug(slug);
+  }
+  
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    return this.useSupabase 
+      ? this.supabaseStorage.createBlogPost(post) 
+      : this.memStorage.createBlogPost(post);
+  }
+  
+  async updateBlogPost(id: number, post: InsertBlogPost): Promise<BlogPost | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.updateBlogPost(id, post) 
+      : this.memStorage.updateBlogPost(id, post);
+  }
+  
+  async deleteBlogPost(id: number): Promise<boolean> {
+    return this.useSupabase 
+      ? this.supabaseStorage.deleteBlogPost(id) 
+      : this.memStorage.deleteBlogPost(id);
+  }
+  
+  async getAllProjects(): Promise<Project[]> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getAllProjects() 
+      : this.memStorage.getAllProjects();
+  }
+  
+  async getFeaturedProjects(): Promise<Project[]> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getFeaturedProjects() 
+      : this.memStorage.getFeaturedProjects();
+  }
+  
+  async getProjectById(id: number): Promise<Project | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getProjectById(id) 
+      : this.memStorage.getProjectById(id);
+  }
+  
+  async getProjectBySlug(slug: string): Promise<Project | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getProjectBySlug(slug) 
+      : this.memStorage.getProjectBySlug(slug);
+  }
+  
+  async createProject(project: InsertProject): Promise<Project> {
+    return this.useSupabase 
+      ? this.supabaseStorage.createProject(project) 
+      : this.memStorage.createProject(project);
+  }
+  
+  async updateProject(id: number, project: InsertProject): Promise<Project | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.updateProject(id, project) 
+      : this.memStorage.updateProject(id, project);
+  }
+  
+  async deleteProject(id: number): Promise<boolean> {
+    return this.useSupabase 
+      ? this.supabaseStorage.deleteProject(id) 
+      : this.memStorage.deleteProject(id);
+  }
+  
+  async addToWaitlist(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
+    return this.useSupabase 
+      ? this.supabaseStorage.addToWaitlist(entry) 
+      : this.memStorage.addToWaitlist(entry);
+  }
+  
+  async getWaitlistEntries(): Promise<WaitlistEntry[]> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getWaitlistEntries() 
+      : this.memStorage.getWaitlistEntries();
+  }
+}
+
+// Use Supabase directly since tables are now created
 export const storage = new SupabaseStorage();

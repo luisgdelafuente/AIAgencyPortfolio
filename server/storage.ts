@@ -136,7 +136,11 @@ export class MemStorage implements IStorage {
 
   async createProject(project: InsertProject): Promise<Project> {
     const id = this.projectIdCounter++;
-    const newProject: Project = { ...project, id };
+    const newProject: Project = { 
+      ...project, 
+      id, 
+      isFeatured: project.isFeatured === undefined ? false : project.isFeatured 
+    };
     this.projects.set(id, newProject);
     return newProject;
   }
@@ -146,7 +150,11 @@ export class MemStorage implements IStorage {
       return undefined;
     }
     
-    const updatedProject: Project = { ...project, id };
+    const updatedProject: Project = { 
+      ...project, 
+      id, 
+      isFeatured: project.isFeatured === undefined ? false : project.isFeatured 
+    };
     this.projects.set(id, updatedProject);
     return updatedProject;
   }
@@ -546,5 +554,5 @@ class HybridStorage implements IStorage {
   }
 }
 
-// Use Supabase directly since tables are now created
+// Use Supabase storage now that tables are created
 export const storage = new SupabaseStorage();

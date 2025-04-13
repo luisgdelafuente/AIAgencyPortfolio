@@ -8,7 +8,7 @@ import { ContentEditor } from '@/components/AdminEditor';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { PageContent } from '@shared/schema';
-import { Pencil, RefreshCw } from 'lucide-react';
+import { Pencil, RefreshCw, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -160,8 +160,111 @@ export default function AdminContent() {
           )}
 
           {!error && !isLoading && pageContents && pageContents.length === 0 && (
-            <div className="text-center py-10 border rounded-lg bg-neutral-50">
-              <p className="text-neutral-500">No page contents found.</p>
+            <div className="text-center py-8 border rounded-lg bg-neutral-50">
+              <p className="text-neutral-500 mb-6">No page contents found. Create initial pages:</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button 
+                  onClick={() => {
+                    const homeContent = JSON.stringify({
+                      heroTitle: "Leading the AI Revolution",
+                      heroSubtitle: "We help enterprises transform through cutting-edge artificial intelligence solutions",
+                      heroCta: "Join Our Waitlist",
+                      featuresTitle: "Our Capabilities",
+                      featuresSubtitle: "Transforming businesses through intelligent technology"
+                    }, null, 2);
+                    updatePageContent.mutate({ page: 'home', content: homeContent });
+                  }}
+                  disabled={updatePageContent.isPending}
+                  className="flex items-center gap-1"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Create Home Page
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const aboutContent = JSON.stringify({
+                      title: "About Us",
+                      mission: "Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.",
+                      vision: "We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.",
+                      history: "Founded in 2020, our team of AI specialists and industry experts has been at the forefront of developing practical applications of machine learning that solve real business problems.",
+                      team: [
+                        {
+                          name: "Alex Johnson",
+                          role: "CEO & Co-founder",
+                          bio: "Former ML research lead at Stanford AI Lab with 15+ years of experience in the field."
+                        },
+                        {
+                          name: "Maria Chen",
+                          role: "CTO & Co-founder",
+                          bio: "PhD in Computer Science, specializing in deep learning architectures and their applications."
+                        },
+                        {
+                          name: "David Park",
+                          role: "Head of Product",
+                          bio: "Experienced product leader who previously scaled AI products at major tech companies."
+                        }
+                      ]
+                    }, null, 2);
+                    updatePageContent.mutate({ page: 'about', content: aboutContent });
+                  }}
+                  disabled={updatePageContent.isPending}
+                  className="flex items-center gap-1"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Create About Page
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const contactContent = JSON.stringify({
+                      title: "Get in Touch",
+                      subtitle: "We'd love to hear from you and discuss how we can help transform your business",
+                      email: "info@aiagency.com",
+                      phone: "+1 (555) 123-4567",
+                      address: "123 Tech Hub, San Francisco, CA 94105",
+                      formTitle: "Send us a message"
+                    }, null, 2);
+                    updatePageContent.mutate({ page: 'contact', content: contactContent });
+                  }}
+                  disabled={updatePageContent.isPending}
+                  className="flex items-center gap-1"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Create Contact Page
+                </Button>
+                <Button 
+                  onClick={() => {
+                    const legalContent = JSON.stringify({
+                      title: "Legal Information",
+                      sections: [
+                        {
+                          title: "Privacy Policy",
+                          content: "We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you."
+                        },
+                        {
+                          title: "Terms of Service",
+                          content: "By accessing our website and services, you agree to these terms of service. Please read them carefully. If you do not agree with these terms, you should not use our website or services."
+                        },
+                        {
+                          title: "Cookie Policy",
+                          content: "Our website uses cookies to distinguish you from other users of our website. This helps us to provide you with a good experience when you browse our website and also allows us to improve our site."
+                        }
+                      ]
+                    }, null, 2);
+                    updatePageContent.mutate({ page: 'legal', content: legalContent });
+                  }}
+                  disabled={updatePageContent.isPending}
+                  className="flex items-center gap-1"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Create Legal Page
+                </Button>
+              </div>
+              {updatePageContent.isPending && (
+                <div className="mt-4 text-sm text-neutral-500 flex items-center justify-center">
+                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                  Creating page...
+                </div>
+              )}
             </div>
           )}
 

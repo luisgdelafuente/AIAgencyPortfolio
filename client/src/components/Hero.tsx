@@ -1,8 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 
+interface HeroContent {
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroCta?: string;
+  featuresTitle?: string;
+  featuresSubtitle?: string;
+  [key: string]: any;
+}
+
 export default function Hero() {
+  const [content, setContent] = useState<HeroContent>({
+    heroTitle: "Industry-Specific AI Applications",
+    heroSubtitle: "Transform data into insights, automate workflows, and stay ahead of the competition.",
+    heroCta: "Join Waitlist"
+  });
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    const fetchContent = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/page-contents/home');
+        if (response.ok) {
+          const data = await response.json();
+          const parsedContent = JSON.parse(data.content);
+          setContent(parsedContent);
+        }
+      } catch (error) {
+        console.log('Error fetching home content:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchContent();
+  }, []);
+
   return (
     <section className="pt-32 pb-16 bg-white">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,17 +47,17 @@ export default function Hero() {
             <span className="text-sm font-medium">Coming Soon</span>
           </div>
           <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 tracking-tight">
-            Industry-Specific <span className="text-gray-900">AI Applications</span>
+            {content.heroTitle?.split(' ').slice(0, -2).join(' ')} <span className="text-gray-900">{content.heroTitle?.split(' ').slice(-2).join(' ')}</span>
           </h1>
           <p className="mt-6 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
-            Transform data into insights, automate workflows, and stay ahead of the competition.
+            {content.heroSubtitle}
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="px-6 py-3 bg-black text-white rounded-md font-medium">
               <Link href="/blog">Read Our Blog</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="px-6 py-3 rounded-md border border-gray-300 text-gray-700 hover:border-gray-400">
-              <a href="#waitlist">Join Waitlist</a>
+              <a href="#waitlist">{content.heroCta}</a>
             </Button>
           </div>
         </div>

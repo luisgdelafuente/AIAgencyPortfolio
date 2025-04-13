@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CircleDot, Sparkles, BarChart3 } from 'lucide-react';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
+}
+
+interface FeatureContent {
+  title: string;
+  description: string;
+}
+
+interface HomeContent {
+  featuresTitle?: string;
+  featuresSubtitle?: string;
+  features?: FeatureContent[];
+  [key: string]: any;
 }
 
 function FeatureCard({ icon, title, description }: FeatureCardProps) {
@@ -22,32 +34,86 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 }
 
 export default function Features() {
-  const features = [
-    {
-      icon: <CircleDot className="w-6 h-6" />,
-      title: "Smart AI Models",
-      description: "State-of-the-art machine learning models tailored for your specific needs."
-    },
-    {
-      icon: <Sparkles className="w-6 h-6" />,
-      title: "Instant Inference",
-      description: "Lightning-fast processing with optimized inference pipelines."
-    },
-    {
-      icon: <BarChart3 className="w-6 h-6" />,
-      title: "Data-Driven Insights",
-      description: "Transform raw data into actionable business intelligence."
-    }
+  const [content, setContent] = useState<HomeContent>({
+    featuresTitle: "Why Choose Our Agency",
+    featuresSubtitle: "We offer cutting-edge AI solutions tailored to your industry needs",
+    features: [
+      {
+        title: "Smart AI Models",
+        description: "State-of-the-art machine learning models tailored for your specific needs."
+      },
+      {
+        title: "Instant Inference",
+        description: "Lightning-fast processing with optimized inference pipelines."
+      },
+      {
+        title: "Data-Driven Insights",
+        description: "Transform raw data into actionable business intelligence."
+      }
+    ]
+  });
+  
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    const fetchContent = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/page-contents/home');
+        if (response.ok) {
+          const data = await response.json();
+          // Handle both string and object formats
+          if (typeof data.content === 'string') {
+            try {
+              const parsedContent = JSON.parse(data.content);
+              setContent(parsedContent);
+            } catch (e) {
+              console.error('Error parsing JSON content:', e);
+            }
+          } else if (typeof data.content === 'object') {
+            setContent(data.content);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching home content:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchContent();
+  }, []);
+
+  // Default icons for features
+  const featureIcons = [
+    <CircleDot className="w-6 h-6" key="circle-dot" />,
+    <Sparkles className="w-6 h-6" key="sparkles" />,
+    <BarChart3 className="w-6 h-6" key="bar-chart" />
   ];
 
   return (
     <section className="py-12 md:py-16 bg-gray-50">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+        {(content.featuresTitle || content.featuresSubtitle) && (
+          <div className="text-center mb-10">
+            {content.featuresTitle && (
+              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+                {content.featuresTitle}
+              </h2>
+            )}
+            {content.featuresSubtitle && (
+              <p className="mt-4 text-lg text-gray-600">
+                {content.featuresSubtitle}
+              </p>
+            )}
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
+          {content.features && content.features.map((feature, index) => (
             <FeatureCard
               key={index}
-              icon={feature.icon}
+              icon={featureIcons[index % featureIcons.length]}
               title={feature.title}
               description={feature.description}
             />

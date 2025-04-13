@@ -27,12 +27,42 @@ async function updatePageContents() {
 }
 
 async function updateHomePageContent() {
+  // Comprehensive home page content that includes all the sections from the website
   const homeContent = {
+    // Hero section
     heroTitle: "Industry-Specific AI Applications",
     heroSubtitle: "Transform data into insights, automate workflows, and stay ahead of the competition.",
     heroCta: "Join Waitlist",
+    
+    // Features section
     featuresTitle: "Why Choose Our Agency",
-    featuresSubtitle: "We offer cutting-edge AI solutions tailored to your industry needs"
+    featuresSubtitle: "We offer cutting-edge AI solutions tailored to your industry needs",
+    
+    // Features list (from Features.tsx)
+    features: [
+      {
+        title: "Smart AI Models",
+        description: "State-of-the-art machine learning models tailored for your specific needs."
+      },
+      {
+        title: "Instant Inference",
+        description: "Lightning-fast processing with optimized inference pipelines."
+      },
+      {
+        title: "Data-Driven Insights",
+        description: "Transform raw data into actionable business intelligence."
+      }
+    ],
+    
+    // Projects section
+    projectsTitle: "Featured Projects", 
+    projectsSubtitle: "See how our AI solutions are transforming industries",
+    projectsCta: "View All Projects",
+    
+    // Blog section
+    blogTitle: "Latest from Our Blog",
+    blogSubtitle: "Stay updated with the latest insights in AI and technology",
+    blogCta: "View All Posts"
   };
 
   const { error } = await supabase

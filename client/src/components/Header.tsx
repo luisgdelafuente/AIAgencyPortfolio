@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTranslations } from '@/hooks/use-translations';
-import LanguageToggle from './LanguageToggle';
 
 const HAL149Logo = () => (
   <div className="flex items-center">
@@ -25,8 +24,7 @@ export default function Header() {
     { href: '/projects/', label: t.nav.projects },
     { href: '/blog/', label: t.nav.blog },
     { href: '/about/', label: t.nav.about },
-    { href: '/contact/', label: t.nav.contact },
-    { href: '/legal/', label: t.nav.legal }
+    { href: '/contact/', label: t.nav.contact }
   ];
 
   return (
@@ -54,9 +52,6 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <div className="pl-2 border-l border-gray-200">
-              <LanguageToggle variant="minimal" />
-            </div>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -87,9 +82,6 @@ export default function Header() {
                       {link.label}
                     </Link>
                   ))}
-                  <div className="pt-4 mt-2 border-t border-gray-200">
-                    <LanguageToggle />
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>

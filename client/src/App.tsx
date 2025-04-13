@@ -33,7 +33,6 @@ function Router() {
       <Route path="/blog/:slug/" component={BlogPost} />
       <Route path="/about/" component={About} />
       <Route path="/contact/" component={Contact} />
-      <Route path="/legal/" component={Legal} />
       <Route path="/admin/" component={AuthPage} />
       <ProtectedRoute path="/admin/dashboard/" component={AdminDashboard} />
       <ProtectedRoute path="/admin/projects/" component={AdminProjects} />

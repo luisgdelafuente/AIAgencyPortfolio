@@ -19,6 +19,8 @@ import AdminWaitlist from "@/pages/AdminWaitlist";
 import AdminContent from "@/pages/AdminContent";
 import React from "react";
 import { AuthProvider } from "@/hooks/use-auth";
+import { LanguageProvider } from "@/hooks/use-language";
+import { TranslationProvider } from "@/hooks/use-translations";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -46,10 +48,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
+      <LanguageProvider>
+        <TranslationProvider>
+          <AuthProvider>
+            <Router />
+            <Toaster />
+          </AuthProvider>
+        </TranslationProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
+import LanguageToggle from './LanguageToggle';
 
 const HAL149Logo = () => (
   <div className="flex items-center">
@@ -10,6 +10,8 @@ const HAL149Logo = () => (
 );
 
 export default function Footer() {
+  const t = useTranslations();
+  
   return (
     <footer className="bg-gray-50 border-t border-gray-100 py-16 mt-16">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,39 +43,37 @@ export default function Footer() {
           </div>
           
           <div>
-            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">Company</h3>
+            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.company}</h3>
             <ul className="space-y-3">
-              <li><Link href="/about/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">About</Link></li>
-              <li><Link href="/blog/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Blog</Link></li>
-              <li><Link href="/legal/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Legal</Link></li>
+              <li><Link href="/about/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.about}</Link></li>
+              <li><Link href="/blog/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.blog}</Link></li>
+              <li><Link href="/legal/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.legal}</Link></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">Resources</h3>
+            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.resources}</h3>
             <ul className="space-y-3">
-              <li><Link href="/projects/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Projects</Link></li>
-              <li><Link href="/contact/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Contact</Link></li>
-              <li><a href="#" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">Documentation</a></li>
+              <li><Link href="/projects/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.projects}</Link></li>
+              <li><Link href="/contact/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.contact}</Link></li>
+              <li><a href="#" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.footer.documentation}</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">Language</h3>
-            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-0 h-auto">
-              <Globe className="h-4 w-4 mr-2" /> English
-            </Button>
+            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.language}</h3>
+            <LanguageToggle />
           </div>
         </div>
         
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} HAL149. All rights reserved.
+            © {new Date().getFullYear()} HAL149. {t.footer.rights}
           </p>
           <div className="flex space-x-8 mt-4 md:mt-0">
-            <span className="text-gray-500 text-sm">v.0.1.0</span>
-            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Privacy Policy</Link>
-            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">Terms of Service</Link>
+            <span className="text-gray-500 text-sm">{t.footer.version}</span>
+            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">{t.footer.privacy}</Link>
+            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">{t.footer.terms}</Link>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface HeroContent {
   heroTitle?: string;
@@ -12,10 +13,11 @@ interface HeroContent {
 }
 
 export default function Hero() {
+  const t = useTranslations();
   const [content, setContent] = useState<HeroContent>({
-    heroTitle: "Industry-Specific AI Applications",
-    heroSubtitle: "Transform data into insights, automate workflows, and stay ahead of the competition.",
-    heroCta: "Join Waitlist"
+    heroTitle: t.hero.title,
+    heroSubtitle: t.hero.subtitle,
+    heroCta: t.hero.cta
   });
   const [loading, setLoading] = useState(false);
   
@@ -64,7 +66,7 @@ export default function Hero() {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="px-6 py-3 bg-black text-white rounded-md font-medium">
-              <Link href="/blog/">Read Our Blog</Link>
+              <Link href="/blog/">{t.hero.readBlog}</Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="px-6 py-3 rounded-md border border-gray-300 text-gray-700 hover:border-gray-400">
               <a href="#waitlist">{content.heroCta}</a>

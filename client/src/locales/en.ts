@@ -19,7 +19,7 @@ export const enTranslations = {
   
   // Features Section
   features: {
-    title: 'Why Choose Our Agency',
+    title: 'Why Choose Us',
     subtitle: 'We offer cutting-edge AI solutions tailored to your industry needs',
     items: [
       {
@@ -47,8 +47,8 @@ export const enTranslations = {
   
   // Blog Section
   blog: {
-    title: 'Latest from Our Blog',
-    subtitle: 'Stay updated with the latest insights in AI and technology',
+    title: 'Latest From Our Blog',
+    subtitle: 'Stay updated with the latest news in AI and technology',
     cta: 'View All Posts',
     noPosts: 'No blog posts available yet.'
   },

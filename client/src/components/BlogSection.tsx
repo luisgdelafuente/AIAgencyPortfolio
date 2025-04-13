@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import BlogCard from './BlogCard';
 import type { BlogPost } from '@shared/schema';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface HomeContent {
   blogTitle?: string;
@@ -15,14 +16,15 @@ interface HomeContent {
 }
 
 export default function BlogSection() {
+  const t = useTranslations();
   const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
     queryKey: ['/api/blog']
   });
   
   const [content, setContent] = useState<HomeContent>({
-    blogTitle: "Latest from Our Blog",
-    blogSubtitle: "Stay updated with the latest insights in AI and technology",
-    blogCta: "View All Posts"
+    blogTitle: t.blog.title,
+    blogSubtitle: t.blog.subtitle,
+    blogCta: t.blog.cta
   });
   
   useEffect(() => {
@@ -56,10 +58,10 @@ export default function BlogSection() {
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {content.blogTitle || "Latest from Our Blog"}
+            {content.blogTitle || t.blog.title}
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            {content.blogSubtitle || "Stay updated with the latest insights in AI and technology"}
+            {content.blogSubtitle || t.blog.subtitle}
           </p>
         </div>
 
@@ -84,14 +86,14 @@ export default function BlogSection() {
             ))
           ) : (
             <div className="col-span-3 text-center py-12">
-              <p className="text-gray-500">No blog posts available yet.</p>
+              <p className="text-gray-500">{t.blog.noPosts}</p>
             </div>
           )}
         </div>
 
         <div className="mt-10 text-center">
           <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
-            <Link href="/blog/">{content.blogCta || "View All Posts"}</Link>
+            <Link href="/blog/">{content.blogCta || t.blog.cta}</Link>
           </Button>
         </div>
       </div>

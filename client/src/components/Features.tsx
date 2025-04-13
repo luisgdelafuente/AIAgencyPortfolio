@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CircleDot, Sparkles, BarChart3 } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -34,23 +35,12 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 }
 
 export default function Features() {
+  const t = useTranslations();
+  
   const [content, setContent] = useState<HomeContent>({
-    featuresTitle: "Why Choose Our Agency",
-    featuresSubtitle: "We offer cutting-edge AI solutions tailored to your industry needs",
-    features: [
-      {
-        title: "Smart AI Models",
-        description: "State-of-the-art machine learning models tailored for your specific needs."
-      },
-      {
-        title: "Instant Inference",
-        description: "Lightning-fast processing with optimized inference pipelines."
-      },
-      {
-        title: "Data-Driven Insights",
-        description: "Transform raw data into actionable business intelligence."
-      }
-    ]
+    featuresTitle: t.features.title,
+    featuresSubtitle: t.features.subtitle,
+    features: t.features.items
   });
   
   const [loading, setLoading] = useState(false);

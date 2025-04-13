@@ -756,6 +756,25 @@ class HybridStorage implements IStorage {
       ? this.supabaseStorage.getWaitlistEntries() 
       : this.memStorage.getWaitlistEntries();
   }
+
+  // Page content methods
+  async getPageContent(page: string): Promise<PageContent | undefined> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getPageContent(page) 
+      : this.memStorage.getPageContent(page);
+  }
+  
+  async getAllPageContents(): Promise<PageContent[]> {
+    return this.useSupabase 
+      ? this.supabaseStorage.getAllPageContents() 
+      : this.memStorage.getAllPageContents();
+  }
+  
+  async upsertPageContent(page: string, content: string): Promise<PageContent> {
+    return this.useSupabase 
+      ? this.supabaseStorage.upsertPageContent(page, content) 
+      : this.memStorage.upsertPageContent(page, content);
+  }
 }
 
 // Use Supabase storage now that tables are created

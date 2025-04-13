@@ -71,6 +71,23 @@ export async function createTables() {
     } else {
       console.log('Waitlist table exists');
     }
+    
+    // Check if page_contents table exists
+    const { data: pageContentsData, error: pageContentsError } = await supabase
+      .from('page_contents')
+      .select('id')
+      .limit(1);
+    
+    if (pageContentsError) {
+      console.log('Page contents table does not exist or is not accessible');
+      // Create page_contents table
+      const { error: createPageContentsError } = await supabase.rpc('create_page_contents_table');
+      if (!createPageContentsError) {
+        console.log('Created page_contents table successfully');
+      }
+    } else {
+      console.log('Page contents table exists');
+    }
 
     console.log('Table check completed. Tables need to be created manually in Supabase dashboard if they don\'t exist.');
     console.log('Table structure:');
@@ -78,6 +95,7 @@ export async function createTables() {
     console.log('- blog_posts: id, title, slug, excerpt, content, image_url, published_at');
     console.log('- projects: id, title, slug, description, content, category, image_url, is_featured');
     console.log('- waitlist: id, email, submitted_at');
+    console.log('- page_contents: id, page, content, updated_at');
 
   } catch (error) {
     console.error('Error checking/creating tables:', error);

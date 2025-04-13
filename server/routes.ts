@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { slugify } from "../shared/utils";
-import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema } from "@shared/schema";
+import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema, insertPageContentSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -250,6 +250,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Page Content routes
+  app.get("/api/page-contents", async (req, res) => {
+    try {
+      const contents = await storage.getAllPageContents();
+      res.json(contents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch page contents", error });
+    }
+  });
+
+  app.get("/api/page-contents/:page", async (req, res) => {
+    try {
+      const content = await storage.getPageContent(req.params.page);
+      if (!content) {
+        return res.status(404).json({ message: "Page content not found" });
+      }
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch page content", error });
+    }
+  });
+
+  app.post("/api/page-contents", isAuthenticated, async (req, res) => {
+    try {
+      const { page, content } = req.body;
+      
+      if (!page || !content) {
+        return res.status(400).json({ message: "Page name and content are required" });
+      }
+      
+      const pageContent = await storage.upsertPageContent(page, content);
+      res.status(201).json(pageContent);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Validation error", error: fromZodError(error) });
+      }
+      res.status(500).json({ message: "Failed to create/update page content", error });
+    }
+  });
+
   // Initialize default admin user if it doesn't exist
   const setupDefaultAdmin = async () => {
     try {
@@ -312,8 +352,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "Machine learning algorithms to assist in early detection of diseases from medical imagery.",
           content: "Our AI-powered diagnostic tool leverages deep learning algorithms to analyze medical images and assist healthcare professionals in detecting early signs of disease. The system was trained on a diverse dataset of medical scans and can identify patterns that might be missed by the human eye. This technology is particularly valuable for remote healthcare settings where specialist expertise may be limited. The project has been implemented in several major hospitals with promising results in improving early diagnosis rates.",
           category: "Healthcare",
-          image_url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-          is_featured: true
+          imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+          isFeatured: true
         },
         {
           title: "Predictive Financial Analytics",
@@ -321,8 +361,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "Advanced algorithms that analyze market trends and predict investment opportunities.",
           content: "Our predictive financial analytics platform combines traditional financial modeling with advanced machine learning techniques to identify market trends and potential investment opportunities. The system analyzes vast amounts of market data, news sentiment, and economic indicators to generate insights that help investors make more informed decisions. It features customizable risk profiles, real-time alerts, and detailed visualization tools that make complex financial data more accessible and actionable for both individual and institutional investors.",
           category: "Finance",
-          image_url: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-          is_featured: true
+          imageUrl: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+          isFeatured: true
         },
         {
           title: "Automated Supply Chain Optimization",
@@ -330,13 +370,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: "AI system that dynamically adjusts supply chain operations based on real-time conditions.",
           content: "Our supply chain optimization solution uses machine learning to create adaptive logistics networks that respond dynamically to changing conditions. The system monitors inventory levels, transportation routes, demand forecasts, and external factors like weather and traffic to continuously optimize the entire supply chain. This results in reduced costs, improved delivery times, and enhanced resilience to disruptions. The solution has been particularly valuable for companies with complex global supply chains seeking to improve efficiency while reducing their environmental impact.",
           category: "Logistics",
-          image_url: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-          is_featured: false
+          imageUrl: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+          isFeatured: false
         }
       ];
       
       for (const project of projects) {
         await storage.createProject(project);
+      }
+      
+      // Seed page contents
+      const pageContents = [
+        {
+          page: "home",
+          content: JSON.stringify({
+            heroTitle: "Leading the AI Revolution",
+            heroSubtitle: "We help enterprises transform through cutting-edge artificial intelligence solutions",
+            heroCta: "Join Our Waitlist",
+            featuresTitle: "Our Capabilities",
+            featuresSubtitle: "Transforming businesses through intelligent technology"
+          })
+        },
+        {
+          page: "about",
+          content: JSON.stringify({
+            title: "About Us",
+            mission: "Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.",
+            vision: "We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.",
+            history: "Founded in 2020, our team of AI specialists and industry experts has been at the forefront of developing practical applications of machine learning that solve real business problems.",
+            team: [
+              {
+                name: "Alex Johnson",
+                role: "CEO & Co-founder",
+                bio: "Former ML research lead at Stanford AI Lab with 15+ years of experience in the field."
+              },
+              {
+                name: "Maria Chen",
+                role: "CTO & Co-founder",
+                bio: "PhD in Computer Science, specializing in deep learning architectures and their applications."
+              },
+              {
+                name: "David Park",
+                role: "Head of Product",
+                bio: "Experienced product leader who previously scaled AI products at major tech companies."
+              }
+            ]
+          })
+        },
+        {
+          page: "contact",
+          content: JSON.stringify({
+            title: "Get in Touch",
+            subtitle: "We'd love to hear from you and discuss how we can help transform your business",
+            email: "info@aiagency.com",
+            phone: "+1 (555) 123-4567",
+            address: "123 Tech Hub, San Francisco, CA 94105",
+            formTitle: "Send us a message"
+          })
+        },
+        {
+          page: "legal",
+          content: JSON.stringify({
+            title: "Legal Information",
+            sections: [
+              {
+                title: "Privacy Policy",
+                content: "We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you."
+              },
+              {
+                title: "Terms of Service",
+                content: "By accessing our website and services, you agree to these terms of service. Please read them carefully. If you do not agree with these terms, you should not use our website or services."
+              },
+              {
+                title: "Cookie Policy",
+                content: "Our website uses cookies to distinguish you from other users of our website. This helps us to provide you with a good experience when you browse our website and also allows us to improve our site."
+              }
+            ]
+          })
+        }
+      ];
+      
+      for (const content of pageContents) {
+        await storage.upsertPageContent(content.page, content.content);
       }
       
       console.log("Initial data seeded successfully");

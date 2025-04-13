@@ -242,7 +242,13 @@ export class SupabaseStorage implements IStorage {
       .order('published_at', { ascending: false });
     
     if (error) throw new Error(`Failed to fetch blog posts: ${error.message}`);
-    return data as BlogPost[];
+    
+    // Map snake_case to camelCase
+    return data.map(post => ({
+      ...post,
+      imageUrl: post.image_url,
+      publishedAt: post.published_at
+    })) as BlogPost[];
   }
 
   async getBlogPostById(id: number): Promise<BlogPost | undefined> {
@@ -253,7 +259,13 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error || !data) return undefined;
-    return data as BlogPost;
+    
+    // Map snake_case to camelCase
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      publishedAt: data.published_at
+    } as BlogPost;
   }
 
   async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
@@ -264,10 +276,17 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error || !data) return undefined;
-    return data as BlogPost;
+    
+    // Map snake_case to camelCase
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      publishedAt: data.published_at
+    } as BlogPost;
   }
 
-  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+  async createBlogPost(post: any): Promise<BlogPost> {
+    // Handle camelCase to snake_case conversion
     const { data, error } = await supabase
       .from('blog_posts')
       .insert(post)
@@ -275,10 +294,16 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error) throw new Error(`Failed to create blog post: ${error.message}`);
-    return data as BlogPost;
+    
+    // Map the response back to camelCase for the application
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      publishedAt: data.published_at
+    } as BlogPost;
   }
 
-  async updateBlogPost(id: number, post: InsertBlogPost): Promise<BlogPost | undefined> {
+  async updateBlogPost(id: number, post: any): Promise<BlogPost | undefined> {
     const { data, error } = await supabase
       .from('blog_posts')
       .update(post)
@@ -287,7 +312,13 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error || !data) return undefined;
-    return data as BlogPost;
+    
+    // Map the response back to camelCase for the application
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      publishedAt: data.published_at
+    } as BlogPost;
   }
 
   async deleteBlogPost(id: number): Promise<boolean> {
@@ -306,7 +337,13 @@ export class SupabaseStorage implements IStorage {
       .select('*');
     
     if (error) throw new Error(`Failed to fetch projects: ${error.message}`);
-    return data as Project[];
+    
+    // Map snake_case to camelCase
+    return data.map(project => ({
+      ...project,
+      imageUrl: project.image_url,
+      isFeatured: project.is_featured
+    })) as Project[];
   }
 
   async getFeaturedProjects(): Promise<Project[]> {
@@ -316,7 +353,13 @@ export class SupabaseStorage implements IStorage {
       .eq('is_featured', true);
     
     if (error) throw new Error(`Failed to fetch featured projects: ${error.message}`);
-    return data as Project[];
+    
+    // Map snake_case to camelCase
+    return data.map(project => ({
+      ...project,
+      imageUrl: project.image_url,
+      isFeatured: project.is_featured
+    })) as Project[];
   }
 
   async getProjectById(id: number): Promise<Project | undefined> {
@@ -327,7 +370,13 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error || !data) return undefined;
-    return data as Project;
+    
+    // Map snake_case to camelCase
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      isFeatured: data.is_featured
+    } as Project;
   }
 
   async getProjectBySlug(slug: string): Promise<Project | undefined> {
@@ -338,14 +387,25 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error || !data) return undefined;
-    return data as Project;
+    
+    // Map snake_case to camelCase
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      isFeatured: data.is_featured
+    } as Project;
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    // Ensure isFeatured is explicitly set to handle the null case
+    // Convert camelCase to snake_case for database and ensure isFeatured is set
     const projectData = {
-      ...project,
-      isFeatured: project.isFeatured === undefined ? false : project.isFeatured
+      title: project.title,
+      slug: project.slug,
+      description: project.description,
+      content: project.content,
+      category: project.category,
+      image_url: project.imageUrl,
+      is_featured: project.isFeatured === undefined ? false : project.isFeatured
     };
     
     const { data, error } = await supabase
@@ -355,14 +415,25 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error) throw new Error(`Failed to create project: ${error.message}`);
-    return data as Project;
+    
+    // Map snake_case back to camelCase
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      isFeatured: data.is_featured
+    } as Project;
   }
 
   async updateProject(id: number, project: InsertProject): Promise<Project | undefined> {
-    // Ensure isFeatured is explicitly set to handle the null case
+    // Convert camelCase to snake_case for database and ensure isFeatured is set
     const projectData = {
-      ...project,
-      isFeatured: project.isFeatured === undefined ? false : project.isFeatured
+      title: project.title,
+      slug: project.slug,
+      description: project.description,
+      content: project.content,
+      category: project.category,
+      image_url: project.imageUrl,
+      is_featured: project.isFeatured === undefined ? false : project.isFeatured
     };
     
     const { data, error } = await supabase
@@ -373,7 +444,13 @@ export class SupabaseStorage implements IStorage {
       .single();
     
     if (error || !data) return undefined;
-    return data as Project;
+    
+    // Map snake_case back to camelCase
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      isFeatured: data.is_featured
+    } as Project;
   }
 
   async deleteProject(id: number): Promise<boolean> {

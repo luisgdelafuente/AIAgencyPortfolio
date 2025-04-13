@@ -13,6 +13,22 @@ const supabaseKey = process.env.SUPABASE_KEY;
 console.log('Environment variables check:');
 console.log('SUPABASE_URL present:', !!supabaseUrl);
 console.log('SUPABASE_KEY present:', !!supabaseKey);
+console.log('DATABASE_URL present:', !!process.env.DATABASE_URL);
+
+// Add CORS headers for better compatibility
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Log basic request info for debugging
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Initialize Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey);

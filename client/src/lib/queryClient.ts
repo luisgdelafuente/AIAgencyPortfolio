@@ -7,15 +7,24 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Function to check if we're running on Netlify
+function isNetlifyEnvironment(): boolean {
+  return window.location.hostname.includes('.netlify.app') || 
+         window.location.hostname.includes('.netlify.com');
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
   // Adjust URL for Netlify deployment if needed
-  const adjustedUrl = process.env.NODE_ENV === 'production' && url.startsWith('/api/') 
-    ? `/.netlify/functions/api${url.substring(4)}` 
-    : url;
+  let adjustedUrl = url;
+  
+  // If we're in Netlify and it's an API call, rewrite to the Netlify function path
+  if (isNetlifyEnvironment() && url.startsWith('/api/')) {
+    adjustedUrl = `/.netlify/functions/api${url.substring(4)}`;
+  }
   
   const res = await fetch(adjustedUrl, {
     method,
@@ -36,10 +45,13 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     // Adjust URL for Netlify deployment if needed
     const url = queryKey[0] as string;
-    const adjustedUrl = process.env.NODE_ENV === 'production' && url.startsWith('/api/') 
-      ? `/.netlify/functions/api${url.substring(4)}` 
-      : url;
-      
+    let adjustedUrl = url;
+    
+    // If we're in Netlify and it's an API call, rewrite to the Netlify function path
+    if (isNetlifyEnvironment() && url.startsWith('/api/')) {
+      adjustedUrl = `/.netlify/functions/api${url.substring(4)}`;
+    }
+    
     const res = await fetch(adjustedUrl, {
       credentials: "include",
     });

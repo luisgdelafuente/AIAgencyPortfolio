@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { slugify } from "../shared/utils";
-import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema, insertPageContentSchema } from "@shared/schema";
+import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema, insertPageContentSchema, insertContactMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -304,6 +304,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: `Failed to create/update page content: ${error.message}`,
         error: error.toString()
       });
+    }
+  });
+  
+  // Contact message routes
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const messageData = insertContactMessageSchema.parse(req.body);
+      const message = await storage.addContactMessage(messageData);
+      res.status(201).json({ message: "Message sent successfully", data: message });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Validation error", error: fromZodError(error) });
+      }
+      res.status(500).json({ message: "Failed to send message", error });
+    }
+  });
+  
+  app.get("/api/contact", isAuthenticated, async (req, res) => {
+    try {
+      const messages = await storage.getContactMessages();
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch contact messages", error });
+    }
+  });
+  
+  app.patch("/api/contact/:id/read", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const message = await storage.markMessageAsRead(id);
+      if (!message) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+      res.json(message);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark message as read", error });
     }
   });
 

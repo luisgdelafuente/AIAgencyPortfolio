@@ -35,10 +35,22 @@ export default function Blog() {
           <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h1 className="text-4xl font-bold text-gray-900 mb-6">
-                Our Blog
+                {(() => {
+                  try {
+                    return pageContent?.content ? JSON.parse(pageContent.content).blogTitle || 'Our Blog' : 'Our Blog';
+                  } catch (e) {
+                    return 'Our Blog';
+                  }
+                })()}
               </h1>
               <p className="text-lg text-gray-600">
-                Insights and updates from the cutting edge of AI technology
+                {(() => {
+                  try {
+                    return pageContent?.content ? JSON.parse(pageContent.content).blogSubtitle || 'Insights and updates from the cutting edge of AI technology' : 'Insights and updates from the cutting edge of AI technology';
+                  } catch (e) {
+                    return 'Insights and updates from the cutting edge of AI technology';
+                  }
+                })()}
               </p>
             </div>
             

@@ -8,10 +8,11 @@ import ProjectsSection from '@/components/ProjectsSection';
 import Waitlist from '@/components/Waitlist';
 import { Helmet } from "react-helmet";
 import { useQuery } from '@tanstack/react-query';
+import { PageContent } from '@shared/schema';
 
 export default function Home() {
   // Fetch page content including metadata
-  const { data: pageContent } = useQuery({
+  const { data: pageContent } = useQuery<PageContent>({
     queryKey: ['/api/page-contents/home'],
   });
 
@@ -27,15 +28,15 @@ export default function Home() {
   };
   
   try {
-    if (pageContent && pageContent.content) {
-      const content = typeof pageContent.content === 'string' 
+    if (pageContent?.content) {
+      const contentObj = typeof pageContent.content === 'string' 
         ? JSON.parse(pageContent.content) 
         : pageContent.content;
       
-      if (content.metadata) {
+      if (contentObj.metadata) {
         metadata = {
           ...metadata,
-          ...content.metadata
+          ...contentObj.metadata
         };
       }
     }

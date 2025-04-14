@@ -375,24 +375,24 @@ export default function AdminContent() {
 
       {/* Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="capitalize">
               Edit {selectedPage} Page Content
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <Tabs defaultValue="content">
+          <div className="py-4 flex-1 overflow-hidden">
+            <Tabs defaultValue="content" className="flex flex-col h-full overflow-hidden">
               <TabsList className="mb-3 w-full">
                 <TabsTrigger value="content" className="flex-1">Page Content</TabsTrigger>
                 <TabsTrigger value="seo" className="flex-1">SEO Metadata</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="content" className="mt-0">
+              <TabsContent value="content" className="mt-0 flex-1 overflow-hidden">
                 <p className="text-sm text-neutral-500 mb-2">
                   Edit the JSON content below. This defines the structure and content of the page.
                 </p>
-                <div className="border rounded-lg overflow-hidden">
+                <div className="border rounded-lg overflow-hidden h-[60vh]">
                   <ContentEditor 
                     value={editContent} 
                     onChange={setEditContent}
@@ -400,7 +400,7 @@ export default function AdminContent() {
                 </div>
               </TabsContent>
               
-              <TabsContent value="seo" className="mt-0 space-y-4">
+              <TabsContent value="seo" className="mt-0 space-y-4 overflow-auto h-[60vh] pr-1">
                 <p className="text-sm text-neutral-500 mb-2">
                   Manage SEO metadata for this page. These fields will be used by search engines and social media platforms.
                 </p>

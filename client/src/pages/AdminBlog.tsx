@@ -62,13 +62,23 @@ export default function AdminBlog() {
   const [currentPostId, setCurrentPostId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('editor');
   
-  const [formData, setFormData] = useState<Partial<InsertBlogPost>>({
+  const [formData, setFormData] = useState<Partial<InsertBlogPost & { metadata?: any }>>({
     title: '',
     slug: '',
     excerpt: '',
     content: '',
     imageUrl: '',
-    publishedAt: new Date().toISOString()
+    publishedAt: new Date().toISOString(),
+    metadata: {
+      // SEO metadata fields
+      title: '',
+      description: '',
+      keywords: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: ''
+    }
   });
   
   const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
@@ -160,7 +170,16 @@ export default function AdminBlog() {
       excerpt: '',
       content: '',
       imageUrl: '',
-      publishedAt: new Date().toISOString()
+      publishedAt: new Date().toISOString(),
+      metadata: {
+        title: '',
+        description: '',
+        keywords: '',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: ''
+      }
     });
     setCurrentPostId(null);
     setEditMode(false);
@@ -174,14 +193,43 @@ export default function AdminBlog() {
   
   const openEditDialog = (post: BlogPost) => {
     setCurrentPostId(post.id);
+    
+    // Try to parse metadata from content if present
+    let existingMetadata = {
+      title: '',
+      description: '',
+      keywords: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: ''
+    };
+    
+    try {
+      const contentObj = typeof post.content === 'string' && post.content.trim().startsWith('{') 
+        ? JSON.parse(post.content)
+        : { content: post.content };
+        
+      if (contentObj.metadata) {
+        existingMetadata = {
+          ...existingMetadata,
+          ...contentObj.metadata
+        };
+      }
+    } catch (e) {
+      console.error('Error parsing metadata from blog post:', e);
+    }
+    
     setFormData({
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt,
       content: post.content,
       imageUrl: post.imageUrl,
-      publishedAt: post.publishedAt
+      publishedAt: post.publishedAt,
+      metadata: existingMetadata
     });
+    
     setEditMode(true);
     setIsDialogOpen(true);
   };

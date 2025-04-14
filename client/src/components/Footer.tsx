@@ -70,10 +70,8 @@ export default function Footer() {
           <p className="text-gray-500 text-sm">
             © {new Date().getFullYear()} HAL149. {t.footer.rights}
           </p>
-          <div className="flex space-x-8 mt-4 md:mt-0">
+          <div className="flex mt-4 md:mt-0">
             <span className="text-gray-500 text-sm">{t.footer.version}</span>
-            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">{t.footer.privacy}</Link>
-            <Link href="/legal/" className="text-gray-500 text-sm hover:text-gray-900 transition-colors">{t.footer.terms}</Link>
           </div>
         </div>
       </div>

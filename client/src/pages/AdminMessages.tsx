@@ -62,30 +62,6 @@ export default function AdminMessages() {
     enabled: true,
   });
 
-  const markAsReadMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return apiRequest(`/api/contact/${id}/read`, 'POST');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/contact'] });
-      toast({
-        title: 'Message updated',
-        description: 'Message marked as read',
-      });
-    },
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to update message status',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const handleMarkAsRead = (id: number) => {
-    markAsReadMutation.mutate(id);
-  };
-
   const handleViewDetails = (message: ContactMessage) => {
     setSelectedMessage(message);
   };
@@ -164,21 +140,6 @@ export default function AdminMessages() {
                           >
                             View
                           </Button>
-                          {!message.read && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="ml-2"
-                              onClick={() => handleMarkAsRead(message.id)}
-                              disabled={markAsReadMutation.isPending}
-                            >
-                              {markAsReadMutation.isPending ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                'Mark as Read'
-                              )}
-                            </Button>
-                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -205,31 +166,13 @@ export default function AdminMessages() {
               {selectedMessage?.message}
             </div>
           </div>
-          <div className="flex justify-between mt-4">
+          <div className="flex justify-end mt-4">
             <Button
               variant="outline"
               onClick={() => setSelectedMessage(null)}
             >
               Close
             </Button>
-            {selectedMessage && !selectedMessage.read && (
-              <Button
-                onClick={() => {
-                  if (selectedMessage) {
-                    handleMarkAsRead(selectedMessage.id);
-                    setSelectedMessage(null);
-                  }
-                }}
-                disabled={markAsReadMutation.isPending}
-              >
-                {markAsReadMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                )}
-                Mark as Read
-              </Button>
-            )}
           </div>
         </DialogContent>
       </Dialog>

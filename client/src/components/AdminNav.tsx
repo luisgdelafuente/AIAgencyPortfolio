@@ -9,7 +9,8 @@ import {
   Users,
   Menu,
   X,
-  Layout
+  Layout,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
@@ -65,7 +66,8 @@ export default function AdminNav() {
     { href: '/admin/blog/', label: 'Blog Posts', icon: <FileText className="h-5 w-5 mr-2" /> },
     { href: '/admin/projects/', label: 'Projects', icon: <FolderKanban className="h-5 w-5 mr-2" /> },
     { href: '/admin/content/', label: 'Page Content', icon: <Layout className="h-5 w-5 mr-2" /> },
-    { href: '/admin/waitlist/', label: 'Waitlist', icon: <Users className="h-5 w-5 mr-2" /> }
+    { href: '/admin/waitlist/', label: 'Waitlist', icon: <Users className="h-5 w-5 mr-2" /> },
+    { href: '/admin/messages/', label: 'Contact Messages', icon: <MessageSquare className="h-5 w-5 mr-2" /> }
   ];
 
   const SidebarContent = () => (

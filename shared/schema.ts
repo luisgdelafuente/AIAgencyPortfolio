@@ -70,6 +70,23 @@ export const insertPageContentSchema = createInsertSchema(pageContents).omit({
   updatedAt: true
 });
 
+// Contact form submissions
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  read: boolean("read").default(false),
+});
+
+export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
+  id: true,
+  submittedAt: true,
+  read: true
+});
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -85,3 +102,6 @@ export type InsertWaitlistEntry = z.infer<typeof insertWaitlistSchema>;
 
 export type PageContent = typeof pageContents.$inferSelect;
 export type InsertPageContent = z.infer<typeof insertPageContentSchema>;
+
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;

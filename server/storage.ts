@@ -3,7 +3,8 @@ import {
   blogPosts, type BlogPost, type InsertBlogPost,
   projects, type Project, type InsertProject,
   waitlist, type WaitlistEntry, type InsertWaitlistEntry,
-  pageContents, type PageContent, type InsertPageContent
+  pageContents, type PageContent, type InsertPageContent,
+  contactMessages, type ContactMessage, type InsertContactMessage
 } from "@shared/schema";
 
 export interface IStorage {
@@ -37,6 +38,11 @@ export interface IStorage {
   getPageContent(page: string): Promise<PageContent | undefined>;
   getAllPageContents(): Promise<PageContent[]>;
   upsertPageContent(page: string, content: string): Promise<PageContent>;
+  
+  // Contact message methods
+  addContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+  getContactMessages(): Promise<ContactMessage[]>;
+  markMessageAsRead(id: number): Promise<ContactMessage | undefined>;
 }
 
 export class MemStorage implements IStorage {

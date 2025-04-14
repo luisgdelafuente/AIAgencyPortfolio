@@ -69,7 +69,30 @@ export default function AdminContent() {
   // Handle opening the edit dialog
   const handleEditClick = (page: PageContent) => {
     setSelectedPage(page.page);
-    setEditContent(prettyPrintContent(page.content));
+    
+    // Check if content has metadata, if not add empty metadata section
+    let content;
+    try {
+      content = typeof page.content === 'string' ? JSON.parse(page.content) : page.content;
+      
+      // Add metadata section if it doesn't exist
+      if (!content.metadata) {
+        content.metadata = {
+          title: `HAL149 | ${page.page.charAt(0).toUpperCase() + page.page.slice(1)}`,
+          description: "",
+          keywords: "",
+          canonical: "",
+          ogTitle: "",
+          ogDescription: "",
+          ogImage: ""
+        };
+      }
+      
+      setEditContent(JSON.stringify(content, null, 2));
+    } catch (e) {
+      setEditContent(prettyPrintContent(page.content));
+    }
+    
     setDialogOpen(true);
   };
 

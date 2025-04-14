@@ -16,8 +16,25 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 
+interface ContactContent {
+  title: string;
+  subtitle: string;
+  email: string;
+  phone: string;
+  address: string;
+  formTitle: string;
+}
+
 export default function Contact() {
   const { toast } = useToast();
+  const [content, setContent] = useState<ContactContent>({
+    title: "Contact Us",
+    subtitle: "Have questions about our AI solutions? We'd love to hear from you.",
+    email: "info@hal149.com",
+    phone: "+1 (555) 123-4567",
+    address: "1234 AI Boulevard\nSan Francisco, CA 94107",
+    formTitle: "Send us a message"
+  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,6 +42,26 @@ export default function Contact() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/page-contents/contact');
+        if (response.ok) {
+          const data = await response.json();
+          const parsedContent = JSON.parse(data.content);
+          setContent(parsedContent);
+        }
+      } catch (error) {
+        console.error('Error fetching contact page content:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContent();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -67,10 +104,10 @@ export default function Contact() {
           <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12">
               <h1 className="text-4xl font-bold text-gray-900 mb-6">
-                Contact Us
+                {content.title}
               </h1>
               <p className="text-lg text-gray-600">
-                Have questions about our AI solutions? We'd love to hear from you.
+                {content.subtitle}
               </p>
             </div>
             
@@ -86,8 +123,12 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Address</h3>
                           <p className="text-gray-600 text-sm">
-                            1234 AI Boulevard<br />
-                            San Francisco, CA 94107
+                            {content.address.split('\n').map((line, i) => (
+                              <React.Fragment key={i}>
+                                {line}
+                                <br />
+                              </React.Fragment>
+                            ))}
                           </p>
                         </div>
                       </div>
@@ -103,8 +144,7 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Email</h3>
                           <p className="text-gray-600 text-sm">
-                            info@hal149.com<br />
-                            support@hal149.com
+                            {content.email}
                           </p>
                         </div>
                       </div>
@@ -120,8 +160,7 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Phone</h3>
                           <p className="text-gray-600 text-sm">
-                            +1 (555) 123-4567<br />
-                            Mon-Fri, 9AM-6PM PST
+                            {content.phone}
                           </p>
                         </div>
                       </div>
@@ -133,7 +172,7 @@ export default function Contact() {
               <div className="md:col-span-2">
                 <Card className="border border-gray-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle className="text-xl font-bold text-gray-900">Send us a message</CardTitle>
+                    <CardTitle className="text-xl font-bold text-gray-900">{content.formTitle}</CardTitle>
                     <CardDescription className="text-gray-600">
                       Fill out the form below and we'll get back to you as soon as possible.
                     </CardDescription>

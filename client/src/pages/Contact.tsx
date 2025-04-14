@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useLoadingState } from '@/hooks/use-loading-state';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import { 
   Card,
@@ -27,6 +28,7 @@ interface ContactContent {
 
 export default function Contact() {
   const { toast } = useToast();
+  const { startLoading, stopLoading } = useLoadingState();
   const [content, setContent] = useState<ContactContent>({
     title: "Contact Us",
     subtitle: "Have questions about our AI solutions? We'd love to hear from you.",

@@ -241,6 +241,38 @@ export class MemStorage implements IStorage {
       return newContent;
     }
   }
+  
+  // Contact message methods
+  private contactMessages: Map<number, ContactMessage> = new Map();
+  private contactMessageIdCounter: number = 1;
+  
+  async addContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const id = this.contactMessageIdCounter++;
+    const submittedAt = new Date();
+    const read = false;
+    const contactMessage: ContactMessage = { ...message, id, submittedAt, read };
+    this.contactMessages.set(id, contactMessage);
+    return contactMessage;
+  }
+  
+  async getContactMessages(): Promise<ContactMessage[]> {
+    return Array.from(this.contactMessages.values())
+      .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+  }
+  
+  async markMessageAsRead(id: number): Promise<ContactMessage | undefined> {
+    const message = this.contactMessages.get(id);
+    if (!message) {
+      return undefined;
+    }
+    
+    const updatedMessage: ContactMessage = {
+      ...message,
+      read: true
+    };
+    this.contactMessages.set(id, updatedMessage);
+    return updatedMessage;
+  }
 }
 
 import { supabase } from './supabase';
@@ -679,6 +711,96 @@ export class SupabaseStorage implements IStorage {
       return newContent;
     }
   }
+  
+  // Contact message methods
+  async addContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    try {
+      // Convert camelCase to snake_case for Supabase
+      const messageData = {
+        name: message.name,
+        email: message.email,
+        subject: message.subject,
+        message: message.message,
+        submitted_at: new Date().toISOString(),
+        read: false
+      };
+      
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert(messageData)
+        .select()
+        .single();
+      
+      if (error) {
+        throw new Error(`Failed to add contact message: ${error.message}`);
+      }
+      
+      // Map snake_case to camelCase
+      return {
+        ...data,
+        submittedAt: data.submitted_at
+      } as ContactMessage;
+    } catch (error) {
+      console.log(`Error in addContactMessage: ${error}`);
+      
+      // Fallback to an in-memory contact message object
+      return {
+        id: -1, // Use negative ID to indicate it's temporary and not stored in DB
+        name: message.name,
+        email: message.email,
+        subject: message.subject,
+        message: message.message,
+        submittedAt: new Date(),
+        read: false
+      };
+    }
+  }
+  
+  async getContactMessages(): Promise<ContactMessage[]> {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+      
+      if (error) {
+        throw new Error(`Failed to fetch contact messages: ${error.message}`);
+      }
+      
+      // Map snake_case to camelCase
+      return data.map(message => ({
+        ...message,
+        submittedAt: message.submitted_at
+      })) as ContactMessage[];
+    } catch (error) {
+      console.log(`Error in getContactMessages: ${error}`);
+      return []; // Return empty array on error
+    }
+  }
+  
+  async markMessageAsRead(id: number): Promise<ContactMessage | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .update({ read: true })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error || !data) {
+        throw new Error(`Failed to mark message as read: ${error?.message}`);
+      }
+      
+      // Map snake_case to camelCase
+      return {
+        ...data,
+        submittedAt: data.submitted_at
+      } as ContactMessage;
+    } catch (error) {
+      console.log(`Error in markMessageAsRead: ${error}`);
+      return undefined;
+    }
+  }
 }
 
 // Initial implementation using Supabase with fallback to MemStorage
@@ -833,6 +955,25 @@ class HybridStorage implements IStorage {
     return this.useSupabase 
       ? this.supabaseStorage.upsertPageContent(page, content) 
       : this.memStorage.upsertPageContent(page, content);
+  }
+  
+  // Contact message methods
+  async addContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    return this.useSupabase
+      ? this.supabaseStorage.addContactMessage(message)
+      : this.memStorage.addContactMessage(message);
+  }
+  
+  async getContactMessages(): Promise<ContactMessage[]> {
+    return this.useSupabase
+      ? this.supabaseStorage.getContactMessages()
+      : this.memStorage.getContactMessages();
+  }
+  
+  async markMessageAsRead(id: number): Promise<ContactMessage | undefined> {
+    return this.useSupabase
+      ? this.supabaseStorage.markMessageAsRead(id)
+      : this.memStorage.markMessageAsRead(id);
   }
 }
 

@@ -88,6 +88,23 @@ export async function createTables() {
     } else {
       console.log('Page contents table exists');
     }
+    
+    // Check if contact_messages table exists
+    const { data: contactMessagesData, error: contactMessagesError } = await supabase
+      .from('contact_messages')
+      .select('id')
+      .limit(1);
+    
+    if (contactMessagesError) {
+      console.log('Contact messages table does not exist or is not accessible');
+      // Create contact_messages table
+      const { error: createContactMessagesError } = await supabase.rpc('create_contact_messages_table');
+      if (!createContactMessagesError) {
+        console.log('Created contact_messages table successfully');
+      }
+    } else {
+      console.log('Contact messages table exists');
+    }
 
     console.log('Table check completed. Tables need to be created manually in Supabase dashboard if they don\'t exist.');
     console.log('Table structure:');
@@ -96,6 +113,7 @@ export async function createTables() {
     console.log('- projects: id, title, slug, description, content, category, image_url, is_featured');
     console.log('- waitlist: id, email, submitted_at');
     console.log('- page_contents: id, page, content, updated_at');
+    console.log('- contact_messages: id, name, email, subject, message, submitted_at, read');
 
   } catch (error) {
     console.error('Error checking/creating tables:', error);

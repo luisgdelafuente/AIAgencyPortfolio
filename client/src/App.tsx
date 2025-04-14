@@ -22,8 +22,6 @@ import React from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
 import { TranslationProvider } from "@/hooks/use-translations";
-import { LoadingProvider } from "@/hooks/use-loading-state";
-import LoadingOverlay from "@/components/LoadingOverlay";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -55,11 +53,8 @@ function App() {
       <LanguageProvider>
         <TranslationProvider>
           <AuthProvider>
-            <LoadingProvider>
-              <Router />
-              <Toaster />
-              <LoadingOverlay />
-            </LoadingProvider>
+            <Router />
+            <Toaster />
           </AuthProvider>
         </TranslationProvider>
       </LanguageProvider>

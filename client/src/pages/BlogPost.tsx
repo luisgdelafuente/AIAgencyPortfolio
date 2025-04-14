@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Helmet } from "react-helmet";
@@ -8,34 +8,14 @@ import { useRoute, Link } from 'wouter';
 import type { BlogPost } from '@shared/schema';
 import { formatDate } from '@shared/utils';
 import { ChevronLeft } from 'lucide-react';
-import { useLoadingState } from '@/hooks/use-loading-state';
 
 export default function BlogPostPage() {
-  const { startLoading, stopLoading } = useLoadingState();
   const [, params] = useRoute('/blog/:slug');
   const slug = params?.slug || '';
 
   const { data: post, isLoading, isError } = useQuery<BlogPost>({
     queryKey: [`/api/blog/${slug}`]
   });
-  
-  useEffect(() => {
-    // Show loading indicator if content fetch takes more than 1 second
-    const loadingTimer = setTimeout(() => {
-      if (isLoading) {
-        startLoading();
-      }
-    }, 1000);
-    
-    if (!isLoading) {
-      stopLoading();
-    }
-    
-    return () => {
-      clearTimeout(loadingTimer);
-      stopLoading();
-    };
-  }, [isLoading, startLoading, stopLoading]);
 
   if (isError) {
     return (

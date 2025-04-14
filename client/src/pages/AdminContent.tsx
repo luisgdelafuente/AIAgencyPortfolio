@@ -382,15 +382,247 @@ export default function AdminContent() {
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-sm text-neutral-500 mb-2">
-              Edit the JSON content below. This defines the structure and content of the page.
-            </p>
-            <div className="border rounded-lg overflow-hidden">
-              <ContentEditor 
-                value={editContent} 
-                onChange={setEditContent}
-              />
-            </div>
+            <Tabs defaultValue="content">
+              <TabsList className="mb-3 w-full">
+                <TabsTrigger value="content" className="flex-1">Page Content</TabsTrigger>
+                <TabsTrigger value="seo" className="flex-1">SEO Metadata</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="content" className="mt-0">
+                <p className="text-sm text-neutral-500 mb-2">
+                  Edit the JSON content below. This defines the structure and content of the page.
+                </p>
+                <div className="border rounded-lg overflow-hidden">
+                  <ContentEditor 
+                    value={editContent} 
+                    onChange={setEditContent}
+                  />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="seo" className="mt-0 space-y-4">
+                <p className="text-sm text-neutral-500 mb-2">
+                  Manage SEO metadata for this page. These fields will be used by search engines and social media platforms.
+                </p>
+                <div className="border rounded-lg p-4 space-y-4">
+                  {/* SEO Metadata Form - will be filled dynamically based on content */}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label htmlFor="meta-title" className="text-sm font-medium">
+                        Page Title
+                      </label>
+                      <input
+                        id="meta-title"
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Page title (shown in browser tab)"
+                        value={(() => {
+                          try {
+                            const content = JSON.parse(editContent);
+                            return content.metadata?.title || '';
+                          } catch (e) {
+                            return '';
+                          }
+                        })()}
+                        onChange={(e) => {
+                          try {
+                            const content = JSON.parse(editContent);
+                            if (!content.metadata) content.metadata = {};
+                            content.metadata.title = e.target.value;
+                            setEditContent(JSON.stringify(content, null, 2));
+                          } catch (e) {
+                            // Handle JSON parse error
+                          }
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="meta-keywords" className="text-sm font-medium">
+                        Keywords
+                      </label>
+                      <input
+                        id="meta-keywords"
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Keywords (comma separated)"
+                        value={(() => {
+                          try {
+                            const content = JSON.parse(editContent);
+                            return content.metadata?.keywords || '';
+                          } catch (e) {
+                            return '';
+                          }
+                        })()}
+                        onChange={(e) => {
+                          try {
+                            const content = JSON.parse(editContent);
+                            if (!content.metadata) content.metadata = {};
+                            content.metadata.keywords = e.target.value;
+                            setEditContent(JSON.stringify(content, null, 2));
+                          } catch (e) {
+                            // Handle JSON parse error
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="meta-description" className="text-sm font-medium">
+                      Meta Description
+                    </label>
+                    <textarea
+                      id="meta-description"
+                      className="w-full p-2 border rounded-md"
+                      rows={3}
+                      placeholder="Brief description of the page (shown in search results)"
+                      value={(() => {
+                        try {
+                          const content = JSON.parse(editContent);
+                          return content.metadata?.description || '';
+                        } catch (e) {
+                          return '';
+                        }
+                      })()}
+                      onChange={(e) => {
+                        try {
+                          const content = JSON.parse(editContent);
+                          if (!content.metadata) content.metadata = {};
+                          content.metadata.description = e.target.value;
+                          setEditContent(JSON.stringify(content, null, 2));
+                        } catch (e) {
+                          // Handle JSON parse error
+                        }
+                      }}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label htmlFor="meta-canonical" className="text-sm font-medium">
+                      Canonical URL
+                    </label>
+                    <input
+                      id="meta-canonical"
+                      className="w-full p-2 border rounded-md"
+                      placeholder="https://example.com/canonical-path/"
+                      value={(() => {
+                        try {
+                          const content = JSON.parse(editContent);
+                          return content.metadata?.canonical || '';
+                        } catch (e) {
+                          return '';
+                        }
+                      })()}
+                      onChange={(e) => {
+                        try {
+                          const content = JSON.parse(editContent);
+                          if (!content.metadata) content.metadata = {};
+                          content.metadata.canonical = e.target.value;
+                          setEditContent(JSON.stringify(content, null, 2));
+                        } catch (e) {
+                          // Handle JSON parse error
+                        }
+                      }}
+                    />
+                    <p className="text-xs text-neutral-500">
+                      Used to prevent duplicate content issues. Leave blank to use the default URL.
+                    </p>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <h4 className="text-sm font-semibold mb-3">Social Media (Open Graph)</h4>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label htmlFor="meta-og-title" className="text-sm font-medium">
+                          Social Title
+                        </label>
+                        <input
+                          id="meta-og-title"
+                          className="w-full p-2 border rounded-md"
+                          placeholder="Title shown when shared on social media"
+                          value={(() => {
+                            try {
+                              const content = JSON.parse(editContent);
+                              return content.metadata?.ogTitle || '';
+                            } catch (e) {
+                              return '';
+                            }
+                          })()}
+                          onChange={(e) => {
+                            try {
+                              const content = JSON.parse(editContent);
+                              if (!content.metadata) content.metadata = {};
+                              content.metadata.ogTitle = e.target.value;
+                              setEditContent(JSON.stringify(content, null, 2));
+                            } catch (e) {
+                              // Handle JSON parse error
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label htmlFor="meta-og-description" className="text-sm font-medium">
+                          Social Description
+                        </label>
+                        <textarea
+                          id="meta-og-description"
+                          className="w-full p-2 border rounded-md"
+                          rows={2}
+                          placeholder="Description shown when shared on social media"
+                          value={(() => {
+                            try {
+                              const content = JSON.parse(editContent);
+                              return content.metadata?.ogDescription || '';
+                            } catch (e) {
+                              return '';
+                            }
+                          })()}
+                          onChange={(e) => {
+                            try {
+                              const content = JSON.parse(editContent);
+                              if (!content.metadata) content.metadata = {};
+                              content.metadata.ogDescription = e.target.value;
+                              setEditContent(JSON.stringify(content, null, 2));
+                            } catch (e) {
+                              // Handle JSON parse error
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label htmlFor="meta-og-image" className="text-sm font-medium">
+                          Social Image URL
+                        </label>
+                        <input
+                          id="meta-og-image"
+                          className="w-full p-2 border rounded-md"
+                          placeholder="https://example.com/image.jpg"
+                          value={(() => {
+                            try {
+                              const content = JSON.parse(editContent);
+                              return content.metadata?.ogImage || '';
+                            } catch (e) {
+                              return '';
+                            }
+                          })()}
+                          onChange={(e) => {
+                            try {
+                              const content = JSON.parse(editContent);
+                              if (!content.metadata) content.metadata = {};
+                              content.metadata.ogImage = e.target.value;
+                              setEditContent(JSON.stringify(content, null, 2));
+                            } catch (e) {
+                              // Handle JSON parse error
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>

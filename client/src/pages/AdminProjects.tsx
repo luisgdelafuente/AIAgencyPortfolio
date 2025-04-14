@@ -51,6 +51,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { FormField, ContentEditor } from '@/components/AdminEditor';
+import { extractItemMetadata } from '@/lib/metadata';
 import type { Project, InsertProject } from '@shared/schema';
 import { slugify } from '@shared/utils';
 
@@ -212,23 +213,31 @@ export default function AdminProjects() {
   const openEditDialog = (project: Project) => {
     setCurrentProjectId(project.id);
     
-    // Try to parse metadata from content if present
+    // Default metadata from the project itself
+    const projectMetadata = extractItemMetadata({
+      ...project,
+      type: 'projects' // Add type to help with canonical URL formation
+    });
+    
+    // Set initial default metadata values
     let existingMetadata = {
-      title: '',
-      description: '',
-      keywords: '',
-      canonical: '',
-      ogTitle: '',
-      ogDescription: '',
-      ogImage: ''
+      title: projectMetadata.title || '',
+      description: projectMetadata.description || '',
+      keywords: projectMetadata.keywords || '',
+      canonical: projectMetadata.canonical || '',
+      ogTitle: projectMetadata.ogTitle || '',
+      ogDescription: projectMetadata.ogDescription || '',
+      ogImage: projectMetadata.ogImage || ''
     };
     
+    // Try to parse metadata from content if present to override defaults
     try {
       const contentObj = typeof project.content === 'string' && project.content.trim().startsWith('{') 
         ? JSON.parse(project.content)
         : { content: project.content };
         
       if (contentObj.metadata) {
+        // Override defaults with any existing metadata
         existingMetadata = {
           ...existingMetadata,
           ...contentObj.metadata

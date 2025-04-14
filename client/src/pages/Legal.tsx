@@ -91,11 +91,11 @@ export default function Legal() {
                 </div>
               ) : (
                 <Tabs defaultValue={content.sections && content.sections.length > 0 
-                  ? content.sections[0].title.toLowerCase().replace(/\s+/g, '-') 
+                  ? `tab-${0}` 
                   : 'privacy'}>
                   <TabsList className="grid w-full grid-cols-2 mb-8">
                     {content.sections && content.sections.map((section, index) => (
-                      <TabsTrigger key={index} value={section.title.toLowerCase().replace(/\s+/g, '-')}>
+                      <TabsTrigger key={index} value={`tab-${index}`}>
                         {section.title}
                       </TabsTrigger>
                     ))}
@@ -110,7 +110,7 @@ export default function Legal() {
                   {content.sections && content.sections.map((section, index) => (
                     <TabsContent 
                       key={index} 
-                      value={section.title.toLowerCase().replace(/\s+/g, '-')} 
+                      value={`tab-${index}`} 
                       className="border rounded-lg p-6 bg-white"
                     >
                       <div className="prose max-w-none">

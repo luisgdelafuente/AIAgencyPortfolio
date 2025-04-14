@@ -22,8 +22,29 @@ import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Loader2, CheckCircle } from 'lucide-react';
 import AdminNav from '@/components/AdminNav';
 import { apiRequest } from '@/lib/queryClient';
-import type { ContactMessage } from '@/lib/types';
-import { formatDate } from '@/lib/utils';
+interface ContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  submittedAt: string;
+  read: boolean;
+}
+
+function formatDate(dateString: string | Date): string {
+  if (!dateString) return '';
+  
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
 import {
   Dialog,
   DialogContent,
@@ -36,7 +57,7 @@ export default function AdminMessages() {
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: messages = [], isLoading, error } = useQuery({
+  const { data: messages = [] as ContactMessage[], isLoading, error } = useQuery<ContactMessage[]>({
     queryKey: ['/api/contact'],
     enabled: true,
   });

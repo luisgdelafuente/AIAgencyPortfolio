@@ -4,7 +4,7 @@ import AdminNav from '@/components/AdminNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, FileText, Users } from 'lucide-react';
+import { BarChart3, FileText, Users, Mail, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 
 export default function AdminDashboard() {
@@ -22,6 +22,16 @@ export default function AdminDashboard() {
 
   const { data: waitlistEntries, isLoading: isLoadingWaitlist } = useQuery<any[]>({
     queryKey: ['/api/waitlist'],
+    enabled: !!user
+  });
+  
+  const { data: contactMessages, isLoading: isLoadingMessages } = useQuery<any[]>({
+    queryKey: ['/api/contact'],
+    enabled: !!user
+  });
+  
+  const { data: pageContents, isLoading: isLoadingContents } = useQuery<any[]>({
+    queryKey: ['/api/page-contents'],
     enabled: !!user
   });
 
@@ -76,7 +86,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="sm:col-span-2 lg:col-span-1">
+              <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Waitlist Subscribers</CardTitle>
                   <Users className="h-4 w-4 text-neutral-500" />
@@ -89,6 +99,34 @@ export default function AdminDashboard() {
                   )}
                 </CardContent>
               </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Contact Messages</CardTitle>
+                  <Mail className="h-4 w-4 text-neutral-500" />
+                </CardHeader>
+                <CardContent>
+                  {isLoadingMessages ? (
+                    <Skeleton className="h-8 w-20" />
+                  ) : (
+                    <div className="text-2xl font-bold">{Array.isArray(contactMessages) ? contactMessages.length : 0}</div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card className="sm:col-span-2 lg:col-span-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Page Contents</CardTitle>
+                  <LayoutDashboard className="h-4 w-4 text-neutral-500" />
+                </CardHeader>
+                <CardContent>
+                  {isLoadingContents ? (
+                    <Skeleton className="h-8 w-20" />
+                  ) : (
+                    <div className="text-2xl font-bold">{Array.isArray(pageContents) ? pageContents.length : 0}</div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
             
             <Card className="mb-6 sm:mb-8">
@@ -97,10 +135,13 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <p className="mb-4">
-                  From here, you can manage your website content including blog posts, projects, and view waitlist subscribers.
+                  From here, you can manage all your website content including blog posts, projects, page contents, contact messages, and waitlist subscribers.
+                </p>
+                <p className="mb-4">
+                  The dashboard displays real-time statistics for all content sections in your website.
                 </p>
                 <p className="hidden sm:block">
-                  Use the navigation panel to access different sections of the admin dashboard.
+                  Use the navigation panel to access and manage different sections of the admin dashboard.
                 </p>
               </CardContent>
             </Card>

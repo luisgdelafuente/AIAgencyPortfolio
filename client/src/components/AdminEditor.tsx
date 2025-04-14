@@ -11,11 +11,30 @@ interface EditorProps {
 }
 
 export function ContentEditor({ value, onChange, preview = false }: EditorProps) {
+  // Extract just the content part if the value contains metadata
+  const getDisplayContent = (val: string): string => {
+    try {
+      // Check if this is a JSON string with metadata
+      if (typeof val === 'string' && val.trim().startsWith('{')) {
+        const parsed = JSON.parse(val);
+        if (parsed.content) {
+          // If we have a content field in the JSON, use that for display
+          return parsed.content;
+        }
+      }
+      // Otherwise just use the raw value
+      return val;
+    } catch (e) {
+      // If it's not valid JSON or there's any error, just use the raw value
+      return val;
+    }
+  };
+
   if (preview) {
     return (
       <Card className="mt-2">
         <CardContent className="p-4 prose max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: value }} />
+          <div dangerouslySetInnerHTML={{ __html: getDisplayContent(value) }} />
         </CardContent>
       </Card>
     );

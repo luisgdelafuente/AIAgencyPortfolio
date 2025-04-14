@@ -65,14 +65,24 @@ export default function AdminProjects() {
   const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('editor');
   
-  const [formData, setFormData] = useState<Partial<InsertProject>>({
+  const [formData, setFormData] = useState<Partial<InsertProject & { metadata?: Record<string, string> }>>({
     title: '',
     slug: '',
     description: '',
     content: '',
     category: '',
     imageUrl: '',
-    isFeatured: false
+    isFeatured: false,
+    metadata: {
+      // SEO metadata fields
+      title: '',
+      description: '',
+      keywords: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: ''
+    }
   });
   
   const { data: projects, isLoading: isLoadingProjects } = useQuery<Project[]>({
@@ -159,6 +169,17 @@ export default function AdminProjects() {
     }
   };
   
+  // Handle changes to metadata fields
+  const handleMetadataChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      metadata: {
+        ...prev.metadata,
+        [field]: value
+      }
+    }));
+  };
+  
   const resetForm = () => {
     setFormData({
       title: '',
@@ -167,7 +188,16 @@ export default function AdminProjects() {
       content: '',
       category: '',
       imageUrl: '',
-      isFeatured: false
+      isFeatured: false,
+      metadata: {
+        title: '',
+        description: '',
+        keywords: '',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: ''
+      }
     });
     setCurrentProjectId(null);
     setEditMode(false);
@@ -181,6 +211,33 @@ export default function AdminProjects() {
   
   const openEditDialog = (project: Project) => {
     setCurrentProjectId(project.id);
+    
+    // Try to parse metadata from content if present
+    let existingMetadata = {
+      title: '',
+      description: '',
+      keywords: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: ''
+    };
+    
+    try {
+      const contentObj = typeof project.content === 'string' && project.content.trim().startsWith('{') 
+        ? JSON.parse(project.content)
+        : { content: project.content };
+        
+      if (contentObj.metadata) {
+        existingMetadata = {
+          ...existingMetadata,
+          ...contentObj.metadata
+        };
+      }
+    } catch (e) {
+      console.error('Error parsing metadata from project:', e);
+    }
+    
     setFormData({
       title: project.title,
       slug: project.slug,
@@ -188,8 +245,10 @@ export default function AdminProjects() {
       content: project.content,
       category: project.category,
       imageUrl: project.imageUrl,
-      isFeatured: project.isFeatured
+      isFeatured: project.isFeatured,
+      metadata: existingMetadata
     });
+    
     setEditMode(true);
     setIsDialogOpen(true);
   };
@@ -209,11 +268,41 @@ export default function AdminProjects() {
       return;
     }
     
+    // Prepare the raw content or a JSON object with content + metadata
+    let finalContent = formData.content;
+    
+    // If we have metadata, store it as a JSON object with the content
+    if (formData.metadata && Object.values(formData.metadata).some(value => value && typeof value === 'string' && value.trim() !== '')) {
+      try {
+        // If content is already a JSON string with metadata
+        let contentObj = {};
+        try {
+          if (typeof formData.content === 'string' && formData.content.trim().startsWith('{')) {
+            contentObj = JSON.parse(formData.content);
+          } else {
+            contentObj = { content: formData.content };
+          }
+        } catch (e) {
+          contentObj = { content: formData.content };
+        }
+        
+        // Update with new metadata
+        finalContent = JSON.stringify({
+          ...contentObj,
+          metadata: formData.metadata
+        });
+      } catch (e) {
+        console.error('Error parsing or stringifying content with metadata:', e);
+        // Fall back to just the content without metadata
+        finalContent = formData.content;
+      }
+    }
+    
     const projectData = {
       title: formData.title!,
       slug: formData.slug || slugify(formData.title!),
       description: formData.description!,
-      content: formData.content!,
+      content: finalContent,
       category: formData.category!,
       imageUrl: formData.imageUrl!,
       isFeatured: formData.isFeatured || false
@@ -348,6 +437,7 @@ export default function AdminProjects() {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="mb-4">
                     <TabsTrigger value="editor">Editor</TabsTrigger>
+                    <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
                   
@@ -424,6 +514,73 @@ export default function AdminProjects() {
                         value={formData.content || ''}
                         onChange={(value) => handleInputChange('content', value)}
                       />
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="seo" className="space-y-6">
+                    <div className="border-b pb-4 mb-4">
+                      <h3 className="text-lg font-medium mb-2">SEO Metadata</h3>
+                      <p className="text-sm text-neutral-500">
+                        This information is used for search engines and social media sharing. 
+                        If left empty, values will be automatically generated from the project content.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          label="Meta Title"
+                          name="metaTitle"
+                          value={formData.metadata?.title || ''}
+                          onChange={(value) => handleMetadataChange('title', value)}
+                        />
+                        <FormField
+                          label="Meta Description"
+                          name="metaDescription"
+                          value={formData.metadata?.description || ''}
+                          onChange={(value) => handleMetadataChange('description', value)}
+                        />
+                      </div>
+                      
+                      <FormField
+                        label="Keywords"
+                        name="keywords"
+                        value={formData.metadata?.keywords || ''}
+                        onChange={(value) => handleMetadataChange('keywords', value)}
+                      />
+                      
+                      <FormField
+                        label="Canonical URL"
+                        name="canonical"
+                        value={formData.metadata?.canonical || ''}
+                        onChange={(value) => handleMetadataChange('canonical', value)}
+                      />
+                      
+                      <div className="border-t pt-6 mt-8">
+                        <h4 className="text-md font-medium mb-4">Social Media</h4>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                          <FormField
+                            label="Open Graph Title"
+                            name="ogTitle"
+                            value={formData.metadata?.ogTitle || ''}
+                            onChange={(value) => handleMetadataChange('ogTitle', value)}
+                          />
+                          <FormField
+                            label="Open Graph Description"
+                            name="ogDescription"
+                            value={formData.metadata?.ogDescription || ''}
+                            onChange={(value) => handleMetadataChange('ogDescription', value)}
+                          />
+                        </div>
+                        
+                        <FormField
+                          label="Open Graph Image URL"
+                          name="ogImage"
+                          value={formData.metadata?.ogImage || ''}
+                          onChange={(value) => handleMetadataChange('ogImage', value)}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
                   

@@ -108,54 +108,38 @@ export default function AdminSettings() {
     }
   });
   
-  // Initialize default page content if not found
+  // Load default values for blog and projects if they exist in the database
+  // We're not creating them automatically anymore to avoid duplication issues
   useEffect(() => {
-    // If blog page content is not found, create it
-    if (!blogPageContent && !isLoadingBlog) {
-      console.log('Blog page content not found, creating default...');
-      const defaultBlogContent = {
-        blogTitle: 'Blog - HAL149',
-        blogSubtitle: 'Latest insights and updates from HAL149',
-        metadata: {
-          title: 'AI Blog - Next-Generation Insights | HAL149',
-          description: 'Explore the latest advances in artificial intelligence, machine learning, and data insights from HAL149\'s research team.',
-          keywords: 'AI blog, machine learning blog, artificial intelligence insights, HAL149 research',
-          canonical: 'https://test.hal149.com/blog/',
-          ogTitle: 'HAL149 AI Blog - Next-Generation Insights',
-          ogDescription: 'Cutting-edge insights on AI, machine learning, and automation from industry experts.',
-          ogImage: 'https://test.hal149.com/images/blog-cover.jpg'
+    // Removed auto-creation logic to resolve duplicate key constraint violation
+    if (blogPageContent && !blogPageData.metadata.title) {
+      try {
+        const content = JSON.parse(blogPageContent.content);
+        if (content.metadata) {
+          setBlogPageData(prev => ({
+            ...prev,
+            metadata: { ...prev.metadata, ...content.metadata }
+          }));
         }
-      };
-      
-      updatePageContentMutation.mutate({
-        page: 'blog',
-        content: JSON.stringify(defaultBlogContent)
-      });
+      } catch (e) {
+        console.error('Error parsing blog page content:', e);
+      }
     }
     
-    // If projects page content is not found, create it
-    if (!projectsPageContent && !isLoadingProjects) {
-      console.log('Projects page content not found, creating default...');
-      const defaultProjectsContent = {
-        projectsTitle: 'Projects - HAL149',
-        projectsSubtitle: 'Innovative AI solutions and case studies',
-        metadata: {
-          title: 'AI Projects & Case Studies | HAL149',
-          description: 'Discover our innovative AI implementations, machine learning solutions, and technological advancements that are transforming industries.',
-          keywords: 'AI projects, machine learning case studies, artificial intelligence solutions, HAL149 innovations',
-          canonical: 'https://test.hal149.com/projects/',
-          ogTitle: 'HAL149 AI Projects & Case Studies',
-          ogDescription: 'Real-world AI implementations and innovations transforming industries.',
-          ogImage: 'https://test.hal149.com/images/projects-cover.jpg'
+    if (projectsPageContent && !projectsPageData.metadata.title) {
+      try {
+        const content = JSON.parse(projectsPageContent.content);
+        if (content.metadata) {
+          setProjectsPageData(prev => ({
+            ...prev,
+            metadata: { ...prev.metadata, ...content.metadata }
+          }));
         }
-      };
-      
-      updatePageContentMutation.mutate({
-        page: 'projects',
-        content: JSON.stringify(defaultProjectsContent)
-      });
+      } catch (e) {
+        console.error('Error parsing projects page content:', e);
+      }
     }
-  }, [blogPageContent, projectsPageContent, isLoadingBlog, isLoadingProjects, updatePageContentMutation]);
+  }, [blogPageContent, projectsPageContent, blogPageData.metadata.title, projectsPageData.metadata.title]);
 
   // Initialize form data from fetched content
   useEffect(() => {

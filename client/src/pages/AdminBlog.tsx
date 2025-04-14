@@ -286,7 +286,7 @@ export default function AdminBlog() {
                           <TableCell>
                             <div className="flex space-x-2">
                               <Button variant="outline" size="icon" asChild>
-                                <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
+                                <a href={`/blog/${post.slug}/`} target="_blank" rel="noopener noreferrer">
                                   <Eye className="h-4 w-4" />
                                   <span className="sr-only">View</span>
                                 </a>

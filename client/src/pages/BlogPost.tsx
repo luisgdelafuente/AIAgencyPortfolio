@@ -1,21 +1,38 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRoute, Link } from 'wouter';
-import type { BlogPost } from '@shared/schema';
+import type { BlogPost, PageContent } from '@shared/schema';
 import { formatDate } from '@shared/utils';
 import { ChevronLeft } from 'lucide-react';
+import { extractMetadata, extractItemMetadata } from '@/lib/metadata';
 
 export default function BlogPostPage() {
   const [, params] = useRoute('/blog/:slug');
   const slug = params?.slug || '';
 
+  // Fetch blog post
   const { data: post, isLoading, isError } = useQuery<BlogPost>({
     queryKey: [`/api/blog/${slug}`]
   });
+  
+  // Fetch blog page metadata (parent)
+  const { data: blogPageContent } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/blog'],
+  });
+  
+  // Extract metadata with inheritance
+  // 1. Start with defaults
+  // 2. Apply blog page metadata (parent)
+  // 3. Apply blog post specific metadata (child)
+  const postMetadata = post ? extractItemMetadata(post) : {};
+  const metadata = extractMetadata(blogPageContent, null, postMetadata);
+  
+  // Create URL for canonical link and sharing
+  const url = post?.slug ? `https://hal149.com/blog/${post.slug}/` : '';
 
   if (isError) {
     return (
@@ -37,10 +54,11 @@ export default function BlogPostPage() {
 
   return (
     <>
-      <Helmet>
-        <title>{post ? `${post.title} | HAL149` : 'Blog Post | HAL149'}</title>
-        <meta name="description" content={post?.excerpt || 'HAL149 blog post'} />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        type="article"
+        url={url}
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />

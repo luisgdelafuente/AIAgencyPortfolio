@@ -1,23 +1,32 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { useQuery } from '@tanstack/react-query';
 import BlogCard from '@/components/BlogCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { BlogPost } from '@shared/schema';
+import type { BlogPost, PageContent } from '@shared/schema';
+import { extractMetadata } from '@/lib/metadata';
 
 export default function Blog() {
   const { data: posts, isLoading } = useQuery<BlogPost[]>({
     queryKey: ['/api/blog']
   });
+  
+  // Fetch the blog page metadata
+  const { data: pageContent } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/blog'],
+  });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
 
   return (
     <>
-      <Helmet>
-        <title>Blog | HAL149</title>
-        <meta name="description" content="Read the latest insights and articles about artificial intelligence and machine learning." />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata} 
+        url="https://hal149.com/blog/"
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />

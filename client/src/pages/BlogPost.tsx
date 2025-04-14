@@ -25,7 +25,7 @@ export default function BlogPostPage() {
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Blog post not found</h1>
             <p className="mb-6">The blog post you are looking for does not exist.</p>
-            <Link href="/blog" className="inline-flex items-center text-neutral-600 hover:text-neutral-900">
+            <Link href="/blog/" className="inline-flex items-center text-neutral-600 hover:text-neutral-900">
               <ChevronLeft className="w-4 h-4 mr-1" /> Back to blog
             </Link>
           </div>
@@ -63,7 +63,7 @@ export default function BlogPostPage() {
             <>
               <div className="bg-neutral-50 py-8">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <Link href="/blog" className="inline-flex items-center text-neutral-600 hover:text-neutral-900 mb-6">
+                  <Link href="/blog/" className="inline-flex items-center text-neutral-600 hover:text-neutral-900 mb-6">
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back to blog
                   </Link>
                   <h1 className="text-4xl font-bold mb-4">{post.title}</h1>

@@ -18,6 +18,7 @@ import AdminBlog from "@/pages/AdminBlog";
 import AdminWaitlist from "@/pages/AdminWaitlist";
 import AdminContent from "@/pages/AdminContent";
 import AdminMessages from "@/pages/AdminMessages";
+import AdminSettings from "@/pages/AdminSettings";
 import React from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
@@ -42,6 +43,7 @@ function Router() {
       <ProtectedRoute path="/admin/content/" component={AdminContent} />
       <ProtectedRoute path="/admin/waitlist/" component={AdminWaitlist} />
       <ProtectedRoute path="/admin/messages/" component={AdminMessages} />
+      <ProtectedRoute path="/admin/settings/" component={AdminSettings} />
       <Route component={NotFound} />
     </Switch>
   );

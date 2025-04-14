@@ -1,23 +1,32 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { useQuery } from '@tanstack/react-query';
 import ProjectCard from '@/components/ProjectCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { Project } from '@shared/schema';
+import type { Project, PageContent } from '@shared/schema';
+import { extractMetadata } from '@/lib/metadata';
 
 export default function Projects() {
   const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ['/api/projects']
   });
+  
+  // Fetch projects page metadata
+  const { data: pageContent } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/projects'],
+  });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
 
   return (
     <>
-      <Helmet>
-        <title>Projects | HAL149</title>
-        <meta name="description" content="Explore our innovative AI projects across various industries." />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        url="https://hal149.com/projects/"
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />

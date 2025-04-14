@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,9 @@ import {
   CardTitle,
   CardDescription 
 } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
+import { PageContent } from '@shared/schema';
+import { extractMetadata } from '@/lib/metadata';
 
 interface ContactContent {
   title: string;
@@ -112,12 +115,20 @@ export default function Contact() {
     }
   };
 
+  // Fetch contact page metadata
+  const { data: pageContent } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/contact'],
+  });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
+
   return (
     <>
-      <Helmet>
-        <title>Contact | HAL149</title>
-        <meta name="description" content="Get in touch with the HAL149 team for inquiries about our AI solutions and services." />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        url="https://hal149.com/contact/"
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />

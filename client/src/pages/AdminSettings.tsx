@@ -85,6 +85,78 @@ export default function AdminSettings() {
     enabled: !!user
   });
   
+  // Mutation for updating page content
+  const updatePageContentMutation = useMutation({
+    mutationFn: async ({ page, content }: { page: string, content: string }) => {
+      const res = await apiRequest("POST", "/api/page-contents", { page, content });
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [`/api/page-contents/${variables.page}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/page-contents'] });
+      toast({
+        title: "Settings updated",
+        description: `The ${variables.page} page settings have been updated successfully`
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update settings",
+        variant: "destructive"
+      });
+    }
+  });
+  
+  // Initialize default page content if not found
+  useEffect(() => {
+    // If blog page content is not found, create it
+    if (!blogPageContent && !isLoadingBlog) {
+      console.log('Blog page content not found, creating default...');
+      const defaultBlogContent = {
+        blogTitle: 'Blog - HAL149',
+        blogSubtitle: 'Latest insights and updates from HAL149',
+        metadata: {
+          title: 'AI Blog - Next-Generation Insights | HAL149',
+          description: 'Explore the latest advances in artificial intelligence, machine learning, and data insights from HAL149\'s research team.',
+          keywords: 'AI blog, machine learning blog, artificial intelligence insights, HAL149 research',
+          canonical: 'https://test.hal149.com/blog/',
+          ogTitle: 'HAL149 AI Blog - Next-Generation Insights',
+          ogDescription: 'Cutting-edge insights on AI, machine learning, and automation from industry experts.',
+          ogImage: 'https://test.hal149.com/images/blog-cover.jpg'
+        }
+      };
+      
+      updatePageContentMutation.mutate({
+        page: 'blog',
+        content: JSON.stringify(defaultBlogContent)
+      });
+    }
+    
+    // If projects page content is not found, create it
+    if (!projectsPageContent && !isLoadingProjects) {
+      console.log('Projects page content not found, creating default...');
+      const defaultProjectsContent = {
+        projectsTitle: 'Projects - HAL149',
+        projectsSubtitle: 'Innovative AI solutions and case studies',
+        metadata: {
+          title: 'AI Projects & Case Studies | HAL149',
+          description: 'Discover our innovative AI implementations, machine learning solutions, and technological advancements that are transforming industries.',
+          keywords: 'AI projects, machine learning case studies, artificial intelligence solutions, HAL149 innovations',
+          canonical: 'https://test.hal149.com/projects/',
+          ogTitle: 'HAL149 AI Projects & Case Studies',
+          ogDescription: 'Real-world AI implementations and innovations transforming industries.',
+          ogImage: 'https://test.hal149.com/images/projects-cover.jpg'
+        }
+      };
+      
+      updatePageContentMutation.mutate({
+        page: 'projects',
+        content: JSON.stringify(defaultProjectsContent)
+      });
+    }
+  }, [blogPageContent, projectsPageContent, isLoadingBlog, isLoadingProjects, updatePageContentMutation]);
+
   // Initialize form data from fetched content
   useEffect(() => {
     if (homePageContent?.content) {
@@ -137,29 +209,6 @@ export default function AdminSettings() {
       }
     }
   }, [projectsPageContent]);
-  
-  // Mutation for updating page content
-  const updatePageContentMutation = useMutation({
-    mutationFn: async ({ page, content }: { page: string, content: string }) => {
-      const res = await apiRequest("POST", "/api/page-contents", { page, content });
-      return res.json();
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [`/api/page-contents/${variables.page}`] });
-      queryClient.invalidateQueries({ queryKey: ['/api/page-contents'] });
-      toast({
-        title: "Settings updated",
-        description: `The ${variables.page} page settings have been updated successfully`
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update settings",
-        variant: "destructive"
-      });
-    }
-  });
   
   // Handle site defaults update
   const handleSiteDefaultsUpdate = () => {
@@ -488,18 +537,14 @@ export default function AdminSettings() {
                               value={blogPageData.metadata.description}
                               onChange={(value) => handleBlogPageChange('metadata.description', value)}
                             />
-                          </div>
-                          
-                          <div className="mt-6">
+                            
                             <FormField
-                              label="Keywords"
+                              label="Meta Keywords"
                               name="metadata.keywords"
                               value={blogPageData.metadata.keywords}
                               onChange={(value) => handleBlogPageChange('metadata.keywords', value)}
                             />
-                          </div>
-                          
-                          <div className="mt-6">
+                            
                             <FormField
                               label="Canonical URL"
                               name="metadata.canonical"
@@ -508,8 +553,8 @@ export default function AdminSettings() {
                             />
                           </div>
                           
-                          <div className="border-t pt-6 mt-6">
-                            <h4 className="text-md font-medium mb-4">Social Media</h4>
+                          <div className="mt-6">
+                            <h4 className="text-md font-medium mb-4">Social Media Metadata</h4>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <FormField
@@ -525,9 +570,7 @@ export default function AdminSettings() {
                                 value={blogPageData.metadata.ogDescription}
                                 onChange={(value) => handleBlogPageChange('metadata.ogDescription', value)}
                               />
-                            </div>
-                            
-                            <div className="mt-6">
+                              
                               <FormField
                                 label="Open Graph Image URL"
                                 name="metadata.ogImage"
@@ -604,18 +647,14 @@ export default function AdminSettings() {
                               value={projectsPageData.metadata.description}
                               onChange={(value) => handleProjectsPageChange('metadata.description', value)}
                             />
-                          </div>
-                          
-                          <div className="mt-6">
+                            
                             <FormField
-                              label="Keywords"
+                              label="Meta Keywords"
                               name="metadata.keywords"
                               value={projectsPageData.metadata.keywords}
                               onChange={(value) => handleProjectsPageChange('metadata.keywords', value)}
                             />
-                          </div>
-                          
-                          <div className="mt-6">
+                            
                             <FormField
                               label="Canonical URL"
                               name="metadata.canonical"
@@ -624,8 +663,8 @@ export default function AdminSettings() {
                             />
                           </div>
                           
-                          <div className="border-t pt-6 mt-6">
-                            <h4 className="text-md font-medium mb-4">Social Media</h4>
+                          <div className="mt-6">
+                            <h4 className="text-md font-medium mb-4">Social Media Metadata</h4>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <FormField
@@ -641,9 +680,7 @@ export default function AdminSettings() {
                                 value={projectsPageData.metadata.ogDescription}
                                 onChange={(value) => handleProjectsPageChange('metadata.ogDescription', value)}
                               />
-                            </div>
-                            
-                            <div className="mt-6">
+                              
                               <FormField
                                 label="Open Graph Image URL"
                                 name="metadata.ogImage"

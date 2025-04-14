@@ -98,8 +98,25 @@ export default function ProjectDetailPage() {
                   className="w-full h-auto rounded-lg mb-6"
                 />
                 <div className="prose max-w-none">
-                  {/* In a real app, you would use a markdown renderer here */}
-                  <div dangerouslySetInnerHTML={{ __html: project.content }} />
+                  {/* Handle both direct HTML and JSON-wrapped content */}
+                  <div dangerouslySetInnerHTML={{ 
+                    __html: (() => {
+                      try {
+                        // Try to parse as JSON first
+                        if (typeof project.content === 'string' && project.content.trim().startsWith('{')) {
+                          const contentObj = JSON.parse(project.content);
+                          // If it has a content field, use that
+                          if (contentObj.content) {
+                            return contentObj.content;
+                          }
+                        }
+                      } catch (e) {
+                        // If parsing fails, just use the raw content
+                      }
+                      // Default case: use the content as-is
+                      return project.content;
+                    })()
+                  }} />
                 </div>
               </div>
             </>

@@ -230,28 +230,33 @@ export default function AdminProjects() {
       ogImage: projectMetadata.ogImage || ''
     };
     
-    // Try to parse metadata from content if present to override defaults
+    // For projects that used the old JSON format, extract the content
+    // This ensures backward compatibility with existing projects
+    let contentValue = project.content;
     try {
-      const contentObj = typeof project.content === 'string' && project.content.trim().startsWith('{') 
-        ? JSON.parse(project.content)
-        : { content: project.content };
-        
-      if (contentObj.metadata) {
-        // Override defaults with any existing metadata
-        existingMetadata = {
-          ...existingMetadata,
-          ...contentObj.metadata
-        };
+      if (typeof project.content === 'string' && project.content.trim().startsWith('{')) {
+        const contentObj = JSON.parse(project.content);
+        if (contentObj.content) {
+          // If we have a content field in the JSON, use that as the raw HTML
+          contentValue = contentObj.content;
+        }
+        if (contentObj.metadata) {
+          // Override defaults with any existing metadata
+          existingMetadata = {
+            ...existingMetadata,
+            ...contentObj.metadata
+          };
+        }
       }
     } catch (e) {
-      console.error('Error parsing metadata from project:', e);
+      console.error('Error parsing content from project:', e);
     }
     
     setFormData({
       title: project.title,
       slug: project.slug,
       description: project.description,
-      content: project.content,
+      content: contentValue, // Use the extracted content value
       category: project.category,
       imageUrl: project.imageUrl,
       isFeatured: project.isFeatured,
@@ -277,35 +282,12 @@ export default function AdminProjects() {
       return;
     }
     
-    // Prepare the raw content or a JSON object with content + metadata
+    // Make the Projects content handling work the same as Blog posts
+    // Just use the raw HTML content directly without wrapping in JSON
     let finalContent = formData.content;
     
-    // If we have metadata, store it as a JSON object with the content
-    if (formData.metadata && Object.values(formData.metadata).some(value => value && typeof value === 'string' && value.trim() !== '')) {
-      try {
-        // If content is already a JSON string with metadata
-        let contentObj = {};
-        try {
-          if (typeof formData.content === 'string' && formData.content.trim().startsWith('{')) {
-            contentObj = JSON.parse(formData.content);
-          } else {
-            contentObj = { content: formData.content };
-          }
-        } catch (e) {
-          contentObj = { content: formData.content };
-        }
-        
-        // Update with new metadata
-        finalContent = JSON.stringify({
-          ...contentObj,
-          metadata: formData.metadata
-        });
-      } catch (e) {
-        console.error('Error parsing or stringifying content with metadata:', e);
-        // Fall back to just the content without metadata
-        finalContent = formData.content;
-      }
-    }
+    // Store metadata separately - this won't affect the content field at all
+    // Blog posts don't wrap the content in JSON, we should be consistent here
     
     const projectData = {
       title: formData.title!,

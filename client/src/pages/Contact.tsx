@@ -49,21 +49,31 @@ export default function Contact() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        // Start global loading state if fetch takes more than 1s
+        const loadingTimeout = setTimeout(() => {
+          startLoading();
+        }, 1000);
+        
         const response = await fetch('/api/page-contents/contact');
         if (response.ok) {
           const data = await response.json();
           const parsedContent = JSON.parse(data.content);
           setContent(parsedContent);
         }
+        
+        // Clear timeout and stop loading
+        clearTimeout(loadingTimeout);
+        stopLoading();
       } catch (error) {
         console.error('Error fetching contact page content:', error);
+        stopLoading();
       } finally {
         setLoading(false);
       }
     };
 
     fetchContent();
-  }, []);
+  }, [startLoading, stopLoading]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -73,6 +83,9 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    // Start global loading state
+    startLoading();
     
     try {
       const response = await fetch('/api/contact', {
@@ -111,6 +124,8 @@ export default function Contact() {
       });
     } finally {
       setIsSubmitting(false);
+      // Stop global loading state
+      stopLoading();
     }
   };
 

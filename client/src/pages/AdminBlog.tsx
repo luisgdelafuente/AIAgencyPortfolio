@@ -48,6 +48,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { FormField, ContentEditor } from '@/components/AdminEditor';
+import { extractItemMetadata } from '@/lib/metadata';
 import type { BlogPost, InsertBlogPost } from '@shared/schema';
 import { formatDate, slugify } from '@shared/utils';
 
@@ -194,15 +195,21 @@ export default function AdminBlog() {
   const openEditDialog = (post: BlogPost) => {
     setCurrentPostId(post.id);
     
+    // Default metadata from the blog post itself
+    const postMetadata = extractItemMetadata({
+      ...post,
+      type: 'blog'  // Add type to help with canonical URL formation
+    });
+    
     // Try to parse metadata from content if present
     let existingMetadata = {
-      title: '',
-      description: '',
-      keywords: '',
-      canonical: '',
-      ogTitle: '',
-      ogDescription: '',
-      ogImage: ''
+      title: postMetadata.title || '',
+      description: postMetadata.description || '',
+      keywords: postMetadata.keywords || '',
+      canonical: postMetadata.canonical || '',
+      ogTitle: postMetadata.ogTitle || '',
+      ogDescription: postMetadata.ogDescription || '',
+      ogImage: postMetadata.ogImage || ''
     };
     
     try {
@@ -211,6 +218,7 @@ export default function AdminBlog() {
         : { content: post.content };
         
       if (contentObj.metadata) {
+        // Override defaults with any existing metadata from content
         existingMetadata = {
           ...existingMetadata,
           ...contentObj.metadata

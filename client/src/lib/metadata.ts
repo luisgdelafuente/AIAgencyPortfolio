@@ -90,14 +90,20 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
   if (!item) return {};
   
   // Extract relevant fields from item
-  return {
+  const baseMetadata = {
     title: item.title ? `${item.title} | HAL149` : '',
     description: item.excerpt || item.description || '',
-    // For blog posts
-    ...(item.content && { 
-      ogDescription: item.excerpt || '', 
-    }),
-    // For projects
+    keywords: item.category ? `${item.category}, HAL149, AI solutions` : 'HAL149, AI solutions',
+    canonical: item.slug ? `https://test.hal149.com/${item.type || 'blog'}/${item.slug}/` : '',
+  };
+  
+  // Return with social metadata defaulting to regular metadata
+  return {
+    ...baseMetadata,
+    // Social media fields default to their corresponding metadata fields
+    ogTitle: baseMetadata.title,
+    ogDescription: baseMetadata.description,
+    // For projects and blog posts with images
     ...(item.imageUrl && { 
       ogImage: item.imageUrl 
     }),

@@ -24,8 +24,7 @@ export default function Header() {
     { href: '/projects/', label: t.nav.projects },
     { href: '/blog/', label: t.nav.blog },
     { href: '/about/', label: t.nav.about },
-    { href: '/contact/', label: t.nav.contact },
-    { href: '/legal/', label: t.nav.legal }
+    { href: '/contact/', label: t.nav.contact }
   ];
 
   return (

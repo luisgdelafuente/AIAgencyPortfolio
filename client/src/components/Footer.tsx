@@ -21,7 +21,7 @@ export default function Footer() {
               <HAL149Logo />
             </Link>
             <p className="text-gray-600 mb-5 max-w-md">
-              Empowering the future with intelligent AI solutions designed for enterprises and innovative organizations.
+              From AI automations to strategic programs HAL149 is your partner to build and deploy tailored AI strategies.
             </p>
             <div className="flex space-x-5 mt-6">
               <a href="#" className="text-gray-400 hover:text-gray-900 transition-colors">

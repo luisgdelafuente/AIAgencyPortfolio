@@ -37,18 +37,22 @@ export default function Projects() {
               <h1 className="text-4xl font-bold text-gray-900 mb-6">
                 {(() => {
                   try {
-                    return pageContent?.content ? JSON.parse(pageContent.content).projectsTitle || 'Our Projects' : 'Our Projects';
+                    return pageContent?.content && JSON.parse(pageContent.content).projectsTitle ? 
+                      JSON.parse(pageContent.content).projectsTitle : 
+                      '';
                   } catch (e) {
-                    return 'Our Projects';
+                    return '';
                   }
                 })()}
               </h1>
               <p className="text-lg text-gray-600">
                 {(() => {
                   try {
-                    return pageContent?.content ? JSON.parse(pageContent.content).projectsSubtitle || 'Explore how our AI solutions are transforming various industries' : 'Explore how our AI solutions are transforming various industries';
+                    return pageContent?.content && JSON.parse(pageContent.content).projectsSubtitle ? 
+                      JSON.parse(pageContent.content).projectsSubtitle : 
+                      '';
                   } catch (e) {
-                    return 'Explore how our AI solutions are transforming various industries';
+                    return '';
                   }
                 })()}
               </p>

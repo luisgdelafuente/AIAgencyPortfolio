@@ -22,9 +22,9 @@ export default function BlogSection() {
   });
   
   const [content, setContent] = useState<HomeContent>({
-    blogTitle: t.blog.title,
-    blogSubtitle: t.blog.subtitle,
-    blogCta: t.blog.cta
+    blogTitle: '',
+    blogSubtitle: '',
+    blogCta: ''
   });
   
   useEffect(() => {
@@ -58,10 +58,10 @@ export default function BlogSection() {
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {content.blogTitle || t.blog.title}
+            {content.blogTitle}
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            {content.blogSubtitle || t.blog.subtitle}
+            {content.blogSubtitle}
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export default function BlogSection() {
 
         <div className="mt-10 text-center">
           <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
-            <Link href="/blog/">{content.blogCta || t.blog.cta}</Link>
+            <Link href="/blog/">{content.blogCta}</Link>
           </Button>
         </div>
       </div>

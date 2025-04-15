@@ -37,18 +37,22 @@ export default function Blog() {
               <h1 className="text-4xl font-bold text-gray-900 mb-6">
                 {(() => {
                   try {
-                    return pageContent?.content ? JSON.parse(pageContent.content).blogTitle || 'Our Blog' : 'Our Blog';
+                    return pageContent?.content && JSON.parse(pageContent.content).blogTitle ? 
+                      JSON.parse(pageContent.content).blogTitle : 
+                      '';
                   } catch (e) {
-                    return 'Our Blog';
+                    return '';
                   }
                 })()}
               </h1>
               <p className="text-lg text-gray-600">
                 {(() => {
                   try {
-                    return pageContent?.content ? JSON.parse(pageContent.content).blogSubtitle || 'Insights and updates from the cutting edge of AI technology' : 'Insights and updates from the cutting edge of AI technology';
+                    return pageContent?.content && JSON.parse(pageContent.content).blogSubtitle ? 
+                      JSON.parse(pageContent.content).blogSubtitle : 
+                      '';
                   } catch (e) {
-                    return 'Insights and updates from the cutting edge of AI technology';
+                    return '';
                   }
                 })()}
               </p>

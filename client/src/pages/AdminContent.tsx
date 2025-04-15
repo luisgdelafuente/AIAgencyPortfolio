@@ -70,14 +70,7 @@ export default function AdminContent() {
   const handleEditClick = (page: PageContent) => {
     setSelectedPage(page.page);
     
-    // Special case for the About page - use raw HTML content
-    if (page.page === 'about') {
-      setEditContent(page.content);
-      setDialogOpen(true);
-      return;
-    }
-    
-    // For other pages, check if content has metadata, if not add empty metadata section
+    // Check if content has metadata, if not add empty metadata section
     let content;
     try {
       content = typeof page.content === 'string' ? JSON.parse(page.content) : page.content;
@@ -107,16 +100,6 @@ export default function AdminContent() {
   const handleSaveContent = () => {
     if (!selectedPage) return;
     
-    // Special case for the About page - save raw HTML content
-    if (selectedPage === 'about') {
-      updatePageContent.mutate({ 
-        page: selectedPage, 
-        content: editContent 
-      });
-      return;
-    }
-    
-    // For other pages, validate and save JSON content
     try {
       // Validate JSON content
       JSON.parse(editContent);
@@ -136,14 +119,7 @@ export default function AdminContent() {
   };
 
   // Display preview of the content
-  const getContentPreview = (page: string, content: any) => {
-    // Special case for the About page - show HTML preview
-    if (page === 'about') {
-      const contentStr = String(content);
-      // Just show the first 500 characters of the HTML
-      return contentStr.substring(0, 500) + (contentStr.length > 500 ? '...' : '');
-    }
-    
+  const getContentPreview = (content: any) => {
     try {
       // Handle both string and object formats since Supabase might return JSONB as object
       const parsed = typeof content === 'string' ? JSON.parse(content) : content;
@@ -238,35 +214,29 @@ export default function AdminContent() {
                 </Button>
                 <Button 
                   onClick={() => {
-                    // Create a basic HTML template for the About page
-                    const aboutContent = `
-<h1>About HAL149</h1>
-<p>Welcome to HAL149, a pioneering AI agency at the forefront of innovation.</p>
-
-<h2>Our Mission</h2>
-<p>Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.</p>
-
-<h2>Our Vision</h2>
-<p>We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.</p>
-
-<h2>Our Team</h2>
-<p>Our team brings together experts from both the AI research community and various industries, creating a unique blend of technical innovation and practical business experience.</p>
-
-<ul>
-  <li><strong>Alex Johnson</strong> - CEO & Co-founder, Former ML research lead at Stanford AI Lab</li>
-  <li><strong>Maria Chen</strong> - CTO & Co-founder, PhD in Computer Science specializing in deep learning</li>
-  <li><strong>David Park</strong> - Head of Product, Experienced product leader in AI technologies</li>
-</ul>
-
-<h2>Our Approach</h2>
-<p>We believe in creating AI solutions that are:</p>
-<ul>
-  <li>Transparent and explainable</li>
-  <li>Ethical and responsible</li>
-  <li>Practical and results-oriented</li>
-  <li>Customized to your specific needs</li>
-</ul>
-`;
+                    const aboutContent = JSON.stringify({
+                      title: "About Us",
+                      mission: "Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.",
+                      vision: "We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.",
+                      history: "Founded in 2020, our team of AI specialists and industry experts has been at the forefront of developing practical applications of machine learning that solve real business problems.",
+                      team: [
+                        {
+                          name: "Alex Johnson",
+                          role: "CEO & Co-founder",
+                          bio: "Former ML research lead at Stanford AI Lab with 15+ years of experience in the field."
+                        },
+                        {
+                          name: "Maria Chen",
+                          role: "CTO & Co-founder",
+                          bio: "PhD in Computer Science, specializing in deep learning architectures and their applications."
+                        },
+                        {
+                          name: "David Park",
+                          role: "Head of Product",
+                          bio: "Experienced product leader who previously scaled AI products at major tech companies."
+                        }
+                      ]
+                    }, null, 2);
                     updatePageContent.mutate({ page: 'about', content: aboutContent });
                   }}
                   disabled={updatePageContent.isPending}
@@ -365,7 +335,7 @@ export default function AdminContent() {
                         <div className="mt-3">
                           <ScrollArea className="h-[150px] w-full rounded border bg-neutral-50 p-4">
                             <pre className="text-xs text-neutral-700 whitespace-pre-wrap">
-                              {getContentPreview(page.page, page.content)}
+                              {getContentPreview(page.content)}
                             </pre>
                           </ScrollArea>
                         </div>
@@ -415,16 +385,12 @@ export default function AdminContent() {
             <Tabs defaultValue="content" className="flex flex-col h-full overflow-hidden">
               <TabsList className="mb-3 w-full">
                 <TabsTrigger value="content" className="flex-1">Page Content</TabsTrigger>
-                {selectedPage !== 'about' && (
-                  <TabsTrigger value="seo" className="flex-1">SEO Metadata</TabsTrigger>
-                )}
+                <TabsTrigger value="seo" className="flex-1">SEO Metadata</TabsTrigger>
               </TabsList>
               
               <TabsContent value="content" className="mt-0 flex-1 overflow-hidden">
                 <p className="text-sm text-neutral-500 mb-2">
-                  {selectedPage === 'about' 
-                    ? 'Edit the HTML content below. You can use standard HTML tags to format your content.'
-                    : 'Edit the JSON content below. This defines the structure and content of the page.'}
+                  Edit the JSON content below. This defines the structure and content of the page.
                 </p>
                 <div className="border rounded-lg overflow-hidden h-[60vh]">
                   <ContentEditor 

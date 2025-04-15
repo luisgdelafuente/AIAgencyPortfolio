@@ -52,17 +52,28 @@ export default function BlogSection() {
     fetchContent();
   }, []);
 
+  // Only render if we have section content after loading
+  if (contentLoading || (!content.blogTitle && !content.blogSubtitle)) {
+    return null;
+  }
+
   return (
     <section className="py-12 md:py-16 bg-gray-50">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            {content.blogTitle}
-          </h2>
-          <p className="mt-4 text-lg text-gray-600">
-            {content.blogSubtitle}
-          </p>
-        </div>
+        {(content.blogTitle || content.blogSubtitle) && (
+          <div className="max-w-3xl mx-auto text-center mb-10">
+            {content.blogTitle && (
+              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+                {content.blogTitle}
+              </h2>
+            )}
+            {content.blogSubtitle && (
+              <p className="mt-4 text-lg text-gray-600">
+                {content.blogSubtitle}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {isLoading ? (
@@ -90,11 +101,13 @@ export default function BlogSection() {
           )}
         </div>
 
-        <div className="mt-10 text-center">
-          <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
-            <Link href="/blog/">{content.blogCta}</Link>
-          </Button>
-        </div>
+        {content.blogCta && (
+          <div className="mt-10 text-center">
+            <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
+              <Link href="/blog/">{content.blogCta}</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet";
 
 export default function About() {
   const [content, setContent] = useState<string>('');
+  const [pageTitle, setPageTitle] = useState<string>('About | HAL149');
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -18,6 +19,14 @@ export default function About() {
           // Use the content directly as HTML without parsing as JSON
           if (data.content) {
             setContent(data.content);
+            
+            // Try to extract page title from first h1 tag if it exists
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data.content;
+            const h1 = tempDiv.querySelector('h1');
+            if (h1 && h1.textContent) {
+              setPageTitle(`${h1.textContent} | HAL149`);
+            }
           }
         }
       } catch (error) {
@@ -33,7 +42,7 @@ export default function About() {
   return (
     <>
       <Helmet>
-        <title>About | HAL149</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Learn about HAL149, our mission, vision, and the team behind our industry-specific AI applications." />
       </Helmet>
       

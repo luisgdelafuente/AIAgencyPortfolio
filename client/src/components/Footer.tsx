@@ -53,11 +53,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.resources}</h3>
+            <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">INDUSTRIES</h3>
             <ul className="space-y-3">
-              <li><Link href="/projects/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.projects}</Link></li>
-              <li><Link href="/contact/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.contact}</Link></li>
-              <li><a href="#" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.footer.documentation}</a></li>
+              <li><span className="text-gray-600 text-sm">Education</span></li>
+              <li><span className="text-gray-600 text-sm">Manufacturing</span></li>
+              <li><span className="text-gray-600 text-sm">Real Estate</span></li>
             </ul>
           </div>
 

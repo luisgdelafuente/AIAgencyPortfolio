@@ -23,7 +23,6 @@ export default function Header() {
   const navLinks = [
     { href: '/projects/', label: t.nav.projects },
     { href: '/blog/', label: t.nav.blog },
-    { href: '/about/', label: t.nav.about },
     { href: '/contact/', label: t.nav.contact }
   ];
 

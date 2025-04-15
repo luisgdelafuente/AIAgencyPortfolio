@@ -11,7 +11,7 @@ const HAL149Logo = () => (
 
 export default function Footer() {
   const t = useTranslations();
-  
+
   return (
     <footer className="bg-gray-50 border-t border-gray-100 py-16 mt-16">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,16 +41,16 @@ export default function Footer() {
               </a>
             </div>
           </div>
-          
+
           <div>
             <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.company}</h3>
             <ul className="space-y-3">
               <li><Link href="/about/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.about}</Link></li>
               <li><Link href="/blog/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.blog}</Link></li>
-              <li><Link href="/legal/" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.nav.legal}</Link></li>
+              {/* Removed Legal link from here */}
             </ul>
           </div>
-          
+
           <div>
             <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.resources}</h3>
             <ul className="space-y-3">
@@ -59,16 +59,16 @@ export default function Footer() {
               <li><a href="#" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">{t.footer.documentation}</a></li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="font-semibold text-sm text-gray-900 uppercase tracking-wider mb-4">{t.footer.language}</h3>
             <LanguageToggle />
           </div>
         </div>
-        
+
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} HAL149. {t.footer.rights}
+            © {new Date().getFullYear()} HAL149. {t.footer.rights} • <Link href="/legal/" className="hover:text-gray-900 transition-colors">Legal</Link>
           </p>
           <div className="flex mt-4 md:mt-0">
             <span className="text-gray-500 text-sm">{t.footer.version}</span>

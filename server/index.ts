@@ -5,6 +5,23 @@ import cors from "cors";
 
 const app = express();
 
+// Redirect Replit domain to custom domain
+app.use((req, res, next) => {
+  const host = req.header('host');
+  
+  // Check if it's a Replit domain
+  if (host && host.includes('replit.app')) {
+    // Get the path including query string
+    const fullPath = req.url;
+    const customDomain = 'hal149.com';
+    
+    // Redirect to the same path on the custom domain
+    return res.redirect(301, `https://${customDomain}${fullPath}`);
+  }
+  
+  next();
+});
+
 // Configure CORS
 app.use(cors({
   origin: true, // Allow any origin in development

@@ -23,9 +23,10 @@ export default function MetaTags({
       <meta name="description" content={metadata.description} />
       {metadata.keywords && <meta name="keywords" content={metadata.keywords} />}
       
-      {/* Canonical URL */}
+      {/* Canonical URL - always prefer the custom domain over Replit domain */}
       {metadata.canonical && <link rel="canonical" href={metadata.canonical} />}
       {!metadata.canonical && url && <link rel="canonical" href={url} />}
+      {!metadata.canonical && !url && <link rel="canonical" href={`https://hal149.com${window.location.pathname}`} />}
       
       {/* Open Graph / Social Media Meta Tags */}
       {metadata.ogTitle 

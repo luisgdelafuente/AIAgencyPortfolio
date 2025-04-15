@@ -1,5 +1,12 @@
+# For the Replit domain (block all crawling to prevent duplicate content)
+User-agent: *
+Disallow: /
+Host: hal149.com
+
+# For the custom domain (allow crawling)
 User-agent: *
 Allow: /
+Host: hal149.com
 
-# Allow crawling of all content
-Sitemap: https://hal149.replit.app/sitemap.xml
+# Sitemap for the main domain
+Sitemap: https://hal149.com/sitemap.xml

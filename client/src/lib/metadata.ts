@@ -1,10 +1,10 @@
 import { PageContent } from '@shared/schema';
 
-// Default metadata fallback values
+// Default metadata fallback values - minimal to ensure the database values are used
 export const defaultMetadata = {
-  title: 'HAL149 - Next-Generation AI Solutions',
-  description: 'Industry-specific AI applications to transform data into insights, automate workflows, and stay ahead of the competition.',
-  keywords: 'AI, machine learning, data insights, automation',
+  title: 'HAL149',
+  description: '',
+  keywords: '',
   canonical: '',
   ogTitle: '',
   ogDescription: '',
@@ -93,8 +93,8 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
   const baseMetadata = {
     title: item.title ? `${item.title} | HAL149` : '',
     description: item.excerpt || item.description || '',
-    keywords: item.category ? `${item.category}, HAL149, AI solutions` : 'HAL149, AI solutions',
-    canonical: item.slug ? `https://test.hal149.com/${item.type || 'blog'}/${item.slug}/` : '',
+    keywords: item.category ? `${item.category}` : '',
+    canonical: item.slug ? `/${item.type || 'blog'}/${item.slug}/` : '',
   };
   
   // Return with social metadata defaulting to regular metadata

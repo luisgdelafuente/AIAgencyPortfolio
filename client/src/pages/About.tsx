@@ -25,8 +25,22 @@ export default function About() {
         const response = await fetch('/api/page-contents/about');
         if (response.ok) {
           const data = await response.json();
-          const parsedContent = JSON.parse(data.content);
-          setContent(parsedContent);
+          console.log('About page data:', data);
+          
+          if (data && data.content) {
+            try {
+              // Parse the JSON content 
+              const parsedContent = JSON.parse(data.content);
+              console.log('Parsed content:', parsedContent);
+              setContent(parsedContent);
+            } catch (parseError) {
+              console.error('Error parsing content JSON:', parseError);
+              // If it's not JSON, assume it's HTML content
+              setContent({
+                content: data.content
+              });
+            }
+          }
         }
       } catch (error) {
         console.log('Error fetching about content:', error);
@@ -60,10 +74,37 @@ export default function About() {
             </div>
             
             <div>
-              <div 
-                className="prose prose-gray max-w-none"
-                dangerouslySetInnerHTML={{ __html: content.content || "" }}
-              />
+              <div className="prose prose-gray max-w-none">
+                {content.vision && (
+                  <div className="mb-10">
+                    <p className="text-gray-600 leading-relaxed">
+                      {content.vision}
+                    </p>
+                  </div>
+                )}
+                
+                {/* If there's a specific content field that contains HTML, render it */}
+                {content.content && (
+                  <div dangerouslySetInnerHTML={{ __html: content.content }} />
+                )}
+                
+                {/* Render any other JSON fields that might be useful */}
+                {content.mission && (
+                  <div className="mb-10">
+                    <p className="text-gray-600 leading-relaxed">
+                      {content.mission}
+                    </p>
+                  </div>
+                )}
+                
+                {content.history && (
+                  <div className="mb-10">
+                    <p className="text-gray-600 leading-relaxed">
+                      {content.history}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </main>

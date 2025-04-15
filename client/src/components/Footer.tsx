@@ -68,7 +68,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} HAL149. {t.footer.rights} • <Link href="/legal/" className="hover:text-gray-900 transition-colors">Legal</Link>
+            © {new Date().getFullYear()} HAL149. {t.footer.rights} • <Link href="/legal/" className="text-gray-500 hover:text-gray-900 transition-colors">Legal</Link>
           </p>
           <div className="flex mt-4 md:mt-0">
             <span className="text-gray-500 text-sm">{t.footer.version}</span>

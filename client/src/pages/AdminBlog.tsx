@@ -257,35 +257,8 @@ export default function AdminBlog() {
       return;
     }
     
-    // Prepare the raw content or a JSON object with content + metadata
+    // Always use the raw content directly - don't wrap in JSON
     let finalContent = formData.content;
-    
-    // If we have metadata, store it as a JSON object with the content
-    if (formData.metadata && Object.values(formData.metadata).some(value => value && typeof value === 'string' && value.trim() !== '')) {
-      try {
-        // If content is already a JSON string with metadata
-        let contentObj = {};
-        try {
-          if (typeof formData.content === 'string' && formData.content.trim().startsWith('{')) {
-            contentObj = JSON.parse(formData.content);
-          } else {
-            contentObj = { content: formData.content };
-          }
-        } catch (e) {
-          contentObj = { content: formData.content };
-        }
-        
-        // Update with new metadata
-        finalContent = JSON.stringify({
-          ...contentObj,
-          metadata: formData.metadata
-        });
-      } catch (e) {
-        console.error('Error parsing or stringifying content with metadata:', e);
-        // Fall back to just the content without metadata
-        finalContent = formData.content;
-      }
-    }
     
     const postData = {
       title: formData.title!,

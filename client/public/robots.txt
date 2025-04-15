@@ -1,11 +1,8 @@
-# For the Replit domain (block all crawling to prevent duplicate content)
-User-agent: *
-Disallow: /
-Host: hal149.com
-
-# For the custom domain (allow crawling)
+# Allow all search engines
 User-agent: *
 Allow: /
+
+# Specify the canonical domain
 Host: hal149.com
 
 # Sitemap for the main domain

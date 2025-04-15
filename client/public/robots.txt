@@ -1,2 +1,5 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+# Allow crawling of all content
+Sitemap: https://hal149.replit.app/sitemap.xml

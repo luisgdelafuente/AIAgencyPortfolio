@@ -70,7 +70,14 @@ export default function AdminContent() {
   const handleEditClick = (page: PageContent) => {
     setSelectedPage(page.page);
     
-    // Check if content has metadata, if not add empty metadata section
+    // Special case for the About page - use raw HTML content
+    if (page.page === 'about') {
+      setEditContent(page.content);
+      setDialogOpen(true);
+      return;
+    }
+    
+    // For other pages, check if content has metadata, if not add empty metadata section
     let content;
     try {
       content = typeof page.content === 'string' ? JSON.parse(page.content) : page.content;
@@ -100,6 +107,16 @@ export default function AdminContent() {
   const handleSaveContent = () => {
     if (!selectedPage) return;
     
+    // Special case for the About page - save raw HTML content
+    if (selectedPage === 'about') {
+      updatePageContent.mutate({ 
+        page: selectedPage, 
+        content: editContent 
+      });
+      return;
+    }
+    
+    // For other pages, validate and save JSON content
     try {
       // Validate JSON content
       JSON.parse(editContent);
@@ -214,29 +231,35 @@ export default function AdminContent() {
                 </Button>
                 <Button 
                   onClick={() => {
-                    const aboutContent = JSON.stringify({
-                      title: "About Us",
-                      mission: "Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.",
-                      vision: "We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.",
-                      history: "Founded in 2020, our team of AI specialists and industry experts has been at the forefront of developing practical applications of machine learning that solve real business problems.",
-                      team: [
-                        {
-                          name: "Alex Johnson",
-                          role: "CEO & Co-founder",
-                          bio: "Former ML research lead at Stanford AI Lab with 15+ years of experience in the field."
-                        },
-                        {
-                          name: "Maria Chen",
-                          role: "CTO & Co-founder",
-                          bio: "PhD in Computer Science, specializing in deep learning architectures and their applications."
-                        },
-                        {
-                          name: "David Park",
-                          role: "Head of Product",
-                          bio: "Experienced product leader who previously scaled AI products at major tech companies."
-                        }
-                      ]
-                    }, null, 2);
+                    // Create a basic HTML template for the About page
+                    const aboutContent = `
+<h1>About HAL149</h1>
+<p>Welcome to HAL149, a pioneering AI agency at the forefront of innovation.</p>
+
+<h2>Our Mission</h2>
+<p>Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.</p>
+
+<h2>Our Vision</h2>
+<p>We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.</p>
+
+<h2>Our Team</h2>
+<p>Our team brings together experts from both the AI research community and various industries, creating a unique blend of technical innovation and practical business experience.</p>
+
+<ul>
+  <li><strong>Alex Johnson</strong> - CEO & Co-founder, Former ML research lead at Stanford AI Lab</li>
+  <li><strong>Maria Chen</strong> - CTO & Co-founder, PhD in Computer Science specializing in deep learning</li>
+  <li><strong>David Park</strong> - Head of Product, Experienced product leader in AI technologies</li>
+</ul>
+
+<h2>Our Approach</h2>
+<p>We believe in creating AI solutions that are:</p>
+<ul>
+  <li>Transparent and explainable</li>
+  <li>Ethical and responsible</li>
+  <li>Practical and results-oriented</li>
+  <li>Customized to your specific needs</li>
+</ul>
+`;
                     updatePageContent.mutate({ page: 'about', content: aboutContent });
                   }}
                   disabled={updatePageContent.isPending}

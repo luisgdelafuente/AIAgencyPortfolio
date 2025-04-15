@@ -136,7 +136,14 @@ export default function AdminContent() {
   };
 
   // Display preview of the content
-  const getContentPreview = (content: any) => {
+  const getContentPreview = (page: string, content: any) => {
+    // Special case for the About page - show HTML preview
+    if (page === 'about') {
+      const contentStr = String(content);
+      // Just show the first 500 characters of the HTML
+      return contentStr.substring(0, 500) + (contentStr.length > 500 ? '...' : '');
+    }
+    
     try {
       // Handle both string and object formats since Supabase might return JSONB as object
       const parsed = typeof content === 'string' ? JSON.parse(content) : content;
@@ -358,7 +365,7 @@ export default function AdminContent() {
                         <div className="mt-3">
                           <ScrollArea className="h-[150px] w-full rounded border bg-neutral-50 p-4">
                             <pre className="text-xs text-neutral-700 whitespace-pre-wrap">
-                              {getContentPreview(page.content)}
+                              {getContentPreview(page.page, page.content)}
                             </pre>
                           </ScrollArea>
                         </div>
@@ -408,12 +415,16 @@ export default function AdminContent() {
             <Tabs defaultValue="content" className="flex flex-col h-full overflow-hidden">
               <TabsList className="mb-3 w-full">
                 <TabsTrigger value="content" className="flex-1">Page Content</TabsTrigger>
-                <TabsTrigger value="seo" className="flex-1">SEO Metadata</TabsTrigger>
+                {selectedPage !== 'about' && (
+                  <TabsTrigger value="seo" className="flex-1">SEO Metadata</TabsTrigger>
+                )}
               </TabsList>
               
               <TabsContent value="content" className="mt-0 flex-1 overflow-hidden">
                 <p className="text-sm text-neutral-500 mb-2">
-                  Edit the JSON content below. This defines the structure and content of the page.
+                  {selectedPage === 'about' 
+                    ? 'Edit the HTML content below. You can use standard HTML tags to format your content.'
+                    : 'Edit the JSON content below. This defines the structure and content of the page.'}
                 </p>
                 <div className="border rounded-lg overflow-hidden h-[60vh]">
                   <ContentEditor 

@@ -37,17 +37,11 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
 export default function Features() {
   const t = useTranslations();
   
-  const [content, setContent] = useState<HomeContent>({
-    featuresTitle: t.features.title,
-    featuresSubtitle: t.features.subtitle,
-    features: t.features.items
-  });
-  
-  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState<HomeContent>({});
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     const fetchContent = async () => {
-      setLoading(true);
       try {
         const response = await fetch('/api/page-contents/home');
         if (response.ok) {
@@ -59,6 +53,7 @@ export default function Features() {
               setContent(parsedContent);
             } catch (e) {
               console.error('Error parsing JSON content:', e);
+              // Don't set fallback content on error
             }
           } else if (typeof data.content === 'object') {
             setContent(data.content);
@@ -66,6 +61,7 @@ export default function Features() {
         }
       } catch (error) {
         console.error('Error fetching home content:', error);
+        // Don't set fallback content on error
       } finally {
         setLoading(false);
       }
@@ -81,10 +77,26 @@ export default function Features() {
     <BarChart3 className="w-6 h-6" key="bar-chart" />
   ];
 
+  // Don't render anything if loading or no content
+  if (loading || !content.features || content.features.length === 0) {
+    return null;
+  }
+
   return (
     <section className="py-12 md:py-16 bg-gray-50">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-        
+        {content.featuresTitle && (
+          <div className="max-w-2xl mx-auto text-center mb-10">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+              {content.featuresTitle}
+            </h2>
+            {content.featuresSubtitle && (
+              <p className="mt-4 text-lg text-gray-600">
+                {content.featuresSubtitle}
+              </p>
+            )}
+          </div>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {content.features && content.features.map((feature, index) => (

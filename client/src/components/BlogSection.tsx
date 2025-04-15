@@ -21,11 +21,8 @@ export default function BlogSection() {
     queryKey: ['/api/blog']
   });
   
-  const [content, setContent] = useState<HomeContent>({
-    blogTitle: '',
-    blogSubtitle: '',
-    blogCta: ''
-  });
+  const [content, setContent] = useState<HomeContent>({});
+  const [contentLoading, setContentLoading] = useState(true);
   
   useEffect(() => {
     const fetchContent = async () => {
@@ -47,6 +44,8 @@ export default function BlogSection() {
         }
       } catch (error) {
         console.error('Error fetching home content:', error);
+      } finally {
+        setContentLoading(false);
       }
     };
     

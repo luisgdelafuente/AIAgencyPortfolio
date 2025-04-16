@@ -55,8 +55,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Apply SEO middleware to inject meta tags - must come very early
-app.use(staticMetaTags);
+// We'll register the SEO middleware later after Vite is set up
 
 app.use((req, res, next) => {
   const start = Date.now();

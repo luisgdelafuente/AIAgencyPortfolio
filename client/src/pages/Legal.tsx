@@ -86,7 +86,7 @@ export default function Legal() {
                   <Skeleton className="h-64 w-full" />
                 </div>
               ) : (
-                <Tabs defaultValue="privacy">
+                <Tabs defaultValue="tab-0">
                   <TabsList className="grid w-full grid-cols-2 mb-8">
                     {content.sections && content.sections.map((section, index) => (
                       <TabsTrigger key={index} value={`tab-${index}`}>

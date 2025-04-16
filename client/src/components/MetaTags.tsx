@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { Helmet } from "react-helmet";
 import { Metadata } from '@/lib/metadata';
 
@@ -27,7 +27,7 @@ interface OgTagConfigs {
  * Reusable component for rendering meta tags across the site
  * Ensures all metadata comes from the database with no hardcoded values
  */
-export default function MetaTags({ 
+function MetaTags({ 
   metadata, 
   type = 'website',
   url,
@@ -42,7 +42,6 @@ export default function MetaTags({
       .then(response => response.json())
       .then(data => {
         setStaticTags(data);
-        console.log('Loaded static OG tags:', data);
       })
       .catch(error => {
         console.error('Failed to load static OG tags:', error);
@@ -181,7 +180,7 @@ export default function MetaTags({
           document.head.appendChild(canonicalLinkElement);
         }
         
-        console.log(`Updated meta tags for page: ${pageType} - Title: ${finalTitle}`);
+        // Meta tags updated successfully
       } catch (error) {
         console.error('Error updating meta tags in document:', error);
       }
@@ -239,3 +238,6 @@ export default function MetaTags({
     return null;
   }
 }
+
+// Export memoized version to prevent unnecessary re-renders
+export default memo(MetaTags);

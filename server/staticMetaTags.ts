@@ -39,14 +39,10 @@ export function staticMetaTags(req: Request, res: Response, next: NextFunction) 
   
   // @ts-ignore - monkey-patch the send method
   res.send = function(body: any) {
-    // Log the content type and body type for debugging
-    console.log(`MetaTags DEBUG - Response type: ${typeof body}, is HTML: ${typeof body === 'string' && body.includes('<!DOCTYPE html>')}, Content-Type: ${res.getHeader('Content-Type')}`);
-    
     // Only process HTML responses
     if (typeof body === 'string' && body.includes('<!DOCTYPE html>')) {
       // Get the path
       const path = req.path;
-      console.log(`MetaTags DEBUG - Path: "${path}"`);
       
       // Generate page-specific meta tags based on URL pattern
       let metaTags = DEFAULT_META_TAGS;
@@ -54,7 +50,6 @@ export function staticMetaTags(req: Request, res: Response, next: NextFunction) 
       // Blog post pattern
       if (path.startsWith('/blog/') && path.length > 6) {
         const blogSlug = path.substring(6).replace(/\/$/, '');
-        console.log(`MetaTags DEBUG - Blog post detected, slug: "${blogSlug}"`);
         // Override with blog-specific tags
         metaTags = `
           <!-- Basic Meta Tags -->

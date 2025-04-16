@@ -67,7 +67,7 @@ export default function Hero() {
             </div>
           )}
           {content.heroTitle && (
-            <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-4xl sm:text-7xl font-bold text-gray-900 tracking-tight max-w-[85%] mx-auto">
               {content.heroTitle.split(' ').length > 2 
                 ? <>
                     {content.heroTitle.split(' ').slice(0, -2).join(' ')} <span className="text-gray-900">{content.heroTitle.split(' ').slice(-2).join(' ')}</span>

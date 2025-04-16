@@ -56,7 +56,9 @@ function MetaTags({
     canonical: String(metadata.canonical || ''),
     ogTitle: String(metadata.ogTitle || ''),
     ogDescription: String(metadata.ogDescription || ''),
-    ogImage: String(metadata.ogImage || '')
+    ogImage: String(metadata.ogImage || ''),
+    ogSiteName: String(metadata.ogSiteName || ''),
+    ogLogo: String(metadata.ogLogo || '')
   };
   
   // Determine page type from path for static pregenerated tags
@@ -224,7 +226,8 @@ function MetaTags({
         {ogImage && <meta property="og:image" content={ogImage} />}
         <meta property="og:type" content={contentType} />
         <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:site_name" content="HAL149" />
+        {safeMetadata.ogSiteName && <meta property="og:site_name" content={safeMetadata.ogSiteName} />}
+        {safeMetadata.ogLogo && <meta property="og:logo" content={safeMetadata.ogLogo} />}
         
         {/* Twitter Card tags */}
         <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />

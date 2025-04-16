@@ -9,7 +9,9 @@ export const defaultMetadata = {
   canonical: '',
   ogTitle: '',
   ogDescription: '',
-  ogImage: ''
+  ogImage: '',
+  ogSiteName: '',
+  ogLogo: ''
 };
 
 // Types for metadata
@@ -21,6 +23,8 @@ export interface Metadata {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  ogSiteName: string;
+  ogLogo: string;
   [key: string]: string; // Allow for additional metadata properties
 }
 
@@ -152,7 +156,9 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
     ...baseMetadata,
     ogTitle: String(extractedMetadata.ogTitle || baseMetadata.title || ''),
     ogDescription: String(extractedMetadata.ogDescription || baseMetadata.description || ''),
-    ogImage: String(extractedMetadata.ogImage || imageUrl || '')
+    ogImage: String(extractedMetadata.ogImage || imageUrl || ''),
+    ogSiteName: String(extractedMetadata.ogSiteName || ''),
+    ogLogo: String(extractedMetadata.ogLogo || '')
   };
   
   // Copy any other extracted metadata properties after converting to strings

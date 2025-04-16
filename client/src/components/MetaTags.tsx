@@ -103,7 +103,7 @@ function MetaTags({
       ? safeMetadata.title
       : staticConfig
         ? staticConfig.title
-        : 'HAL149 | AI Agency';
+        : '';
   
   // To avoid blank meta description which Google doesn't like
   const metaDescription = safeMetadata.description || (staticConfig ? staticConfig.description : '');
@@ -126,7 +126,7 @@ function MetaTags({
     const path = safeMetadata.canonical.endsWith('/')
       ? safeMetadata.canonical
       : safeMetadata.canonical + '/';
-    canonicalUrl = `https://hal149.com${path.startsWith('/') ? '' : '/'}${path}`;
+    canonicalUrl = `${window.location.origin}${path.startsWith('/') ? '' : '/'}${path}`;
   } else if (url && String(url).startsWith('http')) {
     // Use provided URL if it's already a full URL, adding trailing slash if needed
     const fullUrl = String(url);
@@ -135,14 +135,14 @@ function MetaTags({
     // Add domain to provided URL, ensuring trailing slash
     const safeUrl = String(url);
     const path = safeUrl.endsWith('/') ? safeUrl : safeUrl + '/';
-    canonicalUrl = `https://hal149.com${path.startsWith('/') ? '' : '/'}${path}`;
+    canonicalUrl = `${window.location.origin}${path.startsWith('/') ? '' : '/'}${path}`;
   } else if (staticConfig && staticConfig.url) {
     // Use static config URL if available
     canonicalUrl = staticConfig.url;
   } else {
     // Fallback to current path, ensuring trailing slash
     const path = window.location.pathname;
-    canonicalUrl = `https://hal149.com${path.endsWith('/') ? path : path + '/'}`;
+    canonicalUrl = `${window.location.origin}${path.endsWith('/') ? path : path + '/'}`;
   }
   
   // Update actual meta tags in the document head as early as possible

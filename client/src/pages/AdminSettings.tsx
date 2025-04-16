@@ -328,6 +328,22 @@ export default function AdminSettings() {
   
   // Handle blog page form changes
   const handleBlogPageChange = (field: string, value: string) => {
+    // Special handling for canonical URL to validate format
+    if (field === 'metadata.canonical' && value !== '') {
+      // Check if URL has http:// or https:// prefix
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        toast({
+          title: "Invalid URL Format",
+          description: "Canonical URL must start with http:// or https://",
+          variant: "destructive"
+        });
+        // Auto-fix by prepending https:// if user entered a domain or path
+        if (!value.includes('://')) {
+          value = `https://${value}`;
+        }
+      }
+    }
+    
     if (field.startsWith('metadata.')) {
       const metadataField = field.replace('metadata.', '');
       setBlogPageData(prev => ({
@@ -347,6 +363,22 @@ export default function AdminSettings() {
   
   // Handle projects page form changes
   const handleProjectsPageChange = (field: string, value: string) => {
+    // Special handling for canonical URL to validate format
+    if (field === 'metadata.canonical' && value !== '') {
+      // Check if URL has http:// or https:// prefix
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        toast({
+          title: "Invalid URL Format",
+          description: "Canonical URL must start with http:// or https://",
+          variant: "destructive"
+        });
+        // Auto-fix by prepending https:// if user entered a domain or path
+        if (!value.includes('://')) {
+          value = `https://${value}`;
+        }
+      }
+    }
+    
     if (field.startsWith('metadata.')) {
       const metadataField = field.replace('metadata.', '');
       setProjectsPageData(prev => ({
@@ -644,11 +676,15 @@ export default function AdminSettings() {
                             />
                             
                             <FormField
-                              label="Canonical URL"
+                              label="Canonical URL (Full URL)"
                               name="metadata.canonical"
                               value={projectsPageData.metadata.canonical}
                               onChange={(value) => handleProjectsPageChange('metadata.canonical', value)}
+                              required={false}
                             />
+                            <div className="text-sm text-neutral-500 mt-1">
+                              Please enter a complete URL starting with http:// or https:// (e.g., https://hal149.com/projects/)
+                            </div>
                           </div>
                           
                           <div className="mt-6">

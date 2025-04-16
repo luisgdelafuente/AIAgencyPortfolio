@@ -27,7 +27,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           {project.description}
         </p>
         <Link 
-          href={`/projects/${project.slug}/`} 
+          href={`/projects/${project.slug}`} 
           className="inline-flex items-center text-gray-900 hover:text-gray-700 font-medium"
         >
           Read more →

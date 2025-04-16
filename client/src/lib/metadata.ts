@@ -9,9 +9,7 @@ export const defaultMetadata = {
   canonical: '',
   ogTitle: '',
   ogDescription: '',
-  ogImage: '',
-  ogSiteName: '',
-  ogLogo: ''
+  ogImage: ''
 };
 
 // Types for metadata
@@ -23,9 +21,6 @@ export interface Metadata {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
-  ogSiteName: string;
-  ogLogo: string;
-  [key: string]: string; // Allow for additional metadata properties
 }
 
 // Content object with metadata
@@ -58,44 +53,26 @@ export function extractMetadata(
         : pageContent.content;
       
       if (contentObj.metadata) {
-        // Ensure all values are strings to avoid Symbol conversion issues
-        const safeMetadata = Object.entries(contentObj.metadata).reduce((acc, [key, value]) => {
-          acc[key] = (value !== null && value !== undefined) ? String(value) : '';
-          return acc;
-        }, {} as Record<string, string>);
-        
         metadata = {
           ...metadata,
-          ...safeMetadata
+          ...contentObj.metadata
         };
       }
     }
     
     // Layer 2: If explicit parent metadata is provided, override with it
     if (parentMetadata) {
-      // Convert all metadata values to strings
-      const safeParentMetadata = Object.entries(parentMetadata).reduce((acc, [key, value]) => {
-        acc[key] = (value !== null && value !== undefined) ? String(value) : '';
-        return acc;
-      }, {} as Record<string, string>);
-      
       metadata = {
         ...metadata,
-        ...safeParentMetadata
+        ...parentMetadata
       };
     }
     
     // Layer 3: If item-specific metadata exists, it takes highest precedence
     if (itemMetadata) {
-      // Convert all metadata values to strings
-      const safeItemMetadata = Object.entries(itemMetadata).reduce((acc, [key, value]) => {
-        acc[key] = (value !== null && value !== undefined) ? String(value) : '';
-        return acc;
-      }, {} as Record<string, string>);
-      
       metadata = {
         ...metadata,
-        ...safeItemMetadata
+        ...itemMetadata
       };
     }
   } catch (e) {
@@ -113,60 +90,28 @@ export function extractMetadata(
 export function extractItemMetadata(item: any): Partial<Metadata> {
   if (!item) return {};
   
-  // Handle cases where metadata might be stored in the content
-  let extractedMetadata: Partial<Metadata> & Record<string, string> = {};
-  try {
-    // If content is a JSON string, try to extract metadata from it
-    if (typeof item.content === 'string' && item.content.trim().startsWith('{')) {
-      const contentObj = JSON.parse(item.content);
-      if (contentObj.metadata) {
-        // Ensure all metadata values are strings
-        const rawMetadata = contentObj.metadata;
-        Object.keys(rawMetadata).forEach(key => {
-          if (rawMetadata[key] !== null && rawMetadata[key] !== undefined) {
-            extractedMetadata[key] = String(rawMetadata[key]);
-          }
-        });
-      }
-    }
-  } catch (e) {
-    console.error('Error parsing metadata from content:', e);
-  }
-  
-  // Normalize image URL (handle both imageUrl and image_url)
-  const imageUrl = String(item.imageUrl || item.image_url || '');
-  
   // Extract relevant fields from item
   const baseMetadata = {
-    title: item.title ? `${String(item.title)} | HAL149` : '',
-    description: String(item.excerpt || item.description || ''),
-    keywords: item.category ? String(item.category) : '',
+    title: item.title ? `${item.title} | HAL149` : '',
+    description: item.excerpt || item.description || '',
+    keywords: item.category ? `${item.category}` : '',
     // Respect manually set canonical URL if it exists, otherwise generate it
-    canonical: extractedMetadata.canonical 
-      ? (String(extractedMetadata.canonical).endsWith('/') 
-          ? String(extractedMetadata.canonical) 
-          : String(extractedMetadata.canonical) + '/')
+    canonical: item.metadata?.canonical 
+      ? item.metadata.canonical
       : item.slug 
-        ? `https://hal149.com/${item.type || 'blog'}/${String(item.slug)}/` 
+        ? `https://hal149.com/${item.type || 'blog'}/${item.slug}/` 
         : '',
   };
   
-  // Create final metadata with social media fields defaulting to regular fields
-  const finalMetadata: Partial<Metadata> = {
+  // Return with social metadata defaulting to regular metadata
+  return {
     ...baseMetadata,
-    ogTitle: String(extractedMetadata.ogTitle || baseMetadata.title || ''),
-    ogDescription: String(extractedMetadata.ogDescription || baseMetadata.description || ''),
-    ogImage: String(extractedMetadata.ogImage || imageUrl || ''),
-    ogSiteName: String(extractedMetadata.ogSiteName || ''),
-    ogLogo: String(extractedMetadata.ogLogo || '')
+    // Social media fields default to their corresponding metadata fields
+    ogTitle: baseMetadata.title,
+    ogDescription: baseMetadata.description,
+    // For projects and blog posts with images
+    ...(item.imageUrl && { 
+      ogImage: item.imageUrl 
+    }),
   };
-  
-  // Copy any other extracted metadata properties after converting to strings
-  for (const key in extractedMetadata) {
-    if (key !== 'ogTitle' && key !== 'ogDescription' && key !== 'ogImage') {
-      finalMetadata[key] = String(extractedMetadata[key] || '');
-    }
-  }
-  
-  return finalMetadata;
 }

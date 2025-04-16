@@ -95,7 +95,7 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
     title: item.title ? `${item.title} | HAL149` : '',
     description: item.excerpt || item.description || '',
     keywords: item.category ? `${item.category}` : '',
-    canonical: item.slug ? `/${item.type || 'blog'}/${item.slug}/` : '',
+    canonical: item.slug ? `https://hal149.com/${item.type || 'blog'}/${item.slug}/` : '',
   };
   
   // Return with social metadata defaulting to regular metadata

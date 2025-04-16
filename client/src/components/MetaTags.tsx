@@ -32,10 +32,15 @@ export default function MetaTags({
       <meta name="description" content={metaDescription} />
       {metadata.keywords && <meta name="keywords" content={metadata.keywords} />}
       
-      {/* Canonical URL - always prefer the custom domain over Replit domain */}
-      {metadata.canonical && <link rel="canonical" href={metadata.canonical} />}
-      {!metadata.canonical && url && <link rel="canonical" href={url} />}
-      {!metadata.canonical && !url && <link rel="canonical" href={`https://hal149.com${window.location.pathname}`} />}
+      {/* Canonical URL - always prefer the complete URL from database, then fallback to constructed URL */}
+      {metadata.canonical && metadata.canonical.startsWith('http') 
+        ? <link rel="canonical" href={metadata.canonical} /> 
+        : metadata.canonical && !metadata.canonical.startsWith('http')
+          ? <link rel="canonical" href={`https://hal149.com${metadata.canonical.startsWith('/') ? '' : '/'}${metadata.canonical}`} />
+          : url
+            ? <link rel="canonical" href={url} />
+            : <link rel="canonical" href={`https://hal149.com${window.location.pathname}`} />
+      }
       
       {/* Open Graph / Social Media Meta Tags */}
       {metadata.ogTitle 

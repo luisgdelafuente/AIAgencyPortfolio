@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
 import compression from "compression";
-import { injectMetaTags } from "./seoMiddleware";
+import { staticMetaTags } from "./staticMetaTags";
 
 const app = express();
 
@@ -97,7 +97,7 @@ app.use((req, res, next) => {
   });
 
   // Apply SEO middleware to inject meta tags
-  app.use(injectMetaTags);
+  app.use(staticMetaTags);
   
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

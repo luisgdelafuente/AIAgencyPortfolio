@@ -2,8 +2,19 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import cors from "cors";
+import compression from "compression";
 
 const app = express();
+
+// Enable compression for all responses
+app.use(compression({
+  // Compression level (1-9, where 9 is maximum compression but slower)
+  level: 6,
+  // Minimum size in bytes to apply compression
+  threshold: 0,
+  // Compress all responses
+  filter: () => true
+}));
 
 // Redirect Replit domain to custom domain
 app.use((req, res, next) => {

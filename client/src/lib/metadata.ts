@@ -90,28 +90,45 @@ export function extractMetadata(
 export function extractItemMetadata(item: any): Partial<Metadata> {
   if (!item) return {};
   
+  // Handle cases where metadata might be stored in the content
+  let extractedMetadata = {};
+  try {
+    // If content is a JSON string, try to extract metadata from it
+    if (typeof item.content === 'string' && item.content.trim().startsWith('{')) {
+      const contentObj = JSON.parse(item.content);
+      if (contentObj.metadata) {
+        extractedMetadata = contentObj.metadata;
+      }
+    }
+  } catch (e) {
+    console.error('Error parsing metadata from content:', e);
+  }
+  
+  // Normalize image URL (handle both imageUrl and image_url)
+  const imageUrl = item.imageUrl || item.image_url || '';
+  
   // Extract relevant fields from item
   const baseMetadata = {
     title: item.title ? `${item.title} | HAL149` : '',
     description: item.excerpt || item.description || '',
     keywords: item.category ? `${item.category}` : '',
     // Respect manually set canonical URL if it exists, otherwise generate it
-    canonical: item.metadata?.canonical 
-      ? item.metadata.canonical
+    canonical: extractedMetadata?.canonical 
+      ? extractedMetadata.canonical
       : item.slug 
         ? `https://hal149.com/${item.type || 'blog'}/${item.slug}/` 
         : '',
   };
   
-  // Return with social metadata defaulting to regular metadata
+  // Return with social media metadata defaulting to regular metadata
   return {
     ...baseMetadata,
-    // Social media fields default to their corresponding metadata fields
-    ogTitle: baseMetadata.title,
-    ogDescription: baseMetadata.description,
+    // Apply any extracted metadata properties
+    ...extractedMetadata,
+    // Social media fields default to their corresponding metadata fields if not already set
+    ogTitle: extractedMetadata?.ogTitle || baseMetadata.title,
+    ogDescription: extractedMetadata?.ogDescription || baseMetadata.description,
     // For projects and blog posts with images
-    ...(item.imageUrl && { 
-      ogImage: item.imageUrl 
-    }),
+    ogImage: extractedMetadata?.ogImage || imageUrl
   };
 }

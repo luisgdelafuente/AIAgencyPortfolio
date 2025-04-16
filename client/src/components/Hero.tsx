@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from '@/hooks/use-translations';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useQuery } from '@tanstack/react-query';
+import { PageContent } from '@shared/schema';
 
 interface HeroContent {
   heroTitle?: string;
   heroSubtitle?: string;
   heroCta?: string;
+  blogCta?: string;
+  comingSoon?: string;
   featuresTitle?: string;
   featuresSubtitle?: string;
   [key: string]: any;
@@ -14,47 +19,38 @@ interface HeroContent {
 
 export default function Hero() {
   const t = useTranslations();
-  const [content, setContent] = useState<HeroContent>({});
-  const [loading, setLoading] = useState(true);
   
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const response = await fetch('/api/page-contents/home');
-        if (response.ok) {
-          const data = await response.json();
-          // Handle both JSON string and object formats
-          if (typeof data.content === 'string') {
-            try {
-              const parsedContent = JSON.parse(data.content);
-              setContent(parsedContent);
-            } catch (e) {
-              console.error('Error parsing JSON content:', e);
-              // Don't set fallback content on error
-            }
-          } else if (typeof data.content === 'object') {
-            // Content is already an object (JSONB from Supabase)
-            setContent(data.content);
-          }
-        }
-      } catch (error) {
-        console.log('Error fetching home content:', error);
-        // Don't set fallback content on error
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchContent();
-  }, []);
-
-  // Don't render anything while loading to prevent flashing content
-  if (loading) {
+  // Get content from the API using React Query instead of useEffect
+  const { data: pageContent, isLoading } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/home'],
+  });
+  
+  // Parse the content
+  let content: HeroContent = {};
+  if (pageContent?.content) {
+    try {
+      content = typeof pageContent.content === 'string'
+        ? JSON.parse(pageContent.content)
+        : pageContent.content;
+    } catch (error) {
+      console.error('Error parsing JSON content:', error);
+    }
+  }
+  
+  // Loading state with skeletons
+  if (isLoading) {
     return (
       <section className="pt-32 pb-16 bg-white">
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="h-40"></div> {/* Placeholder height */}
+            <div className="flex flex-col items-center gap-6">
+              <Skeleton className="h-12 w-3/4 max-w-2xl" />
+              <Skeleton className="h-4 w-1/2 max-w-xl" />
+              <div className="flex gap-4 mt-8">
+                <Skeleton className="h-10 w-28" />
+                <Skeleton className="h-10 w-28" />
+              </div>
+            </div>
           </div>
         </div>
       </section>

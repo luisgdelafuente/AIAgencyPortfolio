@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CircleDot, Sparkles, BarChart3 } from 'lucide-react';
 import { useTranslations } from '@/hooks/use-translations';
+import { useQuery } from '@tanstack/react-query';
+import { PageContent } from '@shared/schema';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -34,41 +37,38 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
   );
 }
 
+// Skeleton version of FeatureCard for loading state
+function FeatureCardSkeleton() {
+  return (
+    <div className="p-8 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
+      <Skeleton className="w-14 h-14 rounded-full mb-5" />
+      <Skeleton className="h-6 w-1/2 mb-3" />
+      <Skeleton className="h-4 w-full mb-2" />
+      <Skeleton className="h-4 w-5/6 mb-2" />
+      <Skeleton className="h-4 w-4/6" />
+    </div>
+  );
+}
+
 export default function Features() {
   const t = useTranslations();
   
-  const [content, setContent] = useState<HomeContent>({});
-  const [loading, setLoading] = useState(true);
+  // Use React Query for data fetching (consistent with other components)
+  const { data: pageContent, isLoading } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/home'],
+  });
   
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const response = await fetch('/api/page-contents/home');
-        if (response.ok) {
-          const data = await response.json();
-          // Handle both string and object formats
-          if (typeof data.content === 'string') {
-            try {
-              const parsedContent = JSON.parse(data.content);
-              setContent(parsedContent);
-            } catch (e) {
-              console.error('Error parsing JSON content:', e);
-              // Don't set fallback content on error
-            }
-          } else if (typeof data.content === 'object') {
-            setContent(data.content);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching home content:', error);
-        // Don't set fallback content on error
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchContent();
-  }, []);
+  // Parse the content
+  let content: HomeContent = {};
+  if (pageContent?.content) {
+    try {
+      content = typeof pageContent.content === 'string'
+        ? JSON.parse(pageContent.content)
+        : pageContent.content;
+    } catch (error) {
+      console.error('Error parsing features content JSON:', error);
+    }
+  }
 
   // Default icons for features
   const featureIcons = [
@@ -77,8 +77,28 @@ export default function Features() {
     <BarChart3 className="w-6 h-6" key="bar-chart" />
   ];
 
-  // Don't render anything if loading or no content
-  if (loading || !content.features || content.features.length === 0) {
+  // Show skeleton loader while loading
+  if (isLoading) {
+    return (
+      <section className="py-12 md:py-16 bg-gray-50">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto text-center mb-10">
+            <Skeleton className="h-8 w-1/2 mx-auto mb-4" />
+            <Skeleton className="h-4 w-3/4 mx-auto" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FeatureCardSkeleton />
+            <FeatureCardSkeleton />
+            <FeatureCardSkeleton />
+          </div>
+        </div>
+      </section>
+    );
+  }
+  
+  // Don't render anything if no features
+  if (!content.features || content.features.length === 0) {
     return null;
   }
 

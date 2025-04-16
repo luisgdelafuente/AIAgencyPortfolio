@@ -55,6 +55,9 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Apply SEO middleware to inject meta tags - must come very early
+app.use(staticMetaTags);
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -88,6 +91,9 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Apply SEO middleware to inject meta tags - must come before error handler
+  app.use(staticMetaTags);
+  
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -95,9 +101,6 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
     throw err;
   });
-
-  // Apply SEO middleware to inject meta tags
-  app.use(staticMetaTags);
   
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

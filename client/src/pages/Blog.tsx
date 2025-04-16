@@ -73,7 +73,7 @@ export default function Blog() {
               )}
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
               {isLoading ? (
                 // Skeleton loaders while data is loading
                 Array(4).fill(0).map((_, i) => (

@@ -533,10 +533,18 @@ export default function AdminBlog() {
                       </p>
                       
                       <FormField
-                        label="Canonical URL"
+                        label="Canonical URL (Full URL)"
                         name="metadata.canonical"
                         value={formData.metadata?.canonical || ''}
                         onChange={(value) => {
+                          // Auto-fix URL format if needed
+                          if (value && !value.startsWith('http://') && !value.startsWith('https://')) {
+                            // If user entered a path without protocol, add https://
+                            if (!value.includes('://')) {
+                              value = `https://hal149.com${value.startsWith('/') ? '' : '/'}${value}`;
+                            }
+                          }
+                          
                           setFormData(prev => ({
                             ...prev,
                             metadata: { 
@@ -547,7 +555,7 @@ export default function AdminBlog() {
                         }}
                       />
                       <p className="text-xs text-neutral-500 mt-1">
-                        The official URL for this content if it exists elsewhere.
+                        Enter the complete URL (e.g., https://hal149.com/blog/post-slug/) where this content should be considered the original source.
                       </p>
                     </div>
                     

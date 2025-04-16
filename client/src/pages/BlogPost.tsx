@@ -32,7 +32,12 @@ export default function BlogPostPage() {
   const metadata = extractMetadata(blogPageContent, null, postMetadata);
   
   // Create URL for canonical link and sharing
-  const url = post?.slug ? `https://hal149.com/blog/${post.slug}/` : '';
+  // If the post has a custom canonical URL set, prefer that
+  const url = post?.metadata?.canonical 
+    ? post.metadata.canonical 
+    : post?.slug 
+      ? `https://hal149.com/blog/${post.slug}/` 
+      : '';
 
   if (isError) {
     return (

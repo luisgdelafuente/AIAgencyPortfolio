@@ -61,11 +61,9 @@ export default function Hero() {
     <section className="pt-32 pb-16 bg-white">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          {content.comingSoon && (
-            <div className="inline-flex items-center justify-center px-4 py-1 mb-6 rounded-full bg-gray-100 text-gray-900">
-              <span className="text-sm font-medium">{content.comingSoon}</span>
-            </div>
-          )}
+          <div className="inline-flex items-center justify-center px-4 py-1 mb-6 rounded-full bg-gray-100 text-gray-900">
+            <span className="text-sm font-medium">Coming Soon!</span>
+          </div>
           {content.heroTitle && (
             <h1 className="text-4xl sm:text-7xl font-bold text-gray-900 tracking-tight max-w-[85%] mx-auto sm:leading-[1.2]">
               {content.heroTitle.split(' ').length > 2 

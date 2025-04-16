@@ -135,7 +135,7 @@ async function getMetadataForBlogPost(post: BlogPost, url: string): Promise<Meta
   // Set Open Graph specific fields
   metadata.ogTitle = post.title;
   metadata.ogDescription = post.excerpt || '';
-  metadata.ogImage = post.imageUrl || post.image_url || '';
+  metadata.ogImage = post.imageUrl || '';
   metadata.ogType = 'article';
   
   // Try to extract additional metadata from content if it's in JSON format
@@ -178,7 +178,7 @@ async function getMetadataForProject(project: Project, url: string): Promise<Met
   // Set Open Graph specific fields
   metadata.ogTitle = project.title;
   metadata.ogDescription = project.description || '';
-  metadata.ogImage = project.imageUrl || project.image_url || '';
+  metadata.ogImage = project.imageUrl || '';
   metadata.ogType = 'article';
   
   // Try to extract additional metadata from content if it's in JSON format

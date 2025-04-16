@@ -11,12 +11,21 @@ import { log } from './vite';
  * Express middleware that injects meta tags into HTML responses
  */
 export function injectMetaTags(req: Request, res: Response, next: NextFunction) {
+  console.log(`SEO Middleware triggered for: ${req.path}`); // Add this console log
+  
   const originalSend = res.send;
   
   // @ts-ignore - Override the send method with a sync version for simplicity
   res.send = function(body: any): Response {
+    console.log(`SEO: Response send called for ${req.path}, is HTML: ${typeof body === 'string' && body.includes('<!DOCTYPE html>')}`);
+    
     if (typeof body === 'string' && body.includes('<!DOCTYPE html>')) {
-      log(`SEO: Processing HTML response for ${req.path}`);
+      console.log(`SEO: Processing HTML response for ${req.path}`); // Add more detailed logging
+      
+      // Let's log the actual send content for debugging
+      if (typeof body === 'string') {
+        console.log(`HTML before injection (first 300 chars): ${body.substring(0, 300)}`);
+      }
       
       // Default meta tags
       let metaTags = `

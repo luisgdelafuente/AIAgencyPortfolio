@@ -68,6 +68,17 @@ export default function MetaTags({
   }
   
   try {
+    // Add metadata directly to the document head using standard DOM methods
+    // This ensures the meta tags are present even without JavaScript
+    if (typeof document !== 'undefined') {
+      // Direct DOM manipulation for crawlers
+      // Set title
+      if (document.title !== finalTitle) {
+        document.title = finalTitle;
+      }
+    }
+    
+    // Also use React Helmet for React-managed meta tags
     return (
       <Helmet>
         {/* Basic meta tags */}

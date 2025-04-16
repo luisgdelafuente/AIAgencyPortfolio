@@ -1,53 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
+import { useQuery } from '@tanstack/react-query';
+import { PageContent } from '@shared/schema';
+import { extractMetadata } from '@/lib/metadata';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AboutContent {
   title?: string;
   subtitle?: string;
   content?: string;
+  vision?: string;
+  mission?: string;
   [key: string]: any;
 }
 
 export default function About() {
   const [content, setContent] = useState<AboutContent>({});
-  const [loading, setLoading] = useState(true);
+  
+  // Fetch page content including metadata
+  const { data: pageContent, isLoading } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/about'],
+  });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
   
   useEffect(() => {
-    const fetchContent = async () => {
+    if (pageContent?.content) {
       try {
-        const response = await fetch('/api/page-contents/about');
-        if (response.ok) {
-          const data = await response.json();
-          console.log('About page data:', data);
-          
-          if (data && data.content) {
-            try {
-              // Parse the JSON content 
-              const parsedContent = JSON.parse(data.content);
-              console.log('Parsed content:', parsedContent);
-              setContent(parsedContent);
-            } catch (parseError) {
-              console.error('Error parsing content JSON:', parseError);
-              // If it's not JSON, assume it's HTML content
-              setContent({
-                content: data.content
-              });
-            }
-          }
-        }
+        // Parse the JSON content
+        const parsedContent = typeof pageContent.content === 'string' 
+          ? JSON.parse(pageContent.content)
+          : pageContent.content;
+        setContent(parsedContent);
       } catch (error) {
-        console.log('Error fetching about content:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error parsing about content JSON:', error);
+        // If it's not JSON, assume it's HTML content
+        setContent({
+          content: pageContent.content
+        });
       }
-    };
-    
-    fetchContent();
-  }, []);
+    }
+  }, [pageContent]);
   
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -68,18 +66,10 @@ export default function About() {
   
   return (
     <>
-      <Helmet>
-        {content.metadata?.title ? (
-          <title>{content.metadata.title}</title>
-        ) : (
-          <title>About | HAL149</title>
-        )}
-        {content.metadata?.description ? (
-          <meta name="description" content={content.metadata.description} />
-        ) : (
-          <meta name="description" content="Learn about HAL149, our mission, vision, and the team behind our industry-specific AI applications." />
-        )}
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        url="https://hal149.com/about/" 
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />

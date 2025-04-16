@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import type { PageContent } from '@shared/schema';
+import { extractMetadata } from '@/lib/metadata';
 
 interface LegalSection {
   title: string;
@@ -21,21 +22,16 @@ interface LegalContent {
 export default function Legal() {
   const [content, setContent] = useState<LegalContent>({
     title: "Legal Information",
-    sections: [
-      {
-        title: "Privacy Policy",
-        content: "We respect your privacy and are committed to protecting your personal data."
-      },
-      {
-        title: "Terms of Service",
-        content: "By accessing our website and services, you agree to these terms of service."
-      }
-    ]
+    sections: []
   });
   
+  // Fetch page content including metadata
   const { data: pageContent, isLoading } = useQuery<PageContent>({
     queryKey: ['/api/page-contents/legal']
   });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
   
   useEffect(() => {
     if (pageContent && pageContent.content) {
@@ -52,10 +48,10 @@ export default function Legal() {
   
   return (
     <>
-      <Helmet>
-        <title>Legal | HAL149</title>
-        <meta name="description" content="HAL149 legal documents including privacy policy and terms of service." />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        url="https://hal149.com/legal/" 
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />

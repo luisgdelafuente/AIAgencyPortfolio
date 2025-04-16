@@ -39,24 +39,32 @@ export default function MetaTags({
   // Ensure we have a valid og:image URL
   const ogImage = safeMetadata.ogImage;
   
-  // Ensure we have a valid canonical URL with proper formatting
+  // Ensure we have a valid canonical URL with proper formatting and trailing slash
   let canonicalUrl = '';
   if (safeMetadata.canonical && safeMetadata.canonical.startsWith('http')) {
-    // Use canonical URL as is if it's already a full URL
-    canonicalUrl = safeMetadata.canonical;
+    // Use canonical URL as is if it's already a full URL, adding trailing slash if needed
+    canonicalUrl = safeMetadata.canonical.endsWith('/') 
+      ? safeMetadata.canonical
+      : safeMetadata.canonical + '/';
   } else if (safeMetadata.canonical) {
-    // Add domain to canonical URL if it's a relative path
-    canonicalUrl = `https://hal149.com${safeMetadata.canonical.startsWith('/') ? '' : '/'}${safeMetadata.canonical}`;
+    // Add domain to canonical URL if it's a relative path, ensuring trailing slash
+    const path = safeMetadata.canonical.endsWith('/')
+      ? safeMetadata.canonical
+      : safeMetadata.canonical + '/';
+    canonicalUrl = `https://hal149.com${path.startsWith('/') ? '' : '/'}${path}`;
   } else if (url && String(url).startsWith('http')) {
-    // Use provided URL if it's already a full URL
-    canonicalUrl = String(url);
+    // Use provided URL if it's already a full URL, adding trailing slash if needed
+    const fullUrl = String(url);
+    canonicalUrl = fullUrl.endsWith('/') ? fullUrl : fullUrl + '/';
   } else if (url) {
-    // Add domain to provided URL
+    // Add domain to provided URL, ensuring trailing slash
     const safeUrl = String(url);
-    canonicalUrl = `https://hal149.com${safeUrl.startsWith('/') ? '' : '/'}${safeUrl}`;
+    const path = safeUrl.endsWith('/') ? safeUrl : safeUrl + '/';
+    canonicalUrl = `https://hal149.com${path.startsWith('/') ? '' : '/'}${path}`;
   } else {
-    // Fallback to current path
-    canonicalUrl = `https://hal149.com${window.location.pathname}`;
+    // Fallback to current path, ensuring trailing slash
+    const path = window.location.pathname;
+    canonicalUrl = `https://hal149.com${path.endsWith('/') ? path : path + '/'}`;
   }
   
   try {

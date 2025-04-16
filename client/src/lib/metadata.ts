@@ -21,6 +21,7 @@ export interface Metadata {
   ogTitle: string;
   ogDescription: string;
   ogImage: string;
+  [key: string]: string; // Allow for additional metadata properties
 }
 
 // Content object with metadata
@@ -109,7 +110,7 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
   if (!item) return {};
   
   // Handle cases where metadata might be stored in the content
-  let extractedMetadata: Partial<Metadata> = {};
+  let extractedMetadata: Partial<Metadata> & Record<string, string> = {};
   try {
     // If content is a JSON string, try to extract metadata from it
     if (typeof item.content === 'string' && item.content.trim().startsWith('{')) {
@@ -138,7 +139,9 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
     keywords: item.category ? String(item.category) : '',
     // Respect manually set canonical URL if it exists, otherwise generate it
     canonical: extractedMetadata.canonical 
-      ? String(extractedMetadata.canonical)
+      ? (String(extractedMetadata.canonical).endsWith('/') 
+          ? String(extractedMetadata.canonical) 
+          : String(extractedMetadata.canonical) + '/')
       : item.slug 
         ? `https://hal149.com/${item.type || 'blog'}/${String(item.slug)}/` 
         : '',

@@ -1,120 +1,16 @@
 /**
- * Static middleware for injecting meta tags
- * This middleware will immediately intercept requests for HTML pages
- * and inject the appropriate Open Graph tags based on the URL
+ * Direct SEO Middleware - Gets metadata directly from the database without hardcoded values
  */
 import { Request, Response, NextFunction } from 'express';
 import { storage } from './storage';
 import { log } from './vite';
 
-// We'll get the meta tags dynamically for each page
+// Basic meta tags that must be present on all pages
 const BASIC_META_TAGS = `
-  <!-- Basic Meta Tags -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="index, follow" />
 `;
-
-/**
- * Helper function to extract metadata from JSON content
- */
-async function extractMetadata(pageName: string, data?: any): Promise<any> {
-  let metadata: any = {
-    title: '',
-    description: '',
-    ogTitle: '',
-    ogDescription: '',
-    ogImage: '',
-    ogType: 'website',
-    ogSiteName: '',
-    ogLogo: ''
-  };
-  
-  try {
-    // Get page content from the database
-    const pageContent = await storage.getPageContent(pageName);
-    
-    if (pageContent && pageContent.content) {
-      // Parse the JSON content
-      const content = typeof pageContent.content === 'string' 
-        ? JSON.parse(pageContent.content) 
-        : pageContent.content;
-      
-      // Extract metadata from the content if it exists
-      if (content.metadata) {
-        metadata = {
-          ...metadata,
-          ...content.metadata
-        };
-      }
-    }
-    
-    // Merge with any additional data provided
-    if (data) {
-      if (data.title) metadata.title = data.title;
-      if (data.description) metadata.description = data.description || data.excerpt;
-      if (data.ogTitle) metadata.ogTitle = data.ogTitle;
-      if (data.ogDescription) metadata.ogDescription = data.ogDescription;
-      if (data.ogImage) metadata.ogImage = data.ogImage;
-      if (data.imageUrl) metadata.ogImage = metadata.ogImage || data.imageUrl;
-      if (data.image_url) metadata.ogImage = metadata.ogImage || data.image_url;
-    }
-    
-    // Set defaults for OG properties if not set
-    metadata.ogTitle = metadata.ogTitle || metadata.title;
-    metadata.ogDescription = metadata.ogDescription || metadata.description;
-  } catch (error) {
-    log(`Error extracting metadata for ${pageName}: ${error}`);
-  }
-  
-  return metadata;
-}
-
-/**
- * Generate HTML meta tags for a page
- */
-function generateMetaTagsHtml(metadata: any, path: string, type: string = 'website', req?: Request): string {
-  // Ensure we have the necessary values
-  const title = metadata.title || '';
-  const description = metadata.description || '';
-  const ogTitle = metadata.ogTitle || title;
-  const ogDescription = metadata.ogDescription || description;
-  const ogImage = metadata.ogImage || '';
-  const ogSiteName = metadata.ogSiteName || '';
-  const ogLogo = metadata.ogLogo || '';
-  
-  // Base URL for canonical links - avoid hardcoding the domain
-  const host = req?.headers?.host || process.env.REPLIT_DOMAIN || 'example.com';
-  const baseUrl = `https://${host}`;
-  const canonicalUrl = `${baseUrl}${path.endsWith('/') ? path : path + '/'}`;
-  
-  return `
-    ${BASIC_META_TAGS}
-    
-    <!-- SEO Meta Tags -->
-    ${title ? `<title>${title}</title>` : ''}
-    ${description ? `<meta name="description" content="${description}" />` : ''}
-    ${metadata.keywords ? `<meta name="keywords" content="${metadata.keywords}" />` : ''}
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="${type}" />
-    ${ogTitle ? `<meta property="og:title" content="${ogTitle}" />` : ''}
-    ${ogDescription ? `<meta property="og:description" content="${ogDescription}" />` : ''}
-    ${ogImage ? `<meta property="og:image" content="${ogImage}" />` : ''}
-    <meta property="og:url" content="${canonicalUrl}" />
-    ${ogSiteName ? `<meta property="og:site_name" content="${ogSiteName}" />` : ''}
-    ${ogLogo ? `<meta property="og:logo" content="${ogLogo}" />` : ''}
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="${ogImage ? 'summary_large_image' : 'summary'}" />
-    ${ogTitle ? `<meta name="twitter:title" content="${ogTitle}" />` : ''}
-    ${ogDescription ? `<meta name="twitter:description" content="${ogDescription}" />` : ''}
-    ${ogImage ? `<meta name="twitter:image" content="${ogImage}" />` : ''}
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="${canonicalUrl}" />
-  `;
-}
 
 /**
  * Express middleware - adds the required HTML response handler
@@ -123,85 +19,140 @@ export function staticMetaTags(req: Request, res: Response, next: NextFunction) 
   // Store the original send method
   const originalSend = res.send;
   
-  // @ts-ignore - monkey-patch the send method
+  // Override the send method
   res.send = async function(body: any) {
     // Only process HTML responses
     if (typeof body === 'string' && body.includes('<!DOCTYPE html>')) {
       try {
-        // Get the path
+        // Get the current path
         const path = req.path;
+        let pageName = '';
         
-        // Default meta tags (will be overridden later)
-        let metaTags = '';
+        // Determine what content to load
+        let pageData = null;
+        let contentType = 'website';
         
-        // Blog post pattern
+        // Blog post page
         if (path.startsWith('/blog/') && path.length > 6) {
           const blogSlug = path.substring(6).replace(/\/$/, '');
-          
-          // Get the blog post from database
-          const blogPost = await storage.getBlogPostBySlug(blogSlug);
-          
-          if (blogPost) {
-            // Extract metadata from the blog post
-            const metadata = await extractMetadata('blog', blogPost);
-            
-            // Generate meta tags HTML
-            metaTags = generateMetaTagsHtml(metadata, path, 'article', req);
-          } else {
-            // Fallback to blog page metadata
-            const metadata = await extractMetadata('blog');
-            metaTags = generateMetaTagsHtml(metadata, path, 'website', req);
-          }
-        }
-        
-        // Project pattern
+          pageData = await storage.getBlogPostBySlug(blogSlug);
+          contentType = 'article';
+          pageName = 'blog';
+        } 
+        // Project page
         else if (path.startsWith('/projects/') && path.length > 10) {
           const projectSlug = path.substring(10).replace(/\/$/, '');
-          
-          // Get the project from database
-          const project = await storage.getProjectBySlug(projectSlug);
-          
-          if (project) {
-            // Extract metadata from the project
-            const metadata = await extractMetadata('projects', project);
-            
-            // Generate meta tags HTML
-            metaTags = generateMetaTagsHtml(metadata, path, 'article', req);
-          } else {
-            // Fallback to projects page metadata
-            const metadata = await extractMetadata('projects');
-            metaTags = generateMetaTagsHtml(metadata, path, 'website', req);
+          pageData = await storage.getProjectBySlug(projectSlug);
+          contentType = 'article';
+          pageName = 'projects';
+        }
+        // Regular page
+        else {
+          pageName = path === '/' ? 'home' : path.replace(/^\/|\/$/g, '');
+        }
+        
+        // Get page content from database
+        const pageContent = await storage.getPageContent(pageName);
+        
+        // Extract metadata
+        let metadata = {
+          title: '',
+          description: '',
+          keywords: '',
+          ogTitle: '',
+          ogDescription: '',
+          ogImage: '',
+          ogSiteName: '',
+          ogLogo: ''
+        };
+        
+        // Parse page metadata from database content
+        if (pageContent && pageContent.content) {
+          try {
+            const content = JSON.parse(pageContent.content);
+            if (content.metadata) {
+              metadata = { ...metadata, ...content.metadata };
+            }
+          } catch (e) {
+            log(`Error parsing page content: ${e}`);
           }
         }
         
-        // Regular pages with database content
-        else {
-          // Extract page name from path
-          let pageName = path === '/' ? 'home' : path.replace(/^\/|\/$/g, '');
+        // Override with specific page data if available
+        if (pageData) {
+          // For blog posts and projects
+          metadata.title = pageData.title || metadata.title;
+          metadata.description = pageData.excerpt || pageData.description || metadata.description;
           
-          // Get metadata for the page
-          const metadata = await extractMetadata(pageName);
+          // Use imageUrl or image_url if available
+          if (pageData.imageUrl || pageData.image_url) {
+            metadata.ogImage = pageData.imageUrl || pageData.image_url || metadata.ogImage;
+          }
           
-          // Generate meta tags HTML
-          metaTags = generateMetaTagsHtml(metadata, path, 'website', req);
+          // If content contains embedded metadata, use it
+          if (pageData.content && typeof pageData.content === 'string') {
+            try {
+              if (pageData.content.startsWith('{')) {
+                const contentObj = JSON.parse(pageData.content);
+                if (contentObj.metadata) {
+                  metadata = { ...metadata, ...contentObj.metadata };
+                }
+              }
+            } catch (e) {
+              log(`Error parsing content metadata: ${e}`);
+            }
+          }
         }
         
-        // Log meta tag injection
-        log(`MetaTags: Injecting meta tags for ${req.path}`);
+        // Ensure og values are set if regular values are available
+        metadata.ogTitle = metadata.ogTitle || metadata.title;
+        metadata.ogDescription = metadata.ogDescription || metadata.description;
         
-        // Simple injection - add meta tags after the head opening tag
+        // Build canonical URL
+        const host = req.headers.host || process.env.REPLIT_DOMAIN || '';
+        const canonical = metadata.canonical || `https://${host}${path.endsWith('/') ? path : path + '/'}`;
+        
+        // Build final meta tags HTML
+        const metaTags = `
+          ${BASIC_META_TAGS}
+          
+          <!-- SEO Meta Tags -->
+          ${metadata.title ? `<title>${metadata.title}</title>` : ''}
+          ${metadata.description ? `<meta name="description" content="${metadata.description}" />` : ''}
+          ${metadata.keywords ? `<meta name="keywords" content="${metadata.keywords}" />` : ''}
+          
+          <!-- Open Graph / Facebook -->
+          <meta property="og:type" content="${contentType}" />
+          ${metadata.ogTitle ? `<meta property="og:title" content="${metadata.ogTitle}" />` : ''}
+          ${metadata.ogDescription ? `<meta property="og:description" content="${metadata.ogDescription}" />` : ''}
+          ${metadata.ogImage ? `<meta property="og:image" content="${metadata.ogImage}" />` : ''}
+          <meta property="og:url" content="${canonical}" />
+          ${metadata.ogSiteName ? `<meta property="og:site_name" content="${metadata.ogSiteName}" />` : ''}
+          ${metadata.ogLogo ? `<meta property="og:logo" content="${metadata.ogLogo}" />` : ''}
+          
+          <!-- Twitter Card -->
+          <meta name="twitter:card" content="${metadata.ogImage ? 'summary_large_image' : 'summary'}" />
+          ${metadata.ogTitle ? `<meta name="twitter:title" content="${metadata.ogTitle}" />` : ''}
+          ${metadata.ogDescription ? `<meta name="twitter:description" content="${metadata.ogDescription}" />` : ''}
+          ${metadata.ogImage ? `<meta name="twitter:image" content="${metadata.ogImage}" />` : ''}
+          
+          <!-- Canonical URL -->
+          <link rel="canonical" href="${canonical}" />
+        `;
+        
+        // Inject meta tags into HTML
         if (body.includes('<head>')) {
           body = body.replace('<head>', `<head>\n${metaTags}`);
+          log(`Injected meta tags for ${path}`);
         }
       } catch (error) {
-        log(`Error generating meta tags: ${error}`);
+        log(`Error injecting meta tags: ${error}`);
       }
     }
     
-    // Call the original send method
+    // Call original send method
     return originalSend.call(res, body);
   };
   
-  // Continue to the next middleware
   next();
 }

@@ -91,8 +91,7 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Apply SEO middleware to inject meta tags - must come before error handler
-  app.use(staticMetaTags);
+  // Do not apply SEO middleware again (already applied above)
   
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

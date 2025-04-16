@@ -73,7 +73,7 @@ async function extractMetadata(pageName: string, data?: any): Promise<any> {
 /**
  * Generate HTML meta tags for a page
  */
-function generateMetaTagsHtml(metadata: any, path: string, type: string = 'website'): string {
+function generateMetaTagsHtml(metadata: any, path: string, type: string = 'website', req?: Request): string {
   // Ensure we have the necessary values
   const title = metadata.title || '';
   const description = metadata.description || '';
@@ -83,8 +83,9 @@ function generateMetaTagsHtml(metadata: any, path: string, type: string = 'websi
   const ogSiteName = metadata.ogSiteName || '';
   const ogLogo = metadata.ogLogo || '';
   
-  // Base URL for canonical links - use current host or default
-  const baseUrl = `${process.env.BASE_URL || 'https://example.com'}`;
+  // Base URL for canonical links - avoid hardcoding the domain
+  const host = req?.headers?.host || process.env.REPLIT_DOMAIN || 'example.com';
+  const baseUrl = `https://${host}`;
   const canonicalUrl = `${baseUrl}${path.endsWith('/') ? path : path + '/'}`;
   
   return `
@@ -145,11 +146,11 @@ export function staticMetaTags(req: Request, res: Response, next: NextFunction) 
             const metadata = await extractMetadata('blog', blogPost);
             
             // Generate meta tags HTML
-            metaTags = generateMetaTagsHtml(metadata, path, 'article');
+            metaTags = generateMetaTagsHtml(metadata, path, 'article', req);
           } else {
             // Fallback to blog page metadata
             const metadata = await extractMetadata('blog');
-            metaTags = generateMetaTagsHtml(metadata, path);
+            metaTags = generateMetaTagsHtml(metadata, path, 'website', req);
           }
         }
         
@@ -165,11 +166,11 @@ export function staticMetaTags(req: Request, res: Response, next: NextFunction) 
             const metadata = await extractMetadata('projects', project);
             
             // Generate meta tags HTML
-            metaTags = generateMetaTagsHtml(metadata, path, 'article');
+            metaTags = generateMetaTagsHtml(metadata, path, 'article', req);
           } else {
             // Fallback to projects page metadata
             const metadata = await extractMetadata('projects');
-            metaTags = generateMetaTagsHtml(metadata, path);
+            metaTags = generateMetaTagsHtml(metadata, path, 'website', req);
           }
         }
         
@@ -182,7 +183,7 @@ export function staticMetaTags(req: Request, res: Response, next: NextFunction) 
           const metadata = await extractMetadata(pageName);
           
           // Generate meta tags HTML
-          metaTags = generateMetaTagsHtml(metadata, path);
+          metaTags = generateMetaTagsHtml(metadata, path, 'website', req);
         }
         
         // Log meta tag injection

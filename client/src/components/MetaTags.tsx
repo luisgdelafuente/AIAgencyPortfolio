@@ -6,21 +6,30 @@ interface MetaTagsProps {
   metadata: Metadata;
   type?: 'website' | 'article';
   url?: string;
+  pageTitle?: string; // Optional explicit page title that overrides metadata.title
 }
 
 /**
  * Reusable component for rendering meta tags across the site
+ * Ensures all metadata comes from the database with no hardcoded values
  */
 export default function MetaTags({ 
   metadata, 
   type = 'website',
-  url
+  url,
+  pageTitle
 }: MetaTagsProps) {
+  // Final title to use - prioritize specific page title if provided
+  const finalTitle = pageTitle || metadata.title || '';
+  
+  // To avoid blank meta description which Google doesn't like
+  const metaDescription = metadata.description || '';
+  
   return (
     <Helmet>
       {/* Basic meta tags */}
-      <title>{metadata.title}</title>
-      <meta name="description" content={metadata.description} />
+      <title>{finalTitle}</title>
+      <meta name="description" content={metaDescription} />
       {metadata.keywords && <meta name="keywords" content={metadata.keywords} />}
       
       {/* Canonical URL - always prefer the custom domain over Replit domain */}
@@ -31,12 +40,12 @@ export default function MetaTags({
       {/* Open Graph / Social Media Meta Tags */}
       {metadata.ogTitle 
         ? <meta property="og:title" content={metadata.ogTitle} />
-        : <meta property="og:title" content={metadata.title} /> 
+        : <meta property="og:title" content={finalTitle} /> 
       }
       
       {metadata.ogDescription 
         ? <meta property="og:description" content={metadata.ogDescription} />
-        : (metadata.description && <meta property="og:description" content={metadata.description} />)
+        : (metaDescription && <meta property="og:description" content={metaDescription} />)
       }
       
       {metadata.ogImage && <meta property="og:image" content={metadata.ogImage} />}
@@ -47,12 +56,12 @@ export default function MetaTags({
       <meta name="twitter:card" content={metadata.ogImage ? "summary_large_image" : "summary"} />
       {metadata.ogTitle 
         ? <meta name="twitter:title" content={metadata.ogTitle} />
-        : <meta name="twitter:title" content={metadata.title} /> 
+        : <meta name="twitter:title" content={finalTitle} /> 
       }
       
       {metadata.ogDescription 
         ? <meta name="twitter:description" content={metadata.ogDescription} />
-        : (metadata.description && <meta name="twitter:description" content={metadata.description} />)
+        : (metaDescription && <meta name="twitter:description" content={metaDescription} />)
       }
       
       {metadata.ogImage && <meta name="twitter:image" content={metadata.ogImage} />}

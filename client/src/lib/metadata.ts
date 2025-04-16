@@ -1,9 +1,10 @@
 import { PageContent } from '@shared/schema';
 
-// Default metadata fallback values - minimal to ensure the database values are used
+// Minimal default metadata - only used when no data exists in the database
+// This is intentionally minimal to ensure the database values are always used when available
 export const defaultMetadata = {
   title: 'HAL149',
-  description: '',
+  description: '', // Empty to ensure Google doesn't use a hardcoded fallback
   keywords: '',
   canonical: '',
   ogTitle: '',

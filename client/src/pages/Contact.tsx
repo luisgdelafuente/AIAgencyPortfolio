@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MetaTags from '@/components/MetaTags';
@@ -18,26 +18,20 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { PageContent } from '@shared/schema';
 import { extractMetadata } from '@/lib/metadata';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ContactContent {
-  title: string;
-  subtitle: string;
-  email: string;
-  phone: string;
-  address: string;
-  formTitle: string;
+  title?: string;
+  subtitle?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  formTitle?: string;
+  [key: string]: any; // Allow for metadata and other fields
 }
 
 export default function Contact() {
   const { toast } = useToast();
-  const [content, setContent] = useState<ContactContent>({
-    title: "Contact Us",
-    subtitle: "Have questions about our AI solutions? We'd love to hear from you.",
-    email: "info@hal149.com",
-    phone: "+1 (555) 123-4567",
-    address: "1234 AI Boulevard\nSan Francisco, CA 94107",
-    formTitle: "Send us a message"
-  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -45,26 +39,26 @@ export default function Contact() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const response = await fetch('/api/page-contents/contact');
-        if (response.ok) {
-          const data = await response.json();
-          const parsedContent = JSON.parse(data.content);
-          setContent(parsedContent);
-        }
-      } catch (error) {
-        console.error('Error fetching contact page content:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContent();
-  }, []);
+  
+  // Fetch page content including metadata
+  const { data: pageContent, isLoading } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/contact'],
+  });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
+  
+  // Parse the JSON content
+  let content: ContactContent = {};
+  if (pageContent?.content) {
+    try {
+      content = typeof pageContent.content === 'string'
+        ? JSON.parse(pageContent.content)
+        : pageContent.content;
+    } catch (error) {
+      console.error('Error parsing contact content JSON:', error);
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -115,14 +109,6 @@ export default function Contact() {
     }
   };
 
-  // Fetch contact page metadata
-  const { data: pageContent } = useQuery<PageContent>({
-    queryKey: ['/api/page-contents/contact'],
-  });
-  
-  // Extract metadata with inheritance
-  const metadata = extractMetadata(pageContent);
-
   return (
     <>
       <MetaTags 
@@ -135,14 +121,21 @@ export default function Contact() {
         
         <main className="flex-grow pt-28">
           <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-6">
-                {content.title}
-              </h1>
-              <p className="text-lg text-gray-600">
-                {content.subtitle}
-              </p>
-            </div>
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-12 bg-gray-200 rounded mb-6"></div>
+                <div className="h-6 bg-gray-200 rounded w-3/4 mb-12"></div>
+              </div>
+            ) : (
+              <div className="mb-12">
+                <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                  {content.title || ''}
+                </h1>
+                <p className="text-lg text-gray-600">
+                  {content.subtitle || ''}
+                </p>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               <div className="md:col-span-1">
@@ -156,12 +149,18 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Address</h3>
                           <p className="text-gray-600 text-sm">
-                            {content.address.split('\n').map((line, i) => (
-                              <React.Fragment key={i}>
-                                {line}
-                                <br />
-                              </React.Fragment>
-                            ))}
+                            {isLoading ? (
+                              <Skeleton className="h-12 w-full" />
+                            ) : content.address ? (
+                              content.address.split('\n').map((line: string, i: number) => (
+                                <React.Fragment key={i}>
+                                  {line}
+                                  <br />
+                                </React.Fragment>
+                              ))
+                            ) : (
+                              ''
+                            )}
                           </p>
                         </div>
                       </div>
@@ -177,7 +176,11 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Email</h3>
                           <p className="text-gray-600 text-sm">
-                            {content.email}
+                            {isLoading ? (
+                              <Skeleton className="h-4 w-32" />
+                            ) : (
+                              content.email || ''
+                            )}
                           </p>
                         </div>
                       </div>
@@ -193,7 +196,11 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Phone</h3>
                           <p className="text-gray-600 text-sm">
-                            {content.phone}
+                            {isLoading ? (
+                              <Skeleton className="h-4 w-32" />
+                            ) : (
+                              content.phone || ''
+                            )}
                           </p>
                         </div>
                       </div>
@@ -205,7 +212,13 @@ export default function Contact() {
               <div className="md:col-span-2">
                 <Card className="border border-gray-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle className="text-xl font-bold text-gray-900">{content.formTitle}</CardTitle>
+                    <CardTitle className="text-xl font-bold text-gray-900">
+                      {isLoading ? (
+                        <Skeleton className="h-6 w-40" />
+                      ) : (
+                        content.formTitle || 'Send us a message'
+                      )}
+                    </CardTitle>
                     <CardDescription className="text-gray-600">
                       Fill out the form below and we'll get back to you as soon as possible.
                     </CardDescription>

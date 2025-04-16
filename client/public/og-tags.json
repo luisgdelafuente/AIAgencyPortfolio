@@ -1,38 +1,65 @@
 {
+  "default": {
+    "title": "HAL149 | AI Agency",
+    "description": "HAL149 is a premier AI agency creating next-generation artificial intelligence solutions.",
+    "type": "website",
+    "image": "https://hal149.com/og-image.png",
+    "url": "https://hal149.com/"
+  },
   "home": {
     "title": "HAL149 | AI Agency",
     "description": "HAL149 is a premier AI agency creating next-generation artificial intelligence solutions.",
+    "type": "website",
     "image": "https://hal149.com/og-image.png",
     "url": "https://hal149.com/"
   },
   "about": {
     "title": "About | HAL149",
-    "description": "Learn about our mission, team and approach to artificial intelligence at HAL149.",
+    "description": "Learn about HAL149, our mission, and our team.",
+    "type": "website",
     "image": "https://hal149.com/og-image.png",
     "url": "https://hal149.com/about/"
+  },
+  "blog": {
+    "title": "Blog | HAL149",
+    "description": "Read our latest insights on artificial intelligence and technology.",
+    "type": "website",
+    "image": "https://hal149.com/og-image.png",
+    "url": "https://hal149.com/blog/"
   },
   "contact": {
     "title": "Contact | HAL149",
     "description": "Get in touch with HAL149 for AI solutions and services.",
+    "type": "website",
     "image": "https://hal149.com/og-image.png",
     "url": "https://hal149.com/contact/"
-  },
-  "blog": {
-    "title": "Blog | HAL149",
-    "description": "Read the latest artificial intelligence insights and news from HAL149.",
-    "image": "https://hal149.com/og-image.png",
-    "url": "https://hal149.com/blog/"
   },
   "projects": {
     "title": "Projects | HAL149",
     "description": "Explore our innovative AI projects and solutions.",
+    "type": "website",
     "image": "https://hal149.com/og-image.png",
     "url": "https://hal149.com/projects/"
   },
   "legal": {
     "title": "Legal | HAL149",
-    "description": "Legal information and policies for HAL149.",
+    "description": "Legal information for HAL149 website.",
+    "type": "website",
     "image": "https://hal149.com/og-image.png",
     "url": "https://hal149.com/legal/"
+  },
+  "blogPost": {
+    "title": "Blog Post | HAL149",
+    "description": "Read our latest insights on artificial intelligence and technology.",
+    "type": "article",
+    "image": "https://hal149.com/og-image.png",
+    "url": "https://hal149.com/blog/post/"
+  },
+  "project": {
+    "title": "Project | HAL149",
+    "description": "Explore our innovative AI projects and solutions.",
+    "type": "article",
+    "image": "https://hal149.com/og-image.png",
+    "url": "https://hal149.com/projects/project/"
   }
 }

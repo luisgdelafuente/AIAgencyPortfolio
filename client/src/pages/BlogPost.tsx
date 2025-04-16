@@ -63,6 +63,7 @@ export default function BlogPostPage() {
         metadata={metadata}
         type="article"
         url={url}
+        pagePath={`/blog/${slug}`}
       />
       
       <div className="min-h-screen flex flex-col">

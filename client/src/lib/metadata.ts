@@ -53,26 +53,44 @@ export function extractMetadata(
         : pageContent.content;
       
       if (contentObj.metadata) {
+        // Ensure all values are strings to avoid Symbol conversion issues
+        const safeMetadata = Object.entries(contentObj.metadata).reduce((acc, [key, value]) => {
+          acc[key] = (value !== null && value !== undefined) ? String(value) : '';
+          return acc;
+        }, {} as Record<string, string>);
+        
         metadata = {
           ...metadata,
-          ...contentObj.metadata
+          ...safeMetadata
         };
       }
     }
     
     // Layer 2: If explicit parent metadata is provided, override with it
     if (parentMetadata) {
+      // Convert all metadata values to strings
+      const safeParentMetadata = Object.entries(parentMetadata).reduce((acc, [key, value]) => {
+        acc[key] = (value !== null && value !== undefined) ? String(value) : '';
+        return acc;
+      }, {} as Record<string, string>);
+      
       metadata = {
         ...metadata,
-        ...parentMetadata
+        ...safeParentMetadata
       };
     }
     
     // Layer 3: If item-specific metadata exists, it takes highest precedence
     if (itemMetadata) {
+      // Convert all metadata values to strings
+      const safeItemMetadata = Object.entries(itemMetadata).reduce((acc, [key, value]) => {
+        acc[key] = (value !== null && value !== undefined) ? String(value) : '';
+        return acc;
+      }, {} as Record<string, string>);
+      
       metadata = {
         ...metadata,
-        ...itemMetadata
+        ...safeItemMetadata
       };
     }
   } catch (e) {
@@ -91,13 +109,19 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
   if (!item) return {};
   
   // Handle cases where metadata might be stored in the content
-  let extractedMetadata = {};
+  let extractedMetadata: Partial<Metadata> = {};
   try {
     // If content is a JSON string, try to extract metadata from it
     if (typeof item.content === 'string' && item.content.trim().startsWith('{')) {
       const contentObj = JSON.parse(item.content);
       if (contentObj.metadata) {
-        extractedMetadata = contentObj.metadata;
+        // Ensure all metadata values are strings
+        const rawMetadata = contentObj.metadata;
+        Object.keys(rawMetadata).forEach(key => {
+          if (rawMetadata[key] !== null && rawMetadata[key] !== undefined) {
+            extractedMetadata[key] = String(rawMetadata[key]);
+          }
+        });
       }
     }
   } catch (e) {
@@ -105,30 +129,35 @@ export function extractItemMetadata(item: any): Partial<Metadata> {
   }
   
   // Normalize image URL (handle both imageUrl and image_url)
-  const imageUrl = item.imageUrl || item.image_url || '';
+  const imageUrl = String(item.imageUrl || item.image_url || '');
   
   // Extract relevant fields from item
   const baseMetadata = {
-    title: item.title ? `${item.title} | HAL149` : '',
-    description: item.excerpt || item.description || '',
-    keywords: item.category ? `${item.category}` : '',
+    title: item.title ? `${String(item.title)} | HAL149` : '',
+    description: String(item.excerpt || item.description || ''),
+    keywords: item.category ? String(item.category) : '',
     // Respect manually set canonical URL if it exists, otherwise generate it
-    canonical: extractedMetadata?.canonical 
-      ? extractedMetadata.canonical
+    canonical: extractedMetadata.canonical 
+      ? String(extractedMetadata.canonical)
       : item.slug 
-        ? `https://hal149.com/${item.type || 'blog'}/${item.slug}/` 
+        ? `https://hal149.com/${item.type || 'blog'}/${String(item.slug)}/` 
         : '',
   };
   
-  // Return with social media metadata defaulting to regular metadata
-  return {
+  // Create final metadata with social media fields defaulting to regular fields
+  const finalMetadata: Partial<Metadata> = {
     ...baseMetadata,
-    // Apply any extracted metadata properties
-    ...extractedMetadata,
-    // Social media fields default to their corresponding metadata fields if not already set
-    ogTitle: extractedMetadata?.ogTitle || baseMetadata.title,
-    ogDescription: extractedMetadata?.ogDescription || baseMetadata.description,
-    // For projects and blog posts with images
-    ogImage: extractedMetadata?.ogImage || imageUrl
+    ogTitle: String(extractedMetadata.ogTitle || baseMetadata.title || ''),
+    ogDescription: String(extractedMetadata.ogDescription || baseMetadata.description || ''),
+    ogImage: String(extractedMetadata.ogImage || imageUrl || '')
   };
+  
+  // Copy any other extracted metadata properties after converting to strings
+  for (const key in extractedMetadata) {
+    if (key !== 'ogTitle' && key !== 'ogDescription' && key !== 'ogImage') {
+      finalMetadata[key] = String(extractedMetadata[key] || '');
+    }
+  }
+  
+  return finalMetadata;
 }

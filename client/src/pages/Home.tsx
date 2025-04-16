@@ -46,6 +46,7 @@ export default function Home() {
       <MetaTags 
         metadata={metadata} 
         url="https://hal149.com/"
+        pagePath="/"
       />
       
       <div className="min-h-screen flex flex-col">

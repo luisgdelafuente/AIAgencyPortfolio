@@ -57,6 +57,7 @@ export default function ProjectDetailPage() {
         metadata={metadata}
         type="article"
         url={url}
+        pagePath={`/projects/${slug}`}
       />
       
       <div className="min-h-screen flex flex-col">

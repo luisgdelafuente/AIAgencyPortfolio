@@ -30,7 +30,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           href={`/projects/${project.slug}`} 
           className="inline-flex items-center text-gray-900 hover:text-gray-700 font-medium"
         >
-          View Case Study →
+          Read more →
         </Link>
       </div>
     </div>

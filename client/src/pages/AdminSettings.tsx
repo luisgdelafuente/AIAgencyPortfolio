@@ -530,11 +530,15 @@ export default function AdminSettings() {
                             />
                             
                             <FormField
-                              label="Canonical URL"
+                              label="Canonical URL (Full URL)"
                               name="metadata.canonical"
                               value={blogPageData.metadata.canonical}
                               onChange={(value) => handleBlogPageChange('metadata.canonical', value)}
+                              required={false}
                             />
+                            <div className="text-sm text-neutral-500 mt-1">
+                              Please enter a complete URL starting with http:// or https:// (e.g., https://hal149.com/blog/)
+                            </div>
                           </div>
                           
                           <div className="mt-6">

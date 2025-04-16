@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,20 @@ import {
   CardTitle,
   CardDescription 
 } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
+import { PageContent } from '@shared/schema';
+import { extractMetadata } from '@/lib/metadata';
+import { Skeleton } from '@/components/ui/skeleton';
+
+interface ContactContent {
+  title?: string;
+  subtitle?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  formTitle?: string;
+  [key: string]: any; // Allow for metadata and other fields
+}
 
 export default function Contact() {
   const { toast } = useToast();
@@ -25,54 +39,103 @@ export default function Contact() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Fetch page content including metadata
+  const { data: pageContent, isLoading } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/contact'],
+  });
+  
+  // Extract metadata with inheritance
+  const metadata = extractMetadata(pageContent);
+  
+  // Parse the JSON content
+  let content: ContactContent = {};
+  if (pageContent?.content) {
+    try {
+      content = typeof pageContent.content === 'string'
+        ? JSON.parse(pageContent.content)
+        : pageContent.content;
+    } catch (error) {
+      console.error('Error parsing contact content JSON:', error);
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: 'Message sent',
+          description: 'We\'ve received your message and will get back to you soon!',
+        });
+        
+        // Reset form after successful submission
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Error sending contact message:', error);
       toast({
-        title: 'Message sent',
-        description: 'We\'ve received your message and will get back to you soon!',
+        variant: 'destructive',
+        title: 'Error',
+        description: error instanceof Error 
+          ? error.message 
+          : 'There was a problem sending your message. Please try again.',
       });
-      
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-      
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (
     <>
-      <Helmet>
-        <title>Contact | HAL149</title>
-        <meta name="description" content="Get in touch with the HAL149 team for inquiries about our AI solutions and services." />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        url="https://hal149.com/contact/"
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />
         
         <main className="flex-grow pt-28">
           <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-6">
-                Contact Us
-              </h1>
-              <p className="text-lg text-gray-600">
-                Have questions about our AI solutions? We'd love to hear from you.
-              </p>
-            </div>
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-12 bg-gray-200 rounded mb-6"></div>
+                <div className="h-6 bg-gray-200 rounded w-3/4 mb-12"></div>
+              </div>
+            ) : (
+              <div className="mb-12">
+                <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                  {content.title || ''}
+                </h1>
+                <p className="text-lg text-gray-600">
+                  {content.subtitle || ''}
+                </p>
+              </div>
+            )}
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               <div className="md:col-span-1">
@@ -86,8 +149,18 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Address</h3>
                           <p className="text-gray-600 text-sm">
-                            1234 AI Boulevard<br />
-                            San Francisco, CA 94107
+                            {isLoading ? (
+                              <Skeleton className="h-12 w-full" />
+                            ) : content.address ? (
+                              content.address.split('\n').map((line: string, i: number) => (
+                                <React.Fragment key={i}>
+                                  {line}
+                                  <br />
+                                </React.Fragment>
+                              ))
+                            ) : (
+                              ''
+                            )}
                           </p>
                         </div>
                       </div>
@@ -103,8 +176,11 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Email</h3>
                           <p className="text-gray-600 text-sm">
-                            info@hal149.com<br />
-                            support@hal149.com
+                            {isLoading ? (
+                              <Skeleton className="h-4 w-32" />
+                            ) : (
+                              content.email || ''
+                            )}
                           </p>
                         </div>
                       </div>
@@ -120,8 +196,11 @@ export default function Contact() {
                         <div>
                           <h3 className="font-medium text-gray-900 mb-1">Phone</h3>
                           <p className="text-gray-600 text-sm">
-                            +1 (555) 123-4567<br />
-                            Mon-Fri, 9AM-6PM PST
+                            {isLoading ? (
+                              <Skeleton className="h-4 w-32" />
+                            ) : (
+                              content.phone || ''
+                            )}
                           </p>
                         </div>
                       </div>
@@ -133,7 +212,13 @@ export default function Contact() {
               <div className="md:col-span-2">
                 <Card className="border border-gray-200 shadow-sm">
                   <CardHeader>
-                    <CardTitle className="text-xl font-bold text-gray-900">Send us a message</CardTitle>
+                    <CardTitle className="text-xl font-bold text-gray-900">
+                      {isLoading ? (
+                        <Skeleton className="h-6 w-40" />
+                      ) : (
+                        content.formTitle || 'Send us a message'
+                      )}
+                    </CardTitle>
                     <CardDescription className="text-gray-600">
                       Fill out the form below and we'll get back to you as soon as possible.
                     </CardDescription>

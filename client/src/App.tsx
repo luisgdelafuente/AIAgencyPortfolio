@@ -16,26 +16,34 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminProjects from "@/pages/AdminProjects";
 import AdminBlog from "@/pages/AdminBlog";
 import AdminWaitlist from "@/pages/AdminWaitlist";
+import AdminContent from "@/pages/AdminContent";
+import AdminMessages from "@/pages/AdminMessages";
+import AdminSettings from "@/pages/AdminSettings";
 import React from "react";
 import { AuthProvider } from "@/hooks/use-auth";
-import { ProtectedRoute } from "@/lib/protected-route";
+import { LanguageProvider } from "@/hooks/use-language";
+import { TranslationProvider } from "@/hooks/use-translations";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/projects" component={Projects} />
-      <Route path="/projects/:slug" component={ProjectDetail} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:slug" component={BlogPost} />
-      <Route path="/about" component={About} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/legal" component={Legal} />
-      <Route path="/admin" component={AuthPage} />
-      <ProtectedRoute path="/admin/dashboard" component={AdminDashboard} />
-      <ProtectedRoute path="/admin/projects" component={AdminProjects} />
-      <ProtectedRoute path="/admin/blog" component={AdminBlog} />
-      <ProtectedRoute path="/admin/waitlist" component={AdminWaitlist} />
+      <Route path="/projects/" component={Projects} />
+      <Route path="/projects/:slug/" component={ProjectDetail} />
+      <Route path="/blog/" component={Blog} />
+      <Route path="/blog/:slug/" component={BlogPost} />
+      <Route path="/about/" component={About} />
+      <Route path="/contact/" component={Contact} />
+      <Route path="/legal/" component={Legal} />
+      <Route path="/admin/" component={AuthPage} />
+      <ProtectedRoute path="/admin/dashboard/" component={AdminDashboard} />
+      <ProtectedRoute path="/admin/projects/" component={AdminProjects} />
+      <ProtectedRoute path="/admin/blog/" component={AdminBlog} />
+      <ProtectedRoute path="/admin/content/" component={AdminContent} />
+      <ProtectedRoute path="/admin/waitlist/" component={AdminWaitlist} />
+      <ProtectedRoute path="/admin/messages/" component={AdminMessages} />
+      <ProtectedRoute path="/admin/settings/" component={AdminSettings} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -44,10 +52,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
+      <LanguageProvider>
+        <TranslationProvider>
+          <AuthProvider>
+            <Router />
+            <Toaster />
+          </AuthProvider>
+        </TranslationProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

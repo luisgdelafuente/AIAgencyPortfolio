@@ -1,8 +1,56 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import cors from "cors";
+import compression from "compression";
 
 const app = express();
+
+// Enable compression for all responses
+app.use(compression({
+  // Compression level (1-9, where 9 is maximum compression but slower)
+  level: 6,
+  // Minimum size in bytes to apply compression
+  threshold: 0,
+  // Compress all responses
+  filter: () => true
+}));
+
+// Redirect Replit domain to custom domain
+app.use((req, res, next) => {
+  const host = req.header('host');
+  
+  // Check if it's a Replit domain
+  if (host && host.includes('replit.app')) {
+    // Get the path including query string
+    const fullPath = req.url;
+    const customDomain = 'hal149.com';
+    
+    // Redirect to the same path on the custom domain
+    return res.redirect(301, `https://${customDomain}${fullPath}`);
+  }
+  
+  next();
+});
+
+// Configure CORS
+app.use(cors({
+  origin: true, // Allow any origin in development
+  credentials: true
+}));
+
+// Add additional headers for CORS and security
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

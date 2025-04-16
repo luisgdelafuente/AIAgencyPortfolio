@@ -1,0 +1,111 @@
+<h1>HAL149 - AI Agency Website</h1>
+<h2>Project Overview</h2>
+<p>HAL149 is a modern, performant website built for an AI agency to showcase their services, projects, and insights. The platform features a comprehensive content management system with a focus on performance optimization and SEO.</p>
+<p><img src="https://test.hal149.com/images/blog-cover.jpg" alt="HAL149 Website"></p>
+<h2>Features</h2>
+<h3>Frontend</h3>
+<ul>
+<li><strong>Responsive Design</strong>: Mobile-first approach with a clean, professional aesthetic</li>
+<li><strong>Dynamic Content</strong>: All content is loaded from the database, enabling easy updates without code changes</li>
+<li><strong>Blog System</strong>: Full-featured blog with categories, formatting, and SEO metadata</li>
+<li><strong>Project Portfolio</strong>: Showcase AI implementations with detailed case studies</li>
+<li><strong>SEO Optimization</strong>: Advanced metadata management with a four-tier inheritance system</li>
+<li><strong>Performance</strong>: Optimized for Google PageSpeed with minimal JavaScript and efficient rendering</li>
+</ul>
+<h3>Admin Dashboard</h3>
+<ul>
+<li><strong>Content Management</strong>: Easy-to-use interface for managing all website content</li>
+<li><strong>SEO Tools</strong>: Comprehensive metadata management for all pages and content items</li>
+<li><strong>Blog Editor</strong>: Rich text editor with preview functionality</li>
+<li><strong>Project Management</strong>: Create and update portfolio items with detailed information</li>
+<li><strong>Contact Management</strong>: View and respond to inquiries from the contact form</li>
+<li><strong>Settings</strong>: Configure site-wide defaults and section-specific content</li>
+</ul>
+<h3>Backend</h3>
+<ul>
+<li><strong>Express API</strong>: RESTful API endpoints for all data operations</li>
+<li><strong>PostgreSQL Database</strong>: Robust data storage with Supabase integration</li>
+<li><strong>Authentication</strong>: Secure admin authentication system</li>
+<li><strong>Drizzle ORM</strong>: Type-safe database operations with schema validation</li>
+<li><strong>CORS Support</strong>: Configured for secure cross-origin requests in production</li>
+</ul>
+<h2>Technology Stack</h2>
+<ul>
+<li><strong>Frontend</strong>: React with TypeScript</li>
+<li><strong>UI Components</strong>: Tailwind CSS with shadcn/ui</li>
+<li><strong>State Management</strong>: TanStack Query for server state</li>
+<li><strong>Routing</strong>: wouter for lightweight routing</li>
+<li><strong>Backend</strong>: Node.js with Express</li>
+<li><strong>Database</strong>: PostgreSQL with Supabase integration</li>
+<li><strong>ORM</strong>: Drizzle with Zod validation</li>
+<li><strong>Deployment</strong>: Multi-environment support (development, staging, production)</li>
+</ul>
+<h2>Architecture</h2>
+<p>The application follows a modern web architecture pattern:</p>
+<ol>
+<li><strong>Data Layer</strong>: PostgreSQL database accessed through Drizzle ORM</li>
+<li><strong>API Layer</strong>: Express.js backend providing RESTful endpoints</li>
+<li><strong>Frontend Layer</strong>: React with component-based architecture</li>
+<li><strong>Deployment Layer</strong>: Optimized for various hosting environments</li>
+</ol>
+<h2>SEO Features</h2>
+<p>The platform implements a sophisticated metadata inheritance system with four tiers:</p>
+<ol>
+<li><strong>Site Defaults</strong>: Global fallback values for all pages</li>
+<li><strong>Section Pages</strong>: Page-specific metadata for sections like Blog or Projects</li>
+<li><strong>Content Items</strong>: Individual metadata for blog posts and projects</li>
+<li><strong>Social Media</strong>: Specialized metadata for social sharing</li>
+</ol>
+<p>All pages feature proper semantic HTML, canonical URLs, structured data where appropriate, and optimized meta tags for search engines and social media platforms.</p>
+<h2>Performance</h2>
+<p>The website is built with performance as a priority:</p>
+<ul>
+<li>Minimal JavaScript footprint</li>
+<li>Efficient rendering patterns</li>
+<li>Optimized image loading</li>
+<li>Caching strategies for API responses</li>
+<li>Server-side rendering for key pages</li>
+</ul>
+<h2>Getting Started</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Node.js (v18+)</li>
+<li>PostgreSQL database</li>
+</ul>
+<h3>Installation</h3>
+<ol>
+<li>Clone the repository</li>
+</ol>
+<pre><code class="language-bash">git clone https://github.com/yourusername/hal149.git
+cd hal149
+</code></pre>
+<ol start="2">
+<li>Install dependencies</li>
+</ol>
+<pre><code class="language-bash">npm install
+</code></pre>
+<ol start="3">
+<li>Set up environment variables</li>
+</ol>
+<pre><code class="language-bash">cp .env.example .env
+# Edit .env with your database credentials and other configuration
+</code></pre>
+<ol start="4">
+<li>Initialize the database</li>
+</ol>
+<pre><code class="language-bash">npm run db:push
+</code></pre>
+<ol start="5">
+<li>Run the development server</li>
+</ol>
+<pre><code class="language-bash">npm run dev
+</code></pre>
+<h3>Deployment</h3>
+<p>The application can be deployed to any Node.js hosting provider. For production deployment:</p>
+<pre><code class="language-bash">npm run build
+npm start
+</code></pre>
+<h2>License</h2>
+<p>This project is licensed under the MIT License - see the LICENSE file for details.</p>
+<h2>Contact</h2>
+<p>For any inquiries about this project, please contact <a href="mailto:contact@hal149.com">contact@hal149.com</a>.</p>

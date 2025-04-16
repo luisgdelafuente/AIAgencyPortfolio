@@ -20,7 +20,7 @@ export default function BlogCard({ post }: BlogCardProps) {
       <div className="p-6">
         <span className="text-sm text-gray-500">{formatDate(post.publishedAt)}</span>
         <h3 className="mt-2 text-xl font-semibold text-gray-900">
-          <Link href={`/blog/${post.slug}`}>
+          <Link href={`/blog/${post.slug}/`}>
             {post.title}
           </Link>
         </h3>
@@ -28,7 +28,7 @@ export default function BlogCard({ post }: BlogCardProps) {
           {post.excerpt}
         </p>
         <Link 
-          href={`/blog/${post.slug}`} 
+          href={`/blog/${post.slug}/`} 
           className="mt-4 inline-block text-gray-900 hover:text-gray-800"
         >
           Read More →

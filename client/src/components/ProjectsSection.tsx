@@ -1,25 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProjectCard from './ProjectCard';
 import type { Project } from '@shared/schema';
+import { useTranslations } from '@/hooks/use-translations';
+
+interface HomeContent {
+  projectsTitle?: string;
+  projectsSubtitle?: string;
+  projectsCta?: string;
+  [key: string]: any;
+}
 
 export default function ProjectsSection() {
+  const t = useTranslations();
   const { data: projects, isLoading } = useQuery<Project[]>({
     queryKey: ['/api/projects/featured']
   });
+  
+  const [content, setContent] = useState<HomeContent>({
+    projectsTitle: t.projects.title,
+    projectsSubtitle: t.projects.subtitle,
+    projectsCta: t.projects.cta
+  });
+  
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/page-contents/home');
+        if (response.ok) {
+          const data = await response.json();
+          // Handle both string and object formats
+          if (typeof data.content === 'string') {
+            try {
+              const parsedContent = JSON.parse(data.content);
+              setContent(parsedContent);
+            } catch (e) {
+              console.error('Error parsing JSON content:', e);
+            }
+          } else if (typeof data.content === 'object') {
+            setContent(data.content);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching home content:', error);
+      }
+    };
+    
+    fetchContent();
+  }, []);
 
   return (
     <section className="py-12 md:py-16 bg-white">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            Featured Projects
+            {content.projectsTitle || t.projects.title}
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            See how our AI solutions are transforming industries
+            {content.projectsSubtitle || t.projects.subtitle}
           </p>
         </div>
 
@@ -44,14 +85,14 @@ export default function ProjectsSection() {
             ))
           ) : (
             <div className="col-span-2 text-center py-12">
-              <p className="text-gray-500">No projects available yet.</p>
+              <p className="text-gray-500">{t.projects.noProjects}</p>
             </div>
           )}
         </div>
 
         <div className="mt-10 text-center">
           <Button asChild variant="outline" className="px-6 py-3 border-gray-300 hover:border-gray-400 text-gray-900 rounded-lg bg-white">
-            <Link href="/projects">View All Projects</Link>
+            <Link href="/projects/">{content.projectsCta || t.projects.cta}</Link>
           </Button>
         </div>
       </div>

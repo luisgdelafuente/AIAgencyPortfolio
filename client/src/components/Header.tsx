@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Globe, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useTranslations } from '@/hooks/use-translations';
 
 const HAL149Logo = () => (
   <div className="flex items-center">
@@ -13,17 +14,17 @@ const HAL149Logo = () => (
 export default function Header() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
+  const t = useTranslations();
 
   const isActive = (path: string) => {
     return location === path;
   };
 
   const navLinks = [
-    { href: '/projects', label: 'Projects' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/legal', label: 'Legal' }
+    { href: '/projects/', label: t.nav.projects },
+    { href: '/blog/', label: t.nav.blog },
+    { href: '/about/', label: t.nav.about },
+    { href: '/contact/', label: t.nav.contact }
   ];
 
   return (
@@ -51,11 +52,6 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <div className="pl-2 border-l border-gray-200">
-              <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium">
-                <Globe className="h-4 w-4 mr-1.5" /> EN
-              </Button>
-            </div>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -86,11 +82,6 @@ export default function Header() {
                       {link.label}
                     </Link>
                   ))}
-                  <div className="pt-4 mt-2 border-t border-gray-200">
-                    <Button variant="ghost" size="sm" className="text-sm text-gray-600 hover:text-gray-900 justify-start px-0 font-medium">
-                      <Globe className="h-4 w-4 mr-1.5" /> English
-                    </Button>
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>

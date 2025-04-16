@@ -1,20 +1,37 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Helmet } from "react-helmet";
+import MetaTags from '@/components/MetaTags';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRoute, Link } from 'wouter';
-import type { Project } from '@shared/schema';
+import type { Project, PageContent } from '@shared/schema';
 import { ChevronLeft } from 'lucide-react';
+import { extractMetadata, extractItemMetadata } from '@/lib/metadata';
 
 export default function ProjectDetailPage() {
   const [, params] = useRoute('/projects/:slug');
   const slug = params?.slug || '';
 
+  // Fetch project
   const { data: project, isLoading, isError } = useQuery<Project>({
     queryKey: [`/api/projects/${slug}`]
   });
+  
+  // Fetch projects page metadata (parent)
+  const { data: projectsPageContent } = useQuery<PageContent>({
+    queryKey: ['/api/page-contents/projects'],
+  });
+  
+  // Extract metadata with inheritance
+  // 1. Start with defaults
+  // 2. Apply projects page metadata (parent)
+  // 3. Apply project specific metadata (child)
+  const projectMetadata = project ? extractItemMetadata(project) : {};
+  const metadata = extractMetadata(projectsPageContent, null, projectMetadata);
+  
+  // Create URL for canonical link and sharing
+  const url = project?.slug ? `https://hal149.com/projects/${project.slug}/` : '';
 
   if (isError) {
     return (
@@ -36,10 +53,11 @@ export default function ProjectDetailPage() {
 
   return (
     <>
-      <Helmet>
-        <title>{project ? `${project.title} | HAL149` : 'Project | HAL149'}</title>
-        <meta name="description" content={project?.description || 'HAL149 project'} />
-      </Helmet>
+      <MetaTags 
+        metadata={metadata}
+        type="article"
+        url={url}
+      />
       
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -80,8 +98,25 @@ export default function ProjectDetailPage() {
                   className="w-full h-auto rounded-lg mb-6"
                 />
                 <div className="prose max-w-none">
-                  {/* In a real app, you would use a markdown renderer here */}
-                  <div dangerouslySetInnerHTML={{ __html: project.content }} />
+                  {/* Handle both direct HTML and JSON-wrapped content */}
+                  <div dangerouslySetInnerHTML={{ 
+                    __html: (() => {
+                      try {
+                        // Try to parse as JSON first
+                        if (typeof project.content === 'string' && project.content.trim().startsWith('{')) {
+                          const contentObj = JSON.parse(project.content);
+                          // If it has a content field, use that
+                          if (contentObj.content) {
+                            return contentObj.content;
+                          }
+                        }
+                      } catch (e) {
+                        // If parsing fails, just use the raw content
+                      }
+                      // Default case: use the content as-is
+                      return project.content;
+                    })()
+                  }} />
                 </div>
               </div>
             </>

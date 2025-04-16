@@ -48,6 +48,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { FormField, ContentEditor } from '@/components/AdminEditor';
+import { extractItemMetadata } from '@/lib/metadata';
 import type { BlogPost, InsertBlogPost } from '@shared/schema';
 import { formatDate, slugify } from '@shared/utils';
 
@@ -62,13 +63,23 @@ export default function AdminBlog() {
   const [currentPostId, setCurrentPostId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('editor');
   
-  const [formData, setFormData] = useState<Partial<InsertBlogPost>>({
+  const [formData, setFormData] = useState<Partial<InsertBlogPost & { metadata?: Record<string, string> }>>({
     title: '',
     slug: '',
     excerpt: '',
     content: '',
     imageUrl: '',
-    publishedAt: new Date().toISOString()
+    publishedAt: new Date().toISOString(),
+    metadata: {
+      // SEO metadata fields
+      title: '',
+      description: '',
+      keywords: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: ''
+    }
   });
   
   const { data: blogPosts, isLoading } = useQuery<BlogPost[]>({
@@ -160,7 +171,16 @@ export default function AdminBlog() {
       excerpt: '',
       content: '',
       imageUrl: '',
-      publishedAt: new Date().toISOString()
+      publishedAt: new Date().toISOString(),
+      metadata: {
+        title: '',
+        description: '',
+        keywords: '',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: ''
+      }
     });
     setCurrentPostId(null);
     setEditMode(false);
@@ -174,14 +194,50 @@ export default function AdminBlog() {
   
   const openEditDialog = (post: BlogPost) => {
     setCurrentPostId(post.id);
+    
+    // Default metadata from the blog post itself
+    const postMetadata = extractItemMetadata({
+      ...post,
+      type: 'blog'  // Add type to help with canonical URL formation
+    });
+    
+    // Try to parse metadata from content if present
+    let existingMetadata = {
+      title: postMetadata.title || '',
+      description: postMetadata.description || '',
+      keywords: postMetadata.keywords || '',
+      canonical: postMetadata.canonical || '',
+      ogTitle: postMetadata.ogTitle || '',
+      ogDescription: postMetadata.ogDescription || '',
+      ogImage: postMetadata.ogImage || ''
+    };
+    
+    try {
+      const contentObj = typeof post.content === 'string' && post.content.trim().startsWith('{') 
+        ? JSON.parse(post.content)
+        : { content: post.content };
+        
+      if (contentObj.metadata) {
+        // Override defaults with any existing metadata from content
+        existingMetadata = {
+          ...existingMetadata,
+          ...contentObj.metadata
+        };
+      }
+    } catch (e) {
+      console.error('Error parsing metadata from blog post:', e);
+    }
+    
     setFormData({
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt,
       content: post.content,
       imageUrl: post.imageUrl,
-      publishedAt: typeof post.publishedAt === 'string' ? post.publishedAt : new Date(post.publishedAt).toISOString()
+      publishedAt: post.publishedAt,
+      metadata: existingMetadata
     });
+    
     setEditMode(true);
     setIsDialogOpen(true);
   };
@@ -201,11 +257,14 @@ export default function AdminBlog() {
       return;
     }
     
+    // Always use the raw content directly - don't wrap in JSON
+    let finalContent = formData.content;
+    
     const postData = {
       title: formData.title!,
       slug: formData.slug || slugify(formData.title!),
       excerpt: formData.excerpt!,
-      content: formData.content!,
+      content: finalContent,
       imageUrl: formData.imageUrl!,
       publishedAt: typeof formData.publishedAt === 'string'
         ? formData.publishedAt
@@ -240,13 +299,13 @@ export default function AdminBlog() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="flex h-screen bg-neutral-50">
+      <div className="min-h-screen bg-neutral-50">
         <AdminNav />
         
-        <div className="flex-1 overflow-auto">
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Blog Posts</h1>
+        <div className="lg:ml-64 h-full">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold">Blog Posts</h1>
               <Button onClick={openCreateDialog}>
                 <Plus className="h-4 w-4 mr-2" /> Add New Post
               </Button>
@@ -286,7 +345,7 @@ export default function AdminBlog() {
                           <TableCell>
                             <div className="flex space-x-2">
                               <Button variant="outline" size="icon" asChild>
-                                <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
+                                <a href={`/blog/${post.slug}/`} target="_blank" rel="noopener noreferrer">
                                   <Eye className="h-4 w-4" />
                                   <span className="sr-only">View</span>
                                 </a>
@@ -333,6 +392,7 @@ export default function AdminBlog() {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="mb-4">
                     <TabsTrigger value="editor">Editor</TabsTrigger>
+                    <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
                   
@@ -405,6 +465,158 @@ export default function AdminBlog() {
                         value={formData.content || ''}
                         onChange={(value) => handleInputChange('content', value)}
                       />
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="seo" className="space-y-6">
+                    <div className="border-b pb-4 mb-4">
+                      <h3 className="text-lg font-medium mb-2">SEO Metadata</h3>
+                      <p className="text-sm text-neutral-500">
+                        This information is used for search engines and social media sharing. 
+                        If left empty, values will be inherited from the main blog page settings.
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-5">
+                      <FormField
+                        label="Meta Title"
+                        name="metadata.title"
+                        value={formData.metadata?.title || ''}
+                        onChange={(value) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            metadata: { 
+                              ...prev.metadata,
+                              title: value 
+                            }
+                          }));
+                        }}
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Appears in search results and browser tabs. If empty, the post title will be used.
+                      </p>
+                      
+                      <FormField
+                        label="Meta Description"
+                        name="metadata.description"
+                        value={formData.metadata?.description || ''}
+                        onChange={(value) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            metadata: { 
+                              ...prev.metadata,
+                              description: value 
+                            }
+                          }));
+                        }}
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Appears in search results. If empty, the post excerpt will be used.
+                      </p>
+                      
+                      <FormField
+                        label="Keywords"
+                        name="metadata.keywords"
+                        value={formData.metadata?.keywords || ''}
+                        onChange={(value) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            metadata: { 
+                              ...prev.metadata, 
+                              keywords: value 
+                            }
+                          }));
+                        }}
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Comma-separated list of keywords related to this post.
+                      </p>
+                      
+                      <FormField
+                        label="Canonical URL (Full URL)"
+                        name="metadata.canonical"
+                        value={formData.metadata?.canonical || ''}
+                        onChange={(value) => {
+                          // Auto-fix URL format if needed
+                          if (value && !value.startsWith('http://') && !value.startsWith('https://')) {
+                            // If user entered a path without protocol, add https://
+                            if (!value.includes('://')) {
+                              value = `https://hal149.com${value.startsWith('/') ? '' : '/'}${value}`;
+                            }
+                          }
+                          
+                          setFormData(prev => ({
+                            ...prev,
+                            metadata: { 
+                              ...prev.metadata, 
+                              canonical: value 
+                            }
+                          }));
+                        }}
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">
+                        Enter the complete URL (e.g., https://hal149.com/blog/post-slug/) where this content should be considered the original source.
+                      </p>
+                    </div>
+                    
+                    <div className="border-t pt-4 mt-6">
+                      <h4 className="text-md font-medium mb-3">Social Media Sharing</h4>
+                      
+                      <div className="grid grid-cols-1 gap-5">
+                        <FormField
+                          label="Social Title"
+                          name="metadata.ogTitle"
+                          value={formData.metadata?.ogTitle || ''}
+                          onChange={(value) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              metadata: { 
+                                ...prev.metadata, 
+                                ogTitle: value 
+                              }
+                            }));
+                          }}
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Title used when sharing on social media. If empty, the meta title will be used.
+                        </p>
+                        
+                        <FormField
+                          label="Social Description"
+                          name="metadata.ogDescription"
+                          value={formData.metadata?.ogDescription || ''}
+                          onChange={(value) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              metadata: { 
+                                ...prev.metadata, 
+                                ogDescription: value 
+                              }
+                            }));
+                          }}
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Description used when sharing on social media. If empty, the meta description will be used.
+                        </p>
+                        
+                        <FormField
+                          label="Social Image URL"
+                          name="metadata.ogImage"
+                          value={formData.metadata?.ogImage || ''}
+                          onChange={(value) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              metadata: { 
+                                ...prev.metadata, 
+                                ogImage: value 
+                              }
+                            }));
+                          }}
+                        />
+                        <p className="text-xs text-neutral-500 mt-1">
+                          Image displayed when sharing on social media. If empty, the post image will be used.
+                        </p>
+                      </div>
                     </div>
                   </TabsContent>
                   

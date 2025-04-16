@@ -74,13 +74,13 @@ export default function AdminWaitlist() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="flex h-screen bg-neutral-50">
+      <div className="min-h-screen bg-neutral-50">
         <AdminNav />
         
-        <div className="flex-1 overflow-auto">
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Waitlist Subscribers</h1>
+        <div className="lg:ml-64 h-full">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold">Waitlist Subscribers</h1>
               {waitlistEntries && waitlistEntries.length > 0 && (
                 <Button onClick={exportToCSV}>
                   <Download className="h-4 w-4 mr-2" /> Export to CSV

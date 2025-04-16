@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { slugify } from "../shared/utils";
-import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema } from "@shared/schema";
+import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema, insertPageContentSchema, insertContactMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";
@@ -58,11 +58,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         publishedAt: req.body.publishedAt || new Date().toISOString()
       };
       
-      const postData = insertBlogPostSchema.parse({
-        ...bodyWithDefaults,
-        slug: req.body.slug || slugify(bodyWithDefaults.title)
-      });
-      const post = await storage.createBlogPost(postData);
+      // Map camelCase to snake_case for the database
+      const mappedData = {
+        title: bodyWithDefaults.title,
+        slug: req.body.slug || slugify(bodyWithDefaults.title),
+        excerpt: bodyWithDefaults.excerpt,
+        content: bodyWithDefaults.content,
+        image_url: bodyWithDefaults.imageUrl,
+        published_at: bodyWithDefaults.publishedAt
+      };
+      
+      const post = await storage.createBlogPost(mappedData);
       res.status(201).json(post);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -78,13 +84,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID" });
       }
+
+      // Map camelCase to snake_case for the database
+      const mappedData = {
+        title: req.body.title,
+        slug: req.body.slug || slugify(req.body.title),
+        excerpt: req.body.excerpt,
+        content: req.body.content,
+        image_url: req.body.imageUrl,
+        published_at: req.body.publishedAt
+      };
       
-      const postData = insertBlogPostSchema.parse({
-        ...req.body,
-        slug: req.body.slug || slugify(req.body.title)
-      });
-      
-      const post = await storage.updateBlogPost(id, postData);
+      const post = await storage.updateBlogPost(id, mappedData);
       if (!post) {
         return res.status(404).json({ message: "Blog post not found" });
       }
@@ -147,10 +158,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/projects", isAuthenticated, async (req, res) => {
     try {
-      const projectData = insertProjectSchema.parse({
-        ...req.body,
-        slug: slugify(req.body.title)
-      });
+      // We'll skip schema validation here to directly map the fields
+      const projectData = {
+        title: req.body.title,
+        slug: req.body.slug || slugify(req.body.title),
+        description: req.body.description,
+        content: req.body.content,
+        category: req.body.category,
+        imageUrl: req.body.imageUrl,
+        isFeatured: req.body.isFeatured === undefined ? false : req.body.isFeatured
+      };
+      
       const project = await storage.createProject(projectData);
       res.status(201).json(project);
     } catch (error) {
@@ -168,10 +186,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid ID" });
       }
       
-      const projectData = insertProjectSchema.parse({
-        ...req.body,
-        slug: req.body.slug || slugify(req.body.title)
-      });
+      // We'll skip schema validation here to directly map the fields
+      const projectData = {
+        title: req.body.title,
+        slug: req.body.slug || slugify(req.body.title),
+        description: req.body.description,
+        content: req.body.content,
+        category: req.body.category,
+        imageUrl: req.body.imageUrl,
+        isFeatured: req.body.isFeatured === undefined ? false : req.body.isFeatured
+      };
       
       const project = await storage.updateProject(id, projectData);
       if (!project) {
@@ -226,6 +250,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Page Content routes
+  app.get("/api/page-contents", async (req, res) => {
+    try {
+      const contents = await storage.getAllPageContents();
+      res.json(contents || []);
+    } catch (error: any) {
+      console.error('Error getting all page contents:', error);
+      res.status(500).json({ 
+        message: `Failed to fetch page contents: ${error.message}`,
+        error: error.toString()
+      });
+    }
+  });
+
+  app.get("/api/page-contents/:page", async (req, res) => {
+    try {
+      const content = await storage.getPageContent(req.params.page);
+      if (!content) {
+        return res.status(404).json({ 
+          message: "Page content not found",
+          page: req.params.page
+        });
+      }
+      res.json(content);
+    } catch (error: any) {
+      console.error(`Error getting page content for ${req.params.page}:`, error);
+      res.status(500).json({ 
+        message: `Failed to fetch page content: ${error.message}`,
+        page: req.params.page,
+        error: error.toString()
+      });
+    }
+  });
+
+  app.post("/api/page-contents", isAuthenticated, async (req, res) => {
+    try {
+      const { page, content } = req.body;
+      
+      if (!page || !content) {
+        return res.status(400).json({ message: "Page name and content are required" });
+      }
+      
+      console.log(`Updating content for page: ${page}`);
+      const pageContent = await storage.upsertPageContent(page, content);
+      res.status(201).json(pageContent);
+    } catch (error: any) {
+      console.error(`Error updating page content:`, error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Validation error", error: fromZodError(error) });
+      }
+      res.status(500).json({ 
+        message: `Failed to create/update page content: ${error.message}`,
+        error: error.toString()
+      });
+    }
+  });
+  
+  // Contact message routes
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const messageData = insertContactMessageSchema.parse(req.body);
+      const message = await storage.addContactMessage(messageData);
+      res.status(201).json({ message: "Message sent successfully", data: message });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Validation error", error: fromZodError(error) });
+      }
+      res.status(500).json({ message: "Failed to send message", error });
+    }
+  });
+  
+  app.get("/api/contact", isAuthenticated, async (req, res) => {
+    try {
+      const messages = await storage.getContactMessages();
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch contact messages", error });
+    }
+  });
+  
+  app.patch("/api/contact/:id/read", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+      
+      const message = await storage.markMessageAsRead(id);
+      if (!message) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+      res.json(message);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark message as read", error });
+    }
+  });
+
   // Initialize default admin user if it doesn't exist
   const setupDefaultAdmin = async () => {
     try {
@@ -255,24 +376,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           slug: "future-of-ai-in-enterprise",
           excerpt: "Exploring how artificial intelligence is reshaping business operations and strategy.",
           content: "Artificial intelligence is rapidly transforming how businesses operate across all sectors. From automating routine tasks to providing deep insights from data analysis, AI technologies are helping enterprises become more efficient and competitive. This post explores the current state of AI adoption in enterprise settings and looks ahead to future developments that could further revolutionize business operations.",
-          imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-          publishedAt: new Date("2024-03-10").toISOString()
+          image_url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+          published_at: new Date("2024-03-10").toISOString()
         },
         {
           title: "Understanding Neural Networks",
           slug: "understanding-neural-networks",
           excerpt: "A deep dive into the architecture of modern neural networks and their applications.",
           content: "Neural networks form the backbone of many modern AI systems, enabling complex pattern recognition and decision-making capabilities. This post provides an accessible introduction to how neural networks function, explaining key concepts like layers, neurons, activation functions, and training processes. We'll also explore different types of neural networks and their specific applications in various domains.",
-          imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-          publishedAt: new Date("2024-03-08").toISOString()
+          image_url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+          published_at: new Date("2024-03-08").toISOString()
         },
         {
           title: "AI Ethics and Responsibility",
           slug: "ai-ethics-and-responsibility",
           excerpt: "Discussing the importance of ethical considerations in AI development and deployment.",
           content: "As AI systems become more powerful and pervasive, ethical considerations surrounding their development and use grow increasingly important. This post examines key ethical issues in AI, including bias in algorithms, privacy concerns, transparency in decision-making, and the broader societal impacts of automation. We also explore frameworks and best practices for responsible AI development that balances innovation with ethical considerations.",
-          imageUrl: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-          publishedAt: new Date("2024-03-05").toISOString()
+          image_url: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+          published_at: new Date("2024-03-05").toISOString()
         }
       ];
       
@@ -313,6 +434,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const project of projects) {
         await storage.createProject(project);
+      }
+      
+      // Seed page contents
+      const pageContents = [
+        {
+          page: "home",
+          content: JSON.stringify({
+            heroTitle: "Leading the AI Revolution",
+            heroSubtitle: "We help enterprises transform through cutting-edge artificial intelligence solutions",
+            heroCta: "Join Our Waitlist",
+            featuresTitle: "Our Capabilities",
+            featuresSubtitle: "Transforming businesses through intelligent technology"
+          })
+        },
+        {
+          page: "about",
+          content: JSON.stringify({
+            title: "About Us",
+            mission: "Our mission is to democratize artificial intelligence and make its benefits accessible to businesses of all sizes.",
+            vision: "We envision a future where AI enhances human potential rather than replacing it, creating more opportunities for innovation and growth.",
+            history: "Founded in 2020, our team of AI specialists and industry experts has been at the forefront of developing practical applications of machine learning that solve real business problems.",
+            team: [
+              {
+                name: "Alex Johnson",
+                role: "CEO & Co-founder",
+                bio: "Former ML research lead at Stanford AI Lab with 15+ years of experience in the field."
+              },
+              {
+                name: "Maria Chen",
+                role: "CTO & Co-founder",
+                bio: "PhD in Computer Science, specializing in deep learning architectures and their applications."
+              },
+              {
+                name: "David Park",
+                role: "Head of Product",
+                bio: "Experienced product leader who previously scaled AI products at major tech companies."
+              }
+            ]
+          })
+        },
+        {
+          page: "contact",
+          content: JSON.stringify({
+            title: "Get in Touch",
+            subtitle: "We'd love to hear from you and discuss how we can help transform your business",
+            email: "info@aiagency.com",
+            phone: "+1 (555) 123-4567",
+            address: "123 Tech Hub, San Francisco, CA 94105",
+            formTitle: "Send us a message"
+          })
+        },
+        {
+          page: "legal",
+          content: JSON.stringify({
+            title: "Legal Information",
+            sections: [
+              {
+                title: "Privacy Policy",
+                content: "We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you."
+              },
+              {
+                title: "Terms of Service",
+                content: "By accessing our website and services, you agree to these terms of service. Please read them carefully. If you do not agree with these terms, you should not use our website or services."
+              },
+              {
+                title: "Cookie Policy",
+                content: "Our website uses cookies to distinguish you from other users of our website. This helps us to provide you with a good experience when you browse our website and also allows us to improve our site."
+              }
+            ]
+          })
+        }
+      ];
+      
+      for (const content of pageContents) {
+        await storage.upsertPageContent(content.page, content.content);
       }
       
       console.log("Initial data seeded successfully");

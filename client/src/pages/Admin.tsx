@@ -53,22 +53,18 @@ export default function Admin() {
                 <text x="60" y="25" fontFamily="Arial" fontSize="15" fontWeight="bold">HAL149</text>
               </svg>
             </a>
-            <h1 className="mt-6 text-2xl font-bold">Admin Portal</h1>
           </div>
           
           <Card>
-            <CardHeader>
-              <CardTitle>Sign In</CardTitle>
-              <CardDescription>
-                Enter your credentials to access the admin dashboard
-              </CardDescription>
+            <CardHeader className="pb-2">
+              <CardTitle>Admin Login</CardTitle>
             </CardHeader>
             <CardContent>
               <LoginForm />
             </CardContent>
           </Card>
           
-          <p className="mt-6 text-center text-sm text-neutral-500">
+          <p className="mt-4 text-center text-sm text-neutral-500">
             <a href="/" className="underline hover:text-neutral-800">Return to website</a>
           </p>
         </div>

@@ -51,6 +51,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { FormField, ContentEditor } from '@/components/AdminEditor';
+import { extractItemMetadata } from '@/lib/metadata';
 import type { Project, InsertProject } from '@shared/schema';
 import { slugify } from '@shared/utils';
 
@@ -65,14 +66,24 @@ export default function AdminProjects() {
   const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('editor');
   
-  const [formData, setFormData] = useState<Partial<InsertProject>>({
+  const [formData, setFormData] = useState<Partial<InsertProject & { metadata?: Record<string, string> }>>({
     title: '',
     slug: '',
     description: '',
     content: '',
     category: '',
     imageUrl: '',
-    isFeatured: false
+    isFeatured: false,
+    metadata: {
+      // SEO metadata fields
+      title: '',
+      description: '',
+      keywords: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: ''
+    }
   });
   
   const { data: projects, isLoading: isLoadingProjects } = useQuery<Project[]>({
@@ -159,6 +170,17 @@ export default function AdminProjects() {
     }
   };
   
+  // Handle changes to metadata fields
+  const handleMetadataChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      metadata: {
+        ...prev.metadata,
+        [field]: value
+      }
+    }));
+  };
+  
   const resetForm = () => {
     setFormData({
       title: '',
@@ -167,7 +189,16 @@ export default function AdminProjects() {
       content: '',
       category: '',
       imageUrl: '',
-      isFeatured: false
+      isFeatured: false,
+      metadata: {
+        title: '',
+        description: '',
+        keywords: '',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: ''
+      }
     });
     setCurrentProjectId(null);
     setEditMode(false);
@@ -181,15 +212,57 @@ export default function AdminProjects() {
   
   const openEditDialog = (project: Project) => {
     setCurrentProjectId(project.id);
+    
+    // Default metadata from the project itself
+    const projectMetadata = extractItemMetadata({
+      ...project,
+      type: 'projects' // Add type to help with canonical URL formation
+    });
+    
+    // Set initial default metadata values
+    let existingMetadata = {
+      title: projectMetadata.title || '',
+      description: projectMetadata.description || '',
+      keywords: projectMetadata.keywords || '',
+      canonical: projectMetadata.canonical || '',
+      ogTitle: projectMetadata.ogTitle || '',
+      ogDescription: projectMetadata.ogDescription || '',
+      ogImage: projectMetadata.ogImage || ''
+    };
+    
+    // For projects that used the old JSON format, extract the content
+    // This ensures backward compatibility with existing projects
+    let contentValue = project.content;
+    try {
+      if (typeof project.content === 'string' && project.content.trim().startsWith('{')) {
+        const contentObj = JSON.parse(project.content);
+        if (contentObj.content) {
+          // If we have a content field in the JSON, use that as the raw HTML
+          contentValue = contentObj.content;
+        }
+        if (contentObj.metadata) {
+          // Override defaults with any existing metadata
+          existingMetadata = {
+            ...existingMetadata,
+            ...contentObj.metadata
+          };
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing content from project:', e);
+    }
+    
     setFormData({
       title: project.title,
       slug: project.slug,
       description: project.description,
-      content: project.content,
+      content: contentValue, // Use the extracted content value
       category: project.category,
       imageUrl: project.imageUrl,
-      isFeatured: project.isFeatured
+      isFeatured: project.isFeatured,
+      metadata: existingMetadata
     });
+    
     setEditMode(true);
     setIsDialogOpen(true);
   };
@@ -209,11 +282,18 @@ export default function AdminProjects() {
       return;
     }
     
+    // Make the Projects content handling work the same as Blog posts
+    // Just use the raw HTML content directly without wrapping in JSON
+    let finalContent = formData.content;
+    
+    // Store metadata separately - this won't affect the content field at all
+    // Blog posts don't wrap the content in JSON, we should be consistent here
+    
     const projectData = {
       title: formData.title!,
       slug: formData.slug || slugify(formData.title!),
       description: formData.description!,
-      content: formData.content!,
+      content: finalContent,
       category: formData.category!,
       imageUrl: formData.imageUrl!,
       isFeatured: formData.isFeatured || false
@@ -247,13 +327,13 @@ export default function AdminProjects() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       
-      <div className="flex h-screen bg-neutral-50">
+      <div className="min-h-screen bg-neutral-50">
         <AdminNav />
         
-        <div className="flex-1 overflow-auto">
-          <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">Projects</h1>
+        <div className="lg:ml-64 h-full">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold">Projects</h1>
               <Button onClick={openCreateDialog}>
                 <Plus className="h-4 w-4 mr-2" /> Add New Project
               </Button>
@@ -348,6 +428,7 @@ export default function AdminProjects() {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="mb-4">
                     <TabsTrigger value="editor">Editor</TabsTrigger>
+                    <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
                   
@@ -379,8 +460,12 @@ export default function AdminProjects() {
                       <div className="flex items-center space-x-2 h-full pt-8">
                         <Checkbox 
                           id="isFeatured" 
-                          checked={formData.isFeatured}
-                          onCheckedChange={(checked) => handleInputChange('isFeatured', checked === true)}
+                          checked={!!formData.isFeatured}
+                          onCheckedChange={(checked) => {
+                            if (checked !== 'indeterminate') {
+                              handleInputChange('isFeatured', checked);
+                            }
+                          }}
                         />
                         <label
                           htmlFor="isFeatured"
@@ -420,6 +505,73 @@ export default function AdminProjects() {
                         value={formData.content || ''}
                         onChange={(value) => handleInputChange('content', value)}
                       />
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="seo" className="space-y-6">
+                    <div className="border-b pb-4 mb-4">
+                      <h3 className="text-lg font-medium mb-2">SEO Metadata</h3>
+                      <p className="text-sm text-neutral-500">
+                        This information is used for search engines and social media sharing. 
+                        If left empty, values will be automatically generated from the project content.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          label="Meta Title"
+                          name="metaTitle"
+                          value={formData.metadata?.title || ''}
+                          onChange={(value) => handleMetadataChange('title', value)}
+                        />
+                        <FormField
+                          label="Meta Description"
+                          name="metaDescription"
+                          value={formData.metadata?.description || ''}
+                          onChange={(value) => handleMetadataChange('description', value)}
+                        />
+                      </div>
+                      
+                      <FormField
+                        label="Keywords"
+                        name="keywords"
+                        value={formData.metadata?.keywords || ''}
+                        onChange={(value) => handleMetadataChange('keywords', value)}
+                      />
+                      
+                      <FormField
+                        label="Canonical URL"
+                        name="canonical"
+                        value={formData.metadata?.canonical || ''}
+                        onChange={(value) => handleMetadataChange('canonical', value)}
+                      />
+                      
+                      <div className="border-t pt-6 mt-8">
+                        <h4 className="text-md font-medium mb-4">Social Media</h4>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                          <FormField
+                            label="Open Graph Title"
+                            name="ogTitle"
+                            value={formData.metadata?.ogTitle || ''}
+                            onChange={(value) => handleMetadataChange('ogTitle', value)}
+                          />
+                          <FormField
+                            label="Open Graph Description"
+                            name="ogDescription"
+                            value={formData.metadata?.ogDescription || ''}
+                            onChange={(value) => handleMetadataChange('ogDescription', value)}
+                          />
+                        </div>
+                        
+                        <FormField
+                          label="Open Graph Image URL"
+                          name="ogImage"
+                          value={formData.metadata?.ogImage || ''}
+                          onChange={(value) => handleMetadataChange('ogImage', value)}
+                        />
+                      </div>
                     </div>
                   </TabsContent>
                   

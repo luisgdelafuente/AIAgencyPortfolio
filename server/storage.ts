@@ -426,7 +426,9 @@ export class SupabaseStorage implements IStorage {
     return data.map(project => ({
       ...project,
       imageUrl: project.image_url,
-      isFeatured: project.is_featured
+      isFeatured: project.is_featured,
+      githubUrl: project.github_url,
+      demoUrl: project.demo_url
     })) as Project[];
   }
 
@@ -442,7 +444,9 @@ export class SupabaseStorage implements IStorage {
     return data.map(project => ({
       ...project,
       imageUrl: project.image_url,
-      isFeatured: project.is_featured
+      isFeatured: project.is_featured,
+      githubUrl: project.github_url,
+      demoUrl: project.demo_url
     })) as Project[];
   }
 
@@ -459,7 +463,9 @@ export class SupabaseStorage implements IStorage {
     return {
       ...data,
       imageUrl: data.image_url,
-      isFeatured: data.is_featured
+      isFeatured: data.is_featured,
+      githubUrl: data.github_url,
+      demoUrl: data.demo_url
     } as Project;
   }
 

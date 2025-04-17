@@ -57,7 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Set default publishedAt if not provided as ISO string
         publishedAt: req.body.publishedAt || new Date().toISOString()
       };
-      
+
       // Map camelCase to snake_case for the database
       const mappedData = {
         title: bodyWithDefaults.title,
@@ -67,7 +67,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         image_url: bodyWithDefaults.imageUrl,
         published_at: bodyWithDefaults.publishedAt
       };
-      
+
       const post = await storage.createBlogPost(mappedData);
       res.status(201).json(post);
     } catch (error) {
@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         image_url: req.body.imageUrl,
         published_at: req.body.publishedAt
       };
-      
+
       const post = await storage.updateBlogPost(id, mappedData);
       if (!post) {
         return res.status(404).json({ message: "Blog post not found" });
@@ -114,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID" });
       }
-      
+
       const success = await storage.deleteBlogPost(id);
       if (!success) {
         return res.status(404).json({ message: "Blog post not found" });
@@ -166,9 +166,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: req.body.content,
         category: req.body.category,
         imageUrl: req.body.imageUrl,
+        githubUrl: req.body.githubUrl,
+        demoUrl: req.body.demoUrl,
         isFeatured: req.body.isFeatured === undefined ? false : req.body.isFeatured
       };
-      
+
       const project = await storage.createProject(projectData);
       res.status(201).json(project);
     } catch (error) {
@@ -185,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID" });
       }
-      
+
       // We'll skip schema validation here to directly map the fields
       const projectData = {
         title: req.body.title,
@@ -194,9 +196,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: req.body.content,
         category: req.body.category,
         imageUrl: req.body.imageUrl,
+        githubUrl: req.body.githubUrl,
+        demoUrl: req.body.demoUrl,
         isFeatured: req.body.isFeatured === undefined ? false : req.body.isFeatured
       };
-      
+
       const project = await storage.updateProject(id, projectData);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
@@ -216,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID" });
       }
-      
+
       const success = await storage.deleteProject(id);
       if (!success) {
         return res.status(404).json({ message: "Project not found" });
@@ -287,11 +291,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/page-contents", isAuthenticated, async (req, res) => {
     try {
       const { page, content } = req.body;
-      
+
       if (!page || !content) {
         return res.status(400).json({ message: "Page name and content are required" });
       }
-      
+
       console.log(`Updating content for page: ${page}`);
       const pageContent = await storage.upsertPageContent(page, content);
       res.status(201).json(pageContent);
@@ -306,7 +310,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-  
+
   // Contact message routes
   app.post("/api/contact", async (req, res) => {
     try {
@@ -320,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to send message", error });
     }
   });
-  
+
   app.get("/api/contact", isAuthenticated, async (req, res) => {
     try {
       const messages = await storage.getContactMessages();
@@ -329,14 +333,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch contact messages", error });
     }
   });
-  
+
   app.patch("/api/contact/:id/read", isAuthenticated, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID" });
       }
-      
+
       const message = await storage.markMessageAsRead(id);
       if (!message) {
         return res.status(404).json({ message: "Message not found" });
@@ -357,7 +361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           password: "admin123"
         });
         console.log("Default admin user created");
-        
+
         // Add initial seed data
         await seedInitialData();
       }
@@ -396,11 +400,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           published_at: new Date("2024-03-05").toISOString()
         }
       ];
-      
+
       for (const post of blogPosts) {
         await storage.createBlogPost(post);
       }
-      
+
       // Seed projects
       const projects = [
         {
@@ -431,11 +435,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isFeatured: false
         }
       ];
-      
+
       for (const project of projects) {
         await storage.createProject(project);
       }
-      
+
       // Seed page contents
       const pageContents = [
         {
@@ -506,11 +510,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           })
         }
       ];
-      
+
       for (const content of pageContents) {
         await storage.upsertPageContent(content.page, content.content);
       }
-      
+
       console.log("Initial data seeded successfully");
     } catch (error) {
       console.error("Failed to seed initial data:", error);

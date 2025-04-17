@@ -976,7 +976,7 @@ class HybridStorage implements IStorage {
     return this.useSupabase
       ? this.supabaseStorage.getContactMessages()
       : this.memStorage.getContactMessages();
-  }
+    }
 
   asyncmarkMessageAsRead(id: number): Promise<ContactMessage | undefined> {
     return this.useSupabase

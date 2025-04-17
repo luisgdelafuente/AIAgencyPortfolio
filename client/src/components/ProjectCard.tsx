@@ -32,6 +32,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`View the code of ${project.title} project on GitHub`}
+              title="View the code of this project"
               className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal"
             >
               <Github className="w-5 h-5" />
@@ -43,6 +45,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`View an online demo of ${project.title} project`}
+              title="View an online demo of the project"
               className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal"
             >
               <ExternalLink className="w-5 h-5" />
@@ -51,6 +55,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           )}
           <Link 
             href={`/projects/${project.slug}`} 
+            aria-label={`Read the details of ${project.title} project`}
+            title="Read the project details"
             className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal"
           >
             <span>Read more</span>

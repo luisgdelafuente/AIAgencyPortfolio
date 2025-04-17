@@ -39,6 +39,8 @@ export const projects = pgTable("projects", {
   content: text("content").notNull(),
   category: text("category").notNull(),
   imageUrl: text("image_url").notNull(),
+  githubUrl: text("github_url"),
+  demoUrl: text("demo_url"),
   isFeatured: boolean("is_featured").default(false),
 });
 

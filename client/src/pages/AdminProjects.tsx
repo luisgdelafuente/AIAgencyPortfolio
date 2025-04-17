@@ -59,14 +59,14 @@ export default function AdminProjects() {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState('editor');
-  
-  const [formData, setFormData] = useState<Partial<InsertProject & { metadata?: Record<string, string> }>>({
+
+  const [formData, setFormData] = useState<Partial<InsertProject & { metadata?: Record<string, string>; githubUrl?: string; demoUrl?: string }>>({
     title: '',
     slug: '',
     description: '',
@@ -83,14 +83,16 @@ export default function AdminProjects() {
       ogTitle: '',
       ogDescription: '',
       ogImage: ''
-    }
+    },
+    githubUrl: '',
+    demoUrl: ''
   });
-  
+
   const { data: projects, isLoading: isLoadingProjects } = useQuery<Project[]>({
     queryKey: ['/api/projects'],
     enabled: !!user
   });
-  
+
   const createMutation = useMutation({
     mutationFn: async (data: InsertProject) => {
       const res = await apiRequest("POST", "/api/projects", data);
@@ -113,7 +115,7 @@ export default function AdminProjects() {
       });
     }
   });
-  
+
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: InsertProject }) => {
       const res = await apiRequest("PUT", `/api/projects/${id}`, data);
@@ -137,7 +139,7 @@ export default function AdminProjects() {
       });
     }
   });
-  
+
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest("DELETE", `/api/projects/${id}`, undefined);
@@ -160,16 +162,16 @@ export default function AdminProjects() {
       });
     }
   });
-  
+
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    
+
     // Auto-generate slug from title if not manually edited
     if (field === 'title' && !formData.slug) {
       setFormData((prev) => ({ ...prev, slug: slugify(value as string) }));
     }
   };
-  
+
   // Handle changes to metadata fields
   const handleMetadataChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -180,7 +182,7 @@ export default function AdminProjects() {
       }
     }));
   };
-  
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -198,27 +200,29 @@ export default function AdminProjects() {
         ogTitle: '',
         ogDescription: '',
         ogImage: ''
-      }
+      },
+      githubUrl: '',
+      demoUrl: ''
     });
     setCurrentProjectId(null);
     setEditMode(false);
     setActiveTab('editor');
   };
-  
+
   const openCreateDialog = () => {
     resetForm();
     setIsDialogOpen(true);
   };
-  
+
   const openEditDialog = (project: Project) => {
     setCurrentProjectId(project.id);
-    
+
     // Default metadata from the project itself
     const projectMetadata = extractItemMetadata({
       ...project,
       type: 'projects' // Add type to help with canonical URL formation
     });
-    
+
     // Set initial default metadata values
     let existingMetadata = {
       title: projectMetadata.title || '',
@@ -229,7 +233,7 @@ export default function AdminProjects() {
       ogDescription: projectMetadata.ogDescription || '',
       ogImage: projectMetadata.ogImage || ''
     };
-    
+
     // For projects that used the old JSON format, extract the content
     // This ensures backward compatibility with existing projects
     let contentValue = project.content;
@@ -251,7 +255,7 @@ export default function AdminProjects() {
     } catch (e) {
       console.error('Error parsing content from project:', e);
     }
-    
+
     setFormData({
       title: project.title,
       slug: project.slug,
@@ -260,18 +264,20 @@ export default function AdminProjects() {
       category: project.category,
       imageUrl: project.imageUrl,
       isFeatured: project.isFeatured,
-      metadata: existingMetadata
+      metadata: existingMetadata,
+      githubUrl: project.githubUrl || '', // Add githubUrl and demoUrl to formData
+      demoUrl: project.demoUrl || ''
     });
-    
+
     setEditMode(true);
     setIsDialogOpen(true);
   };
-  
+
   const openDeleteDialog = (id: number) => {
     setCurrentProjectId(id);
     setIsDeleteDialogOpen(true);
   };
-  
+
   const handleSubmit = () => {
     if (!formData.title || !formData.description || !formData.content || !formData.category || !formData.imageUrl) {
       toast({
@@ -281,14 +287,14 @@ export default function AdminProjects() {
       });
       return;
     }
-    
+
     // Make the Projects content handling work the same as Blog posts
     // Just use the raw HTML content directly without wrapping in JSON
     let finalContent = formData.content;
-    
+
     // Store metadata separately - this won't affect the content field at all
     // Blog posts don't wrap the content in JSON, we should be consistent here
-    
+
     const projectData = {
       title: formData.title!,
       slug: formData.slug || slugify(formData.title!),
@@ -296,22 +302,24 @@ export default function AdminProjects() {
       content: finalContent,
       category: formData.category!,
       imageUrl: formData.imageUrl!,
-      isFeatured: formData.isFeatured || false
+      isFeatured: formData.isFeatured || false,
+      githubUrl: formData.githubUrl || '', // Include githubUrl and demoUrl in projectData
+      demoUrl: formData.demoUrl || ''
     };
-    
+
     if (editMode && currentProjectId) {
       updateMutation.mutate({ id: currentProjectId, data: projectData });
     } else {
       createMutation.mutate(projectData);
     }
   };
-  
+
   const handleDelete = () => {
     if (currentProjectId) {
       deleteMutation.mutate(currentProjectId);
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
@@ -319,17 +327,17 @@ export default function AdminProjects() {
       </div>
     );
   }
-  
+
   return (
     <>
       <Helmet>
         <title>Manage Projects | HAL149 Admin</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-      
+
       <div className="min-h-screen bg-neutral-50">
         <AdminNav />
-        
+
         <div className="lg:ml-64 h-full">
           <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
@@ -338,7 +346,7 @@ export default function AdminProjects() {
                 <Plus className="h-4 w-4 mr-2" /> Add New Project
               </Button>
             </div>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>All Projects</CardTitle>
@@ -412,7 +420,7 @@ export default function AdminProjects() {
                 )}
               </CardContent>
             </Card>
-            
+
             {/* Create/Edit Dialog */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -424,14 +432,14 @@ export default function AdminProjects() {
                       : 'Fill out the information below to create a new project.'}
                   </DialogDescription>
                 </DialogHeader>
-                
+
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="mb-4">
                     <TabsTrigger value="editor">Editor</TabsTrigger>
                     <TabsTrigger value="seo">SEO Metadata</TabsTrigger>
                     <TabsTrigger value="preview">Preview</TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="editor" className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
@@ -448,7 +456,7 @@ export default function AdminProjects() {
                         onChange={(value) => handleInputChange('slug', value)}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         label="Category"
@@ -475,15 +483,31 @@ export default function AdminProjects() {
                         </label>
                       </div>
                     </div>
-                    
+
                     <FormField
-                      label="Image URL"
-                      name="imageUrl"
-                      value={formData.imageUrl || ''}
-                      onChange={(value) => handleInputChange('imageUrl', value)}
-                      required
-                    />
-                    
+                        label="Image URL"
+                        name="imageUrl"
+                        value={formData.imageUrl || ''}
+                        onChange={(value) => handleInputChange('imageUrl', value)}
+                        required
+                      />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="GitHub URL"
+                        name="githubUrl"
+                        value={formData.githubUrl || ''}
+                        onChange={(value) => handleInputChange('githubUrl', value)}
+                      />
+
+                      <FormField
+                        label="Live Demo URL"
+                        name="demoUrl"
+                        value={formData.demoUrl || ''}
+                        onChange={(value) => handleInputChange('demoUrl', value)}
+                      />
+                    </div>
+
                     <div>
                       <FormField
                         label="Description"
@@ -496,7 +520,7 @@ export default function AdminProjects() {
                         A brief summary that appears on the project listing page
                       </p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium mb-2">
                         Content <span className="text-red-500">*</span>
@@ -507,7 +531,7 @@ export default function AdminProjects() {
                       />
                     </div>
                   </TabsContent>
-                  
+
                   <TabsContent value="seo" className="space-y-6">
                     <div className="border-b pb-4 mb-4">
                       <h3 className="text-lg font-medium mb-2">SEO Metadata</h3>
@@ -516,7 +540,7 @@ export default function AdminProjects() {
                         If left empty, values will be automatically generated from the project content.
                       </p>
                     </div>
-                    
+
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
@@ -532,24 +556,24 @@ export default function AdminProjects() {
                           onChange={(value) => handleMetadataChange('description', value)}
                         />
                       </div>
-                      
+
                       <FormField
                         label="Keywords"
                         name="keywords"
                         value={formData.metadata?.keywords || ''}
                         onChange={(value) => handleMetadataChange('keywords', value)}
                       />
-                      
+
                       <FormField
                         label="Canonical URL"
                         name="canonical"
                         value={formData.metadata?.canonical || ''}
                         onChange={(value) => handleMetadataChange('canonical', value)}
                       />
-                      
+
                       <div className="border-t pt-6 mt-8">
                         <h4 className="text-md font-medium mb-4">Social Media</h4>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                           <FormField
                             label="Open Graph Title"
@@ -564,7 +588,7 @@ export default function AdminProjects() {
                             onChange={(value) => handleMetadataChange('ogDescription', value)}
                           />
                         </div>
-                        
+
                         <FormField
                           label="Open Graph Image URL"
                           name="ogImage"
@@ -574,7 +598,7 @@ export default function AdminProjects() {
                       </div>
                     </div>
                   </TabsContent>
-                  
+
                   <TabsContent value="preview">
                     {formData.title && (
                       <>
@@ -587,7 +611,7 @@ export default function AdminProjects() {
                           <h2 className="text-3xl font-bold mb-2">{formData.title}</h2>
                           {formData.description && <p className="text-neutral-600">{formData.description}</p>}
                         </div>
-                        
+
                         {formData.imageUrl && (
                           <img 
                             src={formData.imageUrl} 
@@ -595,7 +619,7 @@ export default function AdminProjects() {
                             className="w-full h-auto rounded-lg mb-6"
                           />
                         )}
-                        
+
                         {formData.content && (
                           <ContentEditor
                             value={formData.content}
@@ -607,7 +631,7 @@ export default function AdminProjects() {
                     )}
                   </TabsContent>
                 </Tabs>
-                
+
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Cancel
@@ -621,7 +645,7 @@ export default function AdminProjects() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            
+
             {/* Delete Confirmation Dialog */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <AlertDialogContent>

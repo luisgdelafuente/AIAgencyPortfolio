@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { Project } from '@shared/schema';
 
 interface ProjectCardProps {
@@ -47,10 +47,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M7 17L17 7M17 7H8M17 7V16" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M3 8C3 7.07 3 6.60 3.15 6.24C3.35 5.74 3.74 5.35 4.24 5.15C4.60 5 5.07 5 6 5H12C12.93 5 13.40 5 13.76 5.15C14.26 5.35 14.65 5.74 14.85 6.24C15 6.60 15 7.07 15 8V17C15 17.93 15 18.40 14.85 18.76C14.65 19.26 14.26 19.65 13.76 19.85C13.40 20 12.93 20 12 20H6C5.07 20 4.60 20 4.24 19.85C3.74 19.65 3.35 19.26 3.15 18.76C3 18.40 3 17.93 3 17V8Z" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <ExternalLink className="w-5 h-5" />
               <span>Live Demo</span>
             </a>
           )}

@@ -20,22 +20,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
   
-  return {
-    title: `${post.title} | HAL149 Blog`,
+  // Use metadata helper to create blog post specific metadata
+  const { createMetadata } = await import('../../lib/metadata');
+  
+  return createMetadata('blog', {
+    title: post.title,
     description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      type: 'article',
-      url: `https://hal149.com/blog/${post.slug}`,
-      images: post.imageUrl ? [{ url: post.imageUrl }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt,
-    },
-  };
+    image: post.imageUrl,
+    slug: post.slug,
+    canonical: `https://hal149.com/blog/${post.slug}`
+  });
 }
 
 // Format date for display

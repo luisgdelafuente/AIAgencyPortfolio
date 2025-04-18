@@ -5,33 +5,9 @@ import { getPageContent, getAllBlogPosts, getFeaturedProjects } from './lib/api'
 export async function generateMetadata(): Promise<Metadata> {
   const pageContent = await getPageContent('home');
   
-  if (!pageContent) {
-    return {}; // Return empty object if no content found
-  }
-  
-  try {
-    const content = JSON.parse(pageContent.content);
-    const metadata = content.metadata || {};
-    
-    return {
-      title: metadata.title || 'HAL149 | AI Agency',
-      description: metadata.description || 'HAL149 is your partner for AI solutions',
-      keywords: metadata.keywords || 'ai, artificial intelligence, agency',
-      openGraph: {
-        title: metadata.ogTitle || metadata.title || 'HAL149 | AI Agency',
-        description: metadata.ogDescription || metadata.description || 'HAL149 is your partner for AI solutions',
-        images: metadata.ogImage ? [{ url: metadata.ogImage }] : [],
-        url: metadata.canonical || 'https://hal149.com',
-        siteName: 'HAL149',
-      },
-      alternates: {
-        canonical: metadata.canonical || 'https://hal149.com',
-      },
-    };
-  } catch (error) {
-    console.error('Error parsing home page content:', error);
-    return {};
-  }
+  // Use metadata helper to extract and combine with defaults
+  const { extractMetadataFromContent } = await import('./lib/metadata');
+  return extractMetadataFromContent(pageContent);
 }
 
 // Import types from shared schema

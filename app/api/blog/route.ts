@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/server/db';
-import { blogPosts } from '@/shared/schema';
-import { eq } from 'drizzle-orm';
+import { blogPosts, type BlogPost } from '@/shared/schema';
+import { eq, desc } from 'drizzle-orm';
 
 // GET /api/blog - Get all blog posts
 export async function GET(request: NextRequest) {
   try {
     const posts = await db.query.blogPosts.findMany({
-      orderBy: (posts, { desc }: { desc: any }) => [desc(posts.publishedAt)]
+      orderBy: (posts) => [desc(posts.publishedAt)]
     });
     
     return NextResponse.json(posts);
@@ -23,16 +23,33 @@ export async function GET(request: NextRequest) {
 // POST /api/blog - Create a new blog post (protected)
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication - this will be implemented later
-    // const session = await getServerSession();
-    // if (!session || !session.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    // Get session cookie
+    const cookies = request.cookies;
+    const sessionCookie = cookies.get("session")?.value;
+    
+    // Check authentication
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    // Parse the user ID from the session cookie
+    const userId = parseInt(sessionCookie, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+    
+    // Check if user exists and is authorized
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     
     const body = await request.json();
     
     // Validate the request body
-    // This will be improved with zod validation later
     if (!body.title || !body.slug || !body.content || !body.excerpt || !body.imageUrl) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -60,7 +77,7 @@ export async function POST(request: NextRequest) {
       content: body.content,
       excerpt: body.excerpt,
       imageUrl: body.imageUrl,
-      publishedAt: body.publishedAt ? new Date(body.publishedAt) : date
+      publishedAt: body.publishedAt || date.toISOString()
     }).returning();
     
     return NextResponse.json(newPost[0], { status: 201 });

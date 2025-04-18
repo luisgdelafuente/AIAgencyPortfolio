@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const featuredProjects = await db.query.projects.findMany({
       where: eq(projects.isFeatured, true),
-      orderBy: (projects) => [desc(projects.id)]
+      orderBy: (projectsTable) => [desc(projectsTable.id)]
     });
     
     return NextResponse.json(featuredProjects);

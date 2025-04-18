@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
     
     const messages = await db.query.contactMessages.findMany({
-      orderBy: (contactMessages) => [desc(contactMessages.submittedAt)]
+      orderBy: (messagesTable) => [desc(messagesTable.submittedAt)]
     });
     
     return NextResponse.json(messages);
@@ -58,15 +58,13 @@ export async function POST(request: NextRequest) {
     }
     
     // Create the contact message
-    const now = new Date();
     const newMessage = await db.insert(contactMessages)
       .values({
         name: body.name,
         email: body.email,
         subject: body.subject || '',
-        message: body.message,
-        submittedAt: now.toISOString(),
-        read: false
+        message: body.message
+        // submittedAt and read will be set to default values by the database
       })
       .returning();
     

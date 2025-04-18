@@ -7,7 +7,7 @@ import { eq, desc } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   try {
     const allProjects = await db.query.projects.findMany({
-      orderBy: (projects) => [desc(projects.id)]
+      orderBy: (projectsTable) => [desc(projectsTable.id)]
     });
     
     return NextResponse.json(allProjects);

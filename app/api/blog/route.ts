@@ -7,7 +7,7 @@ import { eq, desc } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   try {
     const posts = await db.query.blogPosts.findMany({
-      orderBy: (posts) => [desc(posts.publishedAt)]
+      orderBy: (blogPosts: typeof blogPosts) => [desc(blogPosts.publishedAt)]
     });
     
     return NextResponse.json(posts);

@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
     
     const entries = await db.query.waitlist.findMany({
-      orderBy: (waitlist) => [desc(waitlist.submittedAt)]
+      orderBy: (waitlistTable) => [desc(waitlistTable.submittedAt)]
     });
     
     return NextResponse.json(entries);

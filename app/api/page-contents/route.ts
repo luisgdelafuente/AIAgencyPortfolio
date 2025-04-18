@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/server/db';
-import { pageContents } from '@/shared/schema';
+import { pageContents, type PageContent } from '@/shared/schema';
+import { asc } from 'drizzle-orm';
 
 // GET /api/page-contents - Get all page contents
 export async function GET(request: NextRequest) {
   try {
     const contents = await db.query.pageContents.findMany({
-      orderBy: (contents, { asc }: { asc: any }) => [asc(contents.page)]
+      orderBy: (pageContents) => [asc(pageContents.page)]
     });
     
     return NextResponse.json(contents);

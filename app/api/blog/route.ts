@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/server/db';
-import { blogPosts, type BlogPost } from '@/shared/schema';
+import { blogPosts, users, type BlogPost } from '@/shared/schema';
 import { eq, desc } from 'drizzle-orm';
 
 // GET /api/blog - Get all blog posts

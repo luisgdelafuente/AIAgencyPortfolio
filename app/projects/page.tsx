@@ -7,42 +7,17 @@ export async function generateMetadata(): Promise<Metadata> {
   // Get any custom metadata from the page content
   const pageContent = await getPageContent('projects');
   
-  let metadata = {
-    title: 'Projects | HAL149',
-    description: 'Explore our AI-powered projects and solutions designed to transform businesses',
-    keywords: 'ai projects, artificial intelligence solutions, hal149 case studies, ai applications',
-  };
+  // Use metadata helper to extract and combine with defaults
+  const { extractMetadataFromContent, createMetadata } = await import('../lib/metadata');
   
-  if (pageContent) {
-    try {
-      const content = JSON.parse(pageContent.content);
-      if (content.metadata) {
-        metadata = {
-          ...metadata,
-          title: content.metadata.title || metadata.title,
-          description: content.metadata.description || metadata.description,
-          keywords: content.metadata.keywords || metadata.keywords,
-        };
-      }
-    } catch (error) {
-      console.error('Error parsing projects page content:', error);
-    }
-  }
+  // First get any custom metadata from the page content
+  const contentMetadata = extractMetadataFromContent(pageContent);
   
-  return {
-    ...metadata,
-    openGraph: {
-      title: metadata.title,
-      description: metadata.description,
-      type: 'website',
-      url: 'https://hal149.com/projects',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: metadata.title,
-      description: metadata.description,
-    },
-  };
+  // Then create projects-specific metadata
+  return createMetadata('projects', {
+    title: contentMetadata.title as string,
+    description: contentMetadata.description as string
+  });
 }
 
 // Projects page component

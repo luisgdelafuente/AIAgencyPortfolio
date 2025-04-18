@@ -20,22 +20,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
   
-  return {
-    title: `${project.title} | HAL149 Projects`,
+  // Use metadata helper to create project specific metadata
+  const { createMetadata } = await import('../../lib/metadata');
+  
+  return createMetadata('projects', {
+    title: project.title,
     description: project.description,
-    openGraph: {
-      title: project.title,
-      description: project.description,
-      type: 'article',
-      url: `https://hal149.com/projects/${project.slug}`,
-      images: project.imageUrl ? [{ url: project.imageUrl }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: project.title,
-      description: project.description,
-    },
-  };
+    image: project.imageUrl,
+    slug: project.slug,
+    canonical: `https://hal149.com/projects/${project.slug}`
+  });
 }
 
 // Project page component

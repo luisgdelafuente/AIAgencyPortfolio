@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from '@/lib/api';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
@@ -16,6 +17,52 @@ const parseContent = (content: string | undefined) => {
   }
 };
 
+// Generate metadata for the home page
+export async function generateMetadata(): Promise<Metadata> {
+  // Fetch page content for metadata
+  const pageContentData = await fetchPageContent('home');
+  const pageContent = parseContent(pageContentData?.content);
+  const meta = pageContent.metadata || {};
+  
+  // Log for debugging
+  console.log('Generated metadata for home page:', meta);
+  
+  return {
+    title: meta.title || 'HAL149 | Unlocking Your Business Potential with AI',
+    description: meta.description || 'HAL149 is your partner From AI-powered apps and automations to strategic training and transformation programs',
+    keywords: meta.keywords || 'ai applications, ai solutions, ai automations, industry ai, ai consulting, ai training programs',
+    
+    openGraph: {
+      title: meta.ogTitle || meta.title || 'HAL149 | Unlocking Your Business Potential with AI',
+      description: meta.ogDescription || meta.description || 'HAL149 is your partner From AI-powered apps and automations to strategic training and transformation programs',
+      url: meta.canonical || 'https://hal149.com',
+      siteName: 'HAL149',
+      images: [
+        {
+          url: meta.ogImage || 'https://spebrqnqmrmeacntsrmp.supabase.co/storage/v1/object/public/assets//hallogoblack480.webp',
+          width: 480,
+          height: 480,
+          alt: 'HAL149 Logo',
+        },
+      ],
+      locale: 'en_US',
+      type: 'website',
+    },
+    
+    twitter: {
+      card: 'summary_large_image',
+      title: meta.ogTitle || meta.title || 'HAL149 | Unlocking Your Business Potential with AI',
+      description: meta.ogDescription || meta.description || 'HAL149 is your partner From AI-powered apps and automations to strategic training and transformation programs',
+      images: [meta.ogImage || 'https://spebrqnqmrmeacntsrmp.supabase.co/storage/v1/object/public/assets//hallogoblack480.webp'],
+      creator: '@hal149',
+    },
+    
+    alternates: {
+      canonical: meta.canonical || 'https://hal149.com',
+    },
+  };
+}
+
 export default async function Home() {
   // Fetch data using server components
   const pageContentData = await fetchPageContent('home');
@@ -24,11 +71,6 @@ export default async function Home() {
   
   // Parse the page content
   const pageContent = parseContent(pageContentData?.content);
-
-  // Log metadata for debugging
-  console.log('Home page metadata:', 
-    pageContent.metadata || {}
-  );
 
   // Extract metadata from the page content for client-side component
   const meta = pageContent.metadata || {};

@@ -1,18 +1,16 @@
 import { Metadata } from 'next';
-import { getBlogPostBySlug, getPageContent } from '../../lib/api';
+import { getAllBlogPosts, getBlogPostBySlug } from '../../lib/api';
 import { notFound } from 'next/navigation';
 
-// Generate static params for all blog posts (for static generation)
+// Generate static params for all blog posts at build time
 export async function generateStaticParams() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/blog`);
-  const posts = await response.json();
-  
-  return posts.map((post: any) => ({
+  const posts = await getAllBlogPosts();
+  return posts.map((post) => ({
     slug: post.slug,
   }));
 }
 
-// Generate dynamic metadata for each blog post
+// Generate dynamic metadata for blog posts
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getBlogPostBySlug(params.slug);
   
@@ -26,45 +24,82 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: `${post.title} | HAL149 Blog`,
     description: post.excerpt,
     openGraph: {
-      title: `${post.title} | HAL149 Blog`,
+      title: post.title,
       description: post.excerpt,
       type: 'article',
-      images: post.image_url ? [{ url: post.image_url }] : [],
+      url: `https://hal149.com/blog/${post.slug}`,
+      images: post.imageUrl ? [{ url: post.imageUrl }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
     },
   };
 }
 
+// Format date for display
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
 // Blog post page component
-export default async function BlogPost({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getBlogPostBySlug(params.slug);
   
   if (!post) {
     notFound();
   }
   
-  // Format date
-  const publishDate = new Date(post.published_at).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  
   return (
-    <main>
-      <article>
-        {post.image_url && (
-          <img 
-            src={post.image_url} 
-            alt={post.title} 
-            className="w-full h-64 object-cover mb-8"
-          />
-        )}
+    <div className="py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <p className="text-gray-500 mb-2">
+            {post.publishedAt ? formatDate(post.publishedAt) : 'Published recently'}
+          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">{post.title}</h1>
+          
+          {post.imageUrl && (
+            <div className="mt-6 mb-8 rounded-lg overflow-hidden">
+              <img 
+                src={post.imageUrl} 
+                alt={post.title} 
+                className="w-full h-auto"
+              />
+            </div>
+          )}
+          
+          <div className="mb-6 text-gray-500 italic border-l-4 border-gray-300 pl-4">
+            {post.excerpt}
+          </div>
+        </div>
         
-        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-        <p className="text-gray-500 mb-8">Published on {publishDate}</p>
+        <div className="prose prose-lg max-w-none">
+          {/* 
+            Using dangerouslySetInnerHTML is not ideal for security, but for a 
+            controlled admin environment it's acceptable. In a production app,
+            you might want to use a proper markdown or rich text renderer.
+          */}
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        </div>
         
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
-      </article>
-    </main>
+        <div className="mt-12 border-t border-gray-200 pt-8">
+          <a 
+            href="/blog" 
+            className="inline-flex items-center text-primary-600 hover:text-primary-700"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to all blog posts
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }

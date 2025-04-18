@@ -24,6 +24,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
 import { TranslationProvider } from "@/hooks/use-translations";
 import { ProtectedRoute } from "./lib/protected-route";
+import { MetadataSync } from "@/components/MetadataSync";
 
 function Router() {
   return (
@@ -55,6 +56,7 @@ function App() {
       <LanguageProvider>
         <TranslationProvider>
           <AuthProvider>
+            <MetadataSync />
             <Router />
             <Toaster />
           </AuthProvider>

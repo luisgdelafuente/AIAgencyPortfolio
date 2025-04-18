@@ -1,74 +1,103 @@
-# HAL149 Metadata Implementation Guide
+# Next.js Metadata Implementation Solution
 
-## Overview
+## The Problem
+We encountered an issue with our Next.js application's metadata - it was not appearing in the HTML source. This is critical for SEO since search engine crawlers don't execute JavaScript and won't see client-side rendered metadata.
 
-This document describes the implementation of SEO and social media metadata in the HAL149 website. The solution uses a custom server approach that ensures metadata is:
+## Root Cause
+1. **Client-Side Fetching**: We were fetching metadata client-side only, which happens after the HTML is delivered
+2. **No Server-Side Generation**: We weren't using Next.js's built-in SSR/SSG capabilities for metadata
+3. **Deployment Configuration**: The application was not properly configured for SSR in Replit
 
-1. Dynamically loaded from the database
-2. Properly included in the initial HTML source (essential for SEO)
-3. Unique for each page, including blog posts and project pages
-4. Manageable through the existing admin panel
+## Solution Implementation
 
-## Architecture
+### 1. Proper Next.js App Router Metadata API
 
-The solution consists of two main parts:
+We've implemented the official Next.js App Router metadata API using `generateMetadata` functions in each page:
 
-1. **Custom Express Server** - A server that processes requests before sending them to Next.js, intercepting the HTML and injecting metadata.
-2. **Simplified Client** - The client-side components no longer need to manage metadata, as it's already in the HTML.
-
-## Files
-
-- `server-next.cjs` - Custom Next.js server with metadata injection
-- `run-servers.sh` - Script to run both the Express API and the custom Next.js server
-- `app/components/MetadataWrapper.tsx` - Empty component (metadata is now handled server-side)
-
-## How It Works
-
-1. When a request comes in, the custom server determines the page type (home, about, blog post, etc.)
-2. It fetches the appropriate metadata from the API
-3. It renders the page with Next.js
-4. Before sending the HTML to the browser, it injects the metadata
-5. The result is HTML with proper metadata tags in the source code
-
-## Running the Solution
-
-To run the solution, use the following command:
-
-```
-./run-servers.sh
+```typescript
+// Example from app/page.tsx
+export async function generateMetadata(): Promise<Metadata> {
+  // Fetch page content for metadata
+  const pageContentData = await fetchPageContent('home');
+  const pageContent = parseContent(pageContentData?.content);
+  const meta = pageContent.metadata || {};
+  
+  return {
+    title: meta.title || 'HAL149',
+    description: meta.description || 'Default description',
+    // ...other metadata
+  };
+}
 ```
 
-This script:
-1. Starts the Express API server
-2. Waits for it to initialize
-3. Starts the custom Next.js server
-4. Keeps both running until terminated
+### 2. Server-Side Data Fetching
 
-## Supported Metadata
+We've created dedicated API functions that fetch data with `cache: 'no-store'` to ensure fresh content:
 
-The solution supports all standard SEO and social media metadata:
+```typescript
+export async function fetchPageContent(pageName: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/page-contents/${pageName}`, {
+      cache: 'no-store', // Forces a fetch request every time
+    });
+    // ...
+  }
+}
+```
 
-- Basic (title, description, keywords)
-- Open Graph (og:title, og:description, og:image, og:url, og:type)
-- Twitter Card (twitter:card, twitter:title, twitter:description, twitter:image)
-- Canonical URL
+### 3. Type-Specific Metadata Utilities
 
-## Admin Panel Integration
+We've implemented specialized metadata generators for different content types:
 
-The existing admin panel can be used to edit metadata for each page. The metadata is stored in the database and dynamically loaded by the custom server for each page.
+```typescript
+export async function getBlogPostMetadata(slug: string): Promise<Metadata> {
+  // Fetch the specific blog post
+  const post = await fetchBlogPostBySlug(slug);
+  
+  // Generate metadata specific to this post
+  return {
+    title: `${post.title} | HAL149`,
+    description: post.excerpt,
+    // ...other metadata
+  };
+}
+```
 
-## Testing
+### 4. Server Setup Requirements
 
-To test that metadata is being correctly rendered, view the page source in your browser (right-click > View Page Source) and look for the metadata tags in the `<head>` section.
+For this implementation to work properly in production:
 
-## Security
+1. Next.js must run with its built-in server (`next start`) not as a static export
+2. The server must use the proper build command (`next build`)
 
-All metadata values are sanitized to prevent XSS attacks.
+We've created a dedicated script to run Next.js with SSR:
+```bash
+# start-next-server.sh
+npx next build
+npx next start
+```
 
-## Troubleshooting
+## Deployment Instructions
 
-If metadata is not appearing:
+To ensure metadata works correctly:
 
-1. Check that both servers are running (Express API and custom Next.js server)
-2. Verify that the metadata exists in the database for the page
-3. Check the server logs for any errors in fetching or processing metadata
+1. Make sure to use `next build` and `next start` in production, not `next export`
+2. For Replit deployment, the `.replit` file should use:
+   ```
+   build = ["npx", "next", "build"]
+   run = ["npx", "next", "start"]
+   ```
+
+## Testing Your Implementation
+
+When testing metadata implementation:
+
+1. View page source (right-click > View Page Source) to see the HTML sent to the browser
+2. Use tools like [metatags.io](https://metatags.io/) to validate your metadata
+3. Test with the [Rich Results Test](https://search.google.com/test/rich-results) from Google
+
+## Future Improvements
+
+1. Implement static generation with ISR (Incremental Static Regeneration) for better performance
+2. Add structured data (JSON-LD) for rich search results
+3. Set up automatic metadata validation in CI/CD pipeline

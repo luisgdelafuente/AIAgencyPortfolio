@@ -1,7 +1,7 @@
 import './globals.css';
 import { Metadata } from 'next';
 import React from 'react';
-import Navbar from './components/Navbar';
+import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 
 // Define default metadata for the site
@@ -42,8 +42,8 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8">
+        <Navigation />
+        <main className="flex-grow">
           {children}
         </main>
         <Footer />

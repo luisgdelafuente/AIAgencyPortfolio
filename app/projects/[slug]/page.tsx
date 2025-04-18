@@ -1,6 +1,7 @@
 import { fetchFeaturedProjects } from '../../lib/api';
 import { marked } from 'marked';
 import { Metadata, ResolvingMetadata } from 'next';
+import { getPageMetadata } from '../../lib/metadataUtils';
 import Link from 'next/link';
 
 type Props = {
@@ -12,27 +13,34 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // Fetch all projects and find the one with matching slug
+  // First fetch the projects category page metadata for defaults
+  const projectsMetadata = await getPageMetadata('projects');
+  
+  // Then fetch all projects and find the one with matching slug
   const projects = await fetchFeaturedProjects();
   const project = projects.find(project => project.slug === params.slug);
   
   // If no project is found, return default metadata
   if (!project) {
     return {
+      ...projectsMetadata,
       title: 'Project Not Found | HAL149',
       description: 'The requested project could not be found.',
     };
   }
   
-  // Return metadata based on the project
+  // Return metadata based on the project, inheriting from projects metadata
   return {
+    ...projectsMetadata,
     title: `${project.title} | HAL149 Projects`,
     description: project.description,
-    keywords: `${project.title}, ${project.category}, HAL149 projects, AI solutions`,
+    keywords: `${project.title}, ${project.category}, HAL149 projects, AI solutions${projectsMetadata.keywords ? `, ${projectsMetadata.keywords}` : ''}`,
     openGraph: {
+      ...projectsMetadata.openGraph,
       title: project.title,
       description: project.description,
-      images: project.imageUrl ? [project.imageUrl] : undefined,
+      images: project.imageUrl ? [project.imageUrl] : projectsMetadata.openGraph?.images,
+      type: 'article',
     },
   };
 }

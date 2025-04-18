@@ -2,6 +2,7 @@ import { fetchBlogPosts } from '../../lib/api';
 import { formatDate } from '@shared/utils';
 import { marked } from 'marked';
 import { Metadata, ResolvingMetadata } from 'next';
+import { getPageMetadata } from '../../lib/metadataUtils';
 import Link from 'next/link';
 
 type Props = {
@@ -13,27 +14,34 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // Fetch all blog posts and find the one with matching slug
+  // First fetch the blog category page metadata for defaults
+  const blogMetadata = await getPageMetadata('blog');
+  
+  // Then fetch all blog posts and find the one with matching slug
   const posts = await fetchBlogPosts();
   const post = posts.find(post => post.slug === params.slug);
   
   // If no post is found, return default metadata
   if (!post) {
     return {
+      ...blogMetadata,
       title: 'Blog Post Not Found | HAL149',
       description: 'The requested blog post could not be found.',
     };
   }
   
-  // Return metadata based on the post
+  // Return metadata based on the post, inheriting from blog metadata
   return {
+    ...blogMetadata,
     title: `${post.title} | HAL149 Blog`,
     description: post.excerpt,
-    keywords: `${post.title}, HAL149 blog, AI insights`,
+    keywords: `${post.title}, HAL149 blog, AI insights${blogMetadata.keywords ? `, ${blogMetadata.keywords}` : ''}`,
     openGraph: {
+      ...blogMetadata.openGraph,
       title: post.title,
       description: post.excerpt,
-      images: post.imageUrl ? [post.imageUrl] : undefined,
+      images: post.imageUrl ? [post.imageUrl] : blogMetadata.openGraph?.images,
+      type: 'article',
     },
   };
 }

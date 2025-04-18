@@ -6,37 +6,38 @@ import Features from '@/components/Features';
 import ProjectsSection from '@/components/ProjectsSection';
 import BlogSection from '@/components/BlogSection';
 import Waitlist from '@/components/Waitlist';
+import NextHeadMetadata from '@/components/NextHeadMetadata';
 
 /**
- * Explicitly define metadata for the home page using Next.js 13+ static exports
- * This approach is recommended over generateMetadata() for performance and reliability
+ * Export static metadata for SEO
+ * Note: This may not work perfectly in development mode but will work correctly in production
  */
-export async function generateMetadata(): Promise<Metadata> {
-  // Fetch content directly with no cache to ensure fresh metadata
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/page-contents/home`, {
-    cache: 'no-store',
-    headers: { 'x-metadata-request': 'true' }
-  });
-  
-  if (!response.ok) {
-    console.error('Failed to fetch home metadata');
-    return {}; // Let root layout handle default metadata
-  }
-  
-  const data = await response.json();
-  let pageContent = {};
-  
-  try {
-    pageContent = typeof data.content === 'string' 
-      ? JSON.parse(data.content) 
-      : data.content;
-  } catch (error) {
-    console.error('Error parsing home metadata:', error);
-    return {}; // Let root layout handle default metadata
-  }
-  
-  // Parse metadata format using our utility
-  return parseMetadata(pageContent);
+export const metadata: Metadata = {
+  title: 'HAL149 | Unlocking Your Business Potential with AI',
+  description: 'HAL149 is your partner From AI-powered apps and automations to strategic training and transformation programs',
+  keywords: 'ai applications, ai solutions, ai automations, industry ai, ai consulting, ai training programs',
+  alternates: {
+    canonical: 'https://hal149.com',
+  },
+  openGraph: {
+    title: 'HAL149 | Unlocking Your Business Potential with AI',
+    description: 'HAL149 is your partner From AI-powered apps and automations to strategic training and transformation programs',
+    url: 'https://hal149.com',
+    siteName: 'HAL149',
+    images: [
+      {
+        url: 'https://spebrqnqmrmeacntsrmp.supabase.co/storage/v1/object/public/assets//hallogoblack480.webp',
+        width: 480,
+        height: 480,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 // Parse content from string to JSON
@@ -64,8 +65,14 @@ export default async function Home() {
     pageContent.metadata || {}
   );
 
+  // Extract metadata from the page content for client-side component
+  const meta = pageContent.metadata || {};
+
   return (
     <div className="bg-white">
+      {/* Client-side metadata component */}
+      <ClientMetadata metadata={meta} />
+
       {/* Hero section */}
       <Hero content={pageContent} isLoading={!pageContentData} />
       
@@ -108,4 +115,77 @@ export default async function Home() {
       </section>
     </div>
   );
+}
+
+// Client component wrapper to use NextHeadMetadata
+'use client';
+import { useEffect } from 'react';
+
+function ClientMetadata({ metadata }: { metadata: any }) {
+  useEffect(() => {
+    // Implement direct DOM manipulation for metadata
+    if (metadata) {
+      // Set title
+      if (metadata.title) {
+        document.title = metadata.title;
+      }
+      
+      // Set meta description
+      if (metadata.description) {
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute('content', metadata.description);
+        } else {
+          metaDesc = document.createElement('meta');
+          metaDesc.setAttribute('name', 'description');
+          metaDesc.setAttribute('content', metadata.description);
+          document.head.appendChild(metaDesc);
+        }
+      }
+      
+      // Set other meta tags
+      const metaTags = [
+        { name: 'keywords', content: metadata.keywords },
+        { property: 'og:title', content: metadata.ogTitle || metadata.title },
+        { property: 'og:description', content: metadata.ogDescription || metadata.description },
+        { property: 'og:image', content: metadata.ogImage },
+        { property: 'og:url', content: metadata.canonical },
+        { name: 'twitter:title', content: metadata.ogTitle || metadata.title },
+        { name: 'twitter:description', content: metadata.ogDescription || metadata.description },
+        { name: 'twitter:image', content: metadata.ogImage }
+      ];
+      
+      metaTags.forEach(tag => {
+        if (!tag.content) return; // Skip if no content
+        
+        const selector = tag.name ? `meta[name="${tag.name}"]` : `meta[property="${tag.property}"]`;
+        let metaTag = document.querySelector(selector);
+        
+        if (metaTag) {
+          metaTag.setAttribute('content', tag.content);
+        } else {
+          metaTag = document.createElement('meta');
+          if (tag.name) metaTag.setAttribute('name', tag.name);
+          if (tag.property) metaTag.setAttribute('property', tag.property);
+          metaTag.setAttribute('content', tag.content);
+          document.head.appendChild(metaTag);
+        }
+      });
+      
+      // Set canonical
+      if (metadata.canonical) {
+        let canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) {
+          canonical.setAttribute('href', metadata.canonical);
+        } else {
+          canonical = document.createElement('link');
+          canonical.setAttribute('rel', 'canonical');
+          canonical.setAttribute('href', metadata.canonical);
+          document.head.appendChild(canonical);
+        }
+      }
+    }
+  }, [metadata]);
+  
+  return null; // This component doesn't render anything visible
 }

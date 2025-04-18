@@ -34,6 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+// Import types from shared schema
+import { Project, BlogPost } from '../shared/schema';
+
 // Define feature interface for TypeScript
 interface Feature {
   title: string;
@@ -112,7 +115,7 @@ export default async function Home() {
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {content.features && content.features.map((feature, index) => (
+            {content.features && content.features.map((feature: Feature, index: number) => (
               <div key={index} className="p-8 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
                 <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-5">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,10 +149,10 @@ export default async function Home() {
               // Map through actual featured projects
               featuredProjects.map((project) => (
                 <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                  {project.image_url ? (
+                  {project.imageUrl ? (
                     <div className="h-64 bg-gray-100 relative overflow-hidden">
                       <img 
-                        src={project.image_url} 
+                        src={project.imageUrl} 
                         alt={project.title} 
                         className="absolute inset-0 w-full h-full object-cover"
                       />
@@ -185,7 +188,7 @@ export default async function Home() {
         </div>
       </section>
       
-      {/* Blog Section (placeholder) */}
+      {/* Blog Section */}
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
@@ -198,16 +201,41 @@ export default async function Home() {
           </div>
           
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-              <div className="p-6">
-                <p className="text-sm text-gray-500 mb-2">April 10, 2025</p>
-                <h3 className="text-xl font-bold mb-2">Selling Improved Versions of Existing Products</h3>
-                <p className="text-gray-600 mb-4">
-                  How AI is revolutionizing the way companies improve and iterate on existing products and services.
-                </p>
-                <a href="/blog" className="text-sm font-medium text-primary-600 hover:text-primary-700">Read more →</a>
+            {blogPosts && blogPosts.length > 0 ? (
+              // Display up to 3 most recent blog posts
+              blogPosts.slice(0, 3).map((post) => (
+                <div key={post.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  {post.imageUrl && (
+                    <div className="h-48 bg-gray-100 relative overflow-hidden">
+                      <img 
+                        src={post.imageUrl} 
+                        alt={post.title} 
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <p className="text-sm text-gray-500 mb-2">
+                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : 'Published recently'}
+                    </p>
+                    <h3 className="text-xl font-bold mb-2">{post.title}</h3>
+                    <p className="text-gray-600 mb-4">
+                      {post.excerpt || post.title}
+                    </p>
+                    <a href={`/blog/${post.slug}`} className="text-sm font-medium text-primary-600 hover:text-primary-700">Read more →</a>
+                  </div>
+                </div>
+              ))
+            ) : (
+              // Fallback if no blog posts are available
+              <div className="col-span-3 text-center py-12">
+                <p className="text-gray-500">No blog posts available at the moment.</p>
               </div>
-            </div>
+            )}
           </div>
           
           <div className="mt-10 text-center">

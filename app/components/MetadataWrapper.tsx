@@ -1,20 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Head from 'next/head';
 
 /**
- * Simple component that loads metadata from the API and applies it directly to the DOM
- * Keeps admin panel control without requiring any extra scripts or maintenance
+ * Enhanced component that loads metadata from the API and applies it 
+ * both directly to the DOM and through Next.js head for better SSR support
  */
 export default function MetadataWrapper() {
-  const [isMetadataSet, setIsMetadataSet] = useState(false);
+  const [metadata, setMetadata] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadAndApplyMetadata() {
+    async function loadMetadata() {
       try {
-        // Don't set metadata more than once per page load
-        if (isMetadataSet) return;
-        
         // Fetch metadata for current page from API
         const pagePath = window.location.pathname.replace(/^\/+|\/+$/g, '') || 'home';
         const response = await fetch(`/api/page-contents/${pagePath}`);
@@ -36,38 +35,38 @@ export default function MetadataWrapper() {
           return;
         }
         
-        const metadata = content.metadata || {};
+        const pageMetadata = content.metadata || {};
         
-        // Apply metadata to DOM
-        if (metadata.title) {
-          document.title = metadata.title;
+        // Apply directly to DOM for immediate effect
+        if (pageMetadata.title) {
+          document.title = pageMetadata.title;
         }
         
         // Apply description
-        if (metadata.description) {
+        if (pageMetadata.description) {
           let metaDesc = document.querySelector('meta[name="description"]');
           if (metaDesc) {
-            metaDesc.setAttribute('content', metadata.description);
+            metaDesc.setAttribute('content', pageMetadata.description);
           } else {
             metaDesc = document.createElement('meta');
             metaDesc.setAttribute('name', 'description');
-            metaDesc.setAttribute('content', metadata.description);
+            metaDesc.setAttribute('content', pageMetadata.description);
             document.head.appendChild(metaDesc);
           }
         }
         
-        // Apply other meta tags
+        // Apply other meta tags directly
         const metaTags = [
-          { name: 'keywords', content: metadata.keywords },
-          { property: 'og:title', content: metadata.ogTitle || metadata.title },
-          { property: 'og:description', content: metadata.ogDescription || metadata.description },
-          { property: 'og:image', content: metadata.ogImage },
-          { property: 'og:url', content: metadata.canonical || window.location.href },
+          { name: 'keywords', content: pageMetadata.keywords },
+          { property: 'og:title', content: pageMetadata.ogTitle || pageMetadata.title },
+          { property: 'og:description', content: pageMetadata.ogDescription || pageMetadata.description },
+          { property: 'og:image', content: pageMetadata.ogImage },
+          { property: 'og:url', content: pageMetadata.canonical || window.location.href },
           { property: 'og:type', content: 'website' },
           { name: 'twitter:card', content: 'summary_large_image' },
-          { name: 'twitter:title', content: metadata.ogTitle || metadata.title },
-          { name: 'twitter:description', content: metadata.ogDescription || metadata.description },
-          { name: 'twitter:image', content: metadata.ogImage }
+          { name: 'twitter:title', content: pageMetadata.ogTitle || pageMetadata.title },
+          { name: 'twitter:description', content: pageMetadata.ogDescription || pageMetadata.description },
+          { name: 'twitter:image', content: pageMetadata.ogImage }
         ];
         
         metaTags.forEach(tag => {
@@ -91,29 +90,62 @@ export default function MetadataWrapper() {
         });
         
         // Apply canonical URL
-        if (metadata.canonical) {
+        if (pageMetadata.canonical) {
           let canonical = document.querySelector('link[rel="canonical"]');
           if (canonical) {
-            canonical.setAttribute('href', metadata.canonical);
+            canonical.setAttribute('href', pageMetadata.canonical);
           } else {
             canonical = document.createElement('link');
             canonical.setAttribute('rel', 'canonical');
-            canonical.setAttribute('href', metadata.canonical);
+            canonical.setAttribute('href', pageMetadata.canonical);
             document.head.appendChild(canonical);
           }
         }
         
-        // Mark metadata as set
-        setIsMetadataSet(true);
-        console.log('Successfully applied metadata for', pagePath);
+        // Store metadata for Next.js Head component
+        setMetadata(pageMetadata);
+        setIsLoading(false);
+        console.log('Successfully loaded metadata for', pagePath);
       } catch (error) {
         console.error('Error applying metadata:', error);
+        setIsLoading(false);
       }
     }
     
-    loadAndApplyMetadata();
-  }, [isMetadataSet]);
+    loadMetadata();
+  }, []);
   
-  // This component doesn't render anything visible
-  return null;
+  // Render Next.js Head component with the fetched metadata
+  // This approach combines client-side DOM manipulation with SSR-friendly Head
+  if (!metadata) return null;
+  
+  return (
+    <Head>
+      {metadata.title && <title>{metadata.title}</title>}
+      {metadata.description && <meta name="description" content={metadata.description} />}
+      {metadata.keywords && <meta name="keywords" content={metadata.keywords} />}
+      
+      {/* Open Graph */}
+      {(metadata.ogTitle || metadata.title) && 
+        <meta property="og:title" content={metadata.ogTitle || metadata.title} />}
+      {(metadata.ogDescription || metadata.description) && 
+        <meta property="og:description" content={metadata.ogDescription || metadata.description} />}
+      {metadata.ogImage && <meta property="og:image" content={metadata.ogImage} />}
+      {(metadata.canonical || typeof window !== 'undefined' ? window.location.href : '') && 
+        <meta property="og:url" content={metadata.canonical || 
+          (typeof window !== 'undefined' ? window.location.href : '')} />}
+      <meta property="og:type" content="website" />
+      
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      {(metadata.ogTitle || metadata.title) && 
+        <meta name="twitter:title" content={metadata.ogTitle || metadata.title} />}
+      {(metadata.ogDescription || metadata.description) && 
+        <meta name="twitter:description" content={metadata.ogDescription || metadata.description} />}
+      {metadata.ogImage && <meta name="twitter:image" content={metadata.ogImage} />}
+      
+      {/* Canonical */}
+      {metadata.canonical && <link rel="canonical" href={metadata.canonical} />}
+    </Head>
+  );
 }

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getAllBlogPosts, getBlogPostBySlug } from '../../lib/api';
 import { notFound } from 'next/navigation';
+import NextHead from '../../components/next-head';
 
 // Generate static params for all blog posts at build time
 export async function generateStaticParams() {
@@ -51,6 +52,16 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   
   return (
     <div className="py-12">
+      <NextHead
+        title={`${post.title} | HAL149`}
+        description={post.excerpt || ''}
+        keywords={post.keywords || 'blog, article, ai agency'}
+        canonical={`https://hal149.com/blog/${post.slug}`}
+        ogTitle={post.title}
+        ogDescription={post.excerpt || ''}
+        ogImage={post.imageUrl || ''}
+        ogType="article"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <p className="text-gray-500 mb-2">

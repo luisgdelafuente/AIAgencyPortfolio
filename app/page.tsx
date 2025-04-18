@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { getPageContent, getAllBlogPosts, getFeaturedProjects } from './lib/api';
+import NextHead from './components/next-head';
 
 // Generate dynamic metadata for the home page
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,8 +47,21 @@ export default async function Home() {
     content = {};
   }
   
+  // Extract metadata for the page
+  let metadata = content.metadata || {};
+  
   return (
     <>
+      {/* Add NextHead with dynamic metadata from database */}
+      <NextHead
+        title={metadata.title || 'HAL149 | Unlocking Your Business Potential with AI'}
+        description={metadata.description || 'HAL149 is your partner From AI-powered apps and automations to strategic training and transformation programs'}
+        keywords={metadata.keywords || 'ai applications, ai solutions, ai automations, industry ai, ai consulting, ai training programs'}
+        canonical={metadata.canonical || 'https://hal149.com'}
+        ogTitle={metadata.ogTitle}
+        ogDescription={metadata.ogDescription}
+        ogImage={metadata.ogImage || 'https://spebrqnqmrmeacntsrmp.supabase.co/storage/v1/object/public/assets//hallogoblack480.webp'}
+      />
       {/* Hero Section */}
       <section className="pt-32 pb-16 bg-white">
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">

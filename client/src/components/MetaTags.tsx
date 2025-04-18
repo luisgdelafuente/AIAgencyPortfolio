@@ -9,11 +9,9 @@ interface MetaTagsProps {
 }
 
 /**
- * Enhanced Meta Tags component
- * 
- * This component updates the meta tags that exist in the index.html template
- * We've added default metadata tags to the HTML template for better SEO
- * This component updates those tags based on page-specific data
+ * Reusable component for rendering meta tags across the site
+ * Ensures all metadata comes from the database with no hardcoded values
+ * Uses direct DOM manipulation instead of React Helmet to avoid Replit metadata attributes
  */
 export default function MetaTags({ 
   metadata, 
@@ -21,8 +19,10 @@ export default function MetaTags({
   url,
   pageTitle
 }: MetaTagsProps) {
+  console.log('MetaTags rendering with:', { metadata, type, url, pageTitle });
+  
   // Define values once
-  const finalTitle = pageTitle || metadata.title || document.title || 'HAL149';
+  const finalTitle = pageTitle || metadata.title || '';
   const metaDescription = metadata.description || '';
   const canonicalUrl = getCanonicalUrl(metadata, url);
   const ogTitle = metadata.ogTitle || finalTitle;
@@ -30,65 +30,45 @@ export default function MetaTags({
   
   // Update meta tags when component mounts or props change
   React.useEffect(() => {
-    if (!metadata || Object.keys(metadata).length === 0) {
-      return; // Don't modify anything if we don't have metadata
-    }
-    
-    // Basic metadata - find the title tag with the data-dynamic-meta attribute
-    if (finalTitle) {
-      document.title = finalTitle;
-      const titleTag = document.querySelector('title[data-dynamic-meta="title"]');
-      if (titleTag) {
-        titleTag.textContent = finalTitle;
-      }
-    }
-    
-    if (metaDescription) {
-      updateMetaTag('meta', { name: 'description', content: metaDescription });
-    }
+    // Basic metadata
+    document.title = finalTitle;
+    updateOrCreateTag('meta', { name: 'description', content: metaDescription });
     
     if (metadata.keywords) {
-      updateMetaTag('meta', { name: 'keywords', content: metadata.keywords });
+      updateOrCreateTag('meta', { name: 'keywords', content: metadata.keywords });
     }
     
     // Canonical URL
-    updateMetaTag('link', { rel: 'canonical', href: canonicalUrl });
+    updateOrCreateTag('link', { rel: 'canonical', href: canonicalUrl });
     
     // Open Graph tags
-    updateMetaTag('meta', { property: 'og:title', content: ogTitle });
-    
+    updateOrCreateTag('meta', { property: 'og:title', content: ogTitle });
     if (ogDescription) {
-      updateMetaTag('meta', { property: 'og:description', content: ogDescription });
+      updateOrCreateTag('meta', { property: 'og:description', content: ogDescription });
     }
-    
     if (metadata.ogImage) {
-      updateMetaTag('meta', { property: 'og:image', content: metadata.ogImage });
+      updateOrCreateTag('meta', { property: 'og:image', content: metadata.ogImage });
     }
-    
-    updateMetaTag('meta', { property: 'og:type', content: type });
-    
+    updateOrCreateTag('meta', { property: 'og:type', content: type });
     if (url) {
-      updateMetaTag('meta', { property: 'og:url', content: url });
+      updateOrCreateTag('meta', { property: 'og:url', content: url });
     }
     
     // Twitter Card tags
-    updateMetaTag('meta', { 
+    updateOrCreateTag('meta', { 
       name: 'twitter:card', 
       content: metadata.ogImage ? 'summary_large_image' : 'summary'
     });
-    
-    updateMetaTag('meta', { name: 'twitter:title', content: ogTitle });
-    
+    updateOrCreateTag('meta', { name: 'twitter:title', content: ogTitle });
     if (ogDescription) {
-      updateMetaTag('meta', { name: 'twitter:description', content: ogDescription });
+      updateOrCreateTag('meta', { name: 'twitter:description', content: ogDescription });
     }
-    
     if (metadata.ogImage) {
-      updateMetaTag('meta', { name: 'twitter:image', content: metadata.ogImage });
+      updateOrCreateTag('meta', { name: 'twitter:image', content: metadata.ogImage });
     }
     
     // Remove any remaining Replit metadata attributes
-    cleanReplitAttributes();
+    cleanReplitMetadata();
     
   }, [finalTitle, metaDescription, canonicalUrl, ogTitle, ogDescription, metadata, type, url]);
   
@@ -105,38 +85,28 @@ export default function MetaTags({
     }
   }
   
-  // Helper function to update meta tags - uses data-dynamic-meta where available
-  function updateMetaTag(
+  // Helper function to update or create meta/link tags
+  function updateOrCreateTag(
     tagName: 'meta' | 'link', 
     attributes: Record<string, string>
   ) {
-    let selector = '';
-    let dynamicAttribute = '';
+    let selector = tagName;
     
-    // Determine the data-dynamic-meta attribute name based on the attribute
+    // Build selector based on attributes
     if (attributes.name) {
-      selector = `${tagName}[name="${attributes.name}"]`;
-      dynamicAttribute = attributes.name;
+      selector += `[name="${attributes.name}"]`;
     } else if (attributes.property) {
-      selector = `${tagName}[property="${attributes.property}"]`;
-      dynamicAttribute = attributes.property;
+      selector += `[property="${attributes.property}"]`;
     } else if (attributes.rel) {
-      selector = `${tagName}[rel="${attributes.rel}"]`;
-      dynamicAttribute = attributes.rel;
+      selector += `[rel="${attributes.rel}"]`;
     }
     
-    // First try to find a tag with the data-dynamic-meta attribute
-    const dynamicTag = document.querySelector(`${tagName}[data-dynamic-meta="${dynamicAttribute}"]`);
-    const existingTag = dynamicTag || document.querySelector(selector);
+    const existingTag = document.head.querySelector(selector);
     
     if (existingTag) {
       // Update existing tag
       Object.entries(attributes).forEach(([key, value]) => {
-        if (key === 'content' || key === 'href') {
-          existingTag.setAttribute(key, value);
-        } else {
-          existingTag.setAttribute(key, value);
-        }
+        existingTag.setAttribute(key, value);
       });
     } else {
       // Create new tag
@@ -144,25 +114,17 @@ export default function MetaTags({
       Object.entries(attributes).forEach(([key, value]) => {
         newTag.setAttribute(key, value);
       });
-      // Also add the data-dynamic-meta attribute for future updates
-      newTag.setAttribute('data-dynamic-meta', dynamicAttribute);
       document.head.appendChild(newTag);
     }
   }
   
   // Clean up any Replit metadata attributes
-  function cleanReplitAttributes() {
-    const allMetaTags = document.head.querySelectorAll('meta, link');
-    allMetaTags.forEach(tag => {
-      if (tag.hasAttribute('data-replit-metadata')) {
-        tag.removeAttribute('data-replit-metadata');
-      }
-      if (tag.hasAttribute('data-component-name')) {
-        tag.removeAttribute('data-component-name');
-      }
-      if (tag.hasAttribute('data-rh')) {
-        tag.removeAttribute('data-rh');
-      }
+  function cleanReplitMetadata() {
+    const replitTags = document.head.querySelectorAll('[data-replit-metadata]');
+    replitTags.forEach(tag => {
+      tag.removeAttribute('data-replit-metadata');
+      tag.removeAttribute('data-component-name');
+      tag.removeAttribute('data-rh');
     });
   }
   

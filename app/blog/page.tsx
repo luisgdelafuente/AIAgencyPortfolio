@@ -49,7 +49,7 @@ export default async function Blog() {
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           {blogPosts && blogPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogPosts.map((post) => (
+              {blogPosts.map((post: any) => (
                 <article key={post.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md">
                   {post.imageUrl && (
                     <div className="h-48 relative overflow-hidden">

@@ -1,4 +1,4 @@
-import '../client/src/index.css'; // We'll update this path later
+import './globals.css';
 import { Metadata } from 'next';
 import React from 'react';
 import Navbar from './components/Navbar';

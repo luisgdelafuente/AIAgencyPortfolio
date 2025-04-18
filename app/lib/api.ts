@@ -1,8 +1,9 @@
 import { BlogPost, Project, PageContent } from '../../shared/schema';
-import { supabase } from './supabase';
+import { getSupabase } from './supabase';
 
 // Fetch page content by page name
 export async function getPageContent(page: string): Promise<PageContent | null> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('page_contents')
     .select('*')
@@ -19,6 +20,7 @@ export async function getPageContent(page: string): Promise<PageContent | null> 
 
 // Fetch all blog posts
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
@@ -34,6 +36,7 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
 
 // Fetch a single blog post by slug
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
@@ -50,6 +53,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 
 // Fetch all projects
 export async function getAllProjects(): Promise<Project[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('projects')
     .select('*')
@@ -65,6 +69,7 @@ export async function getAllProjects(): Promise<Project[]> {
 
 // Fetch featured projects
 export async function getFeaturedProjects(): Promise<Project[]> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('projects')
     .select('*')
@@ -81,6 +86,7 @@ export async function getFeaturedProjects(): Promise<Project[]> {
 
 // Fetch a single project by slug
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  const supabase = getSupabase();
   const { data, error } = await supabase
     .from('projects')
     .select('*')

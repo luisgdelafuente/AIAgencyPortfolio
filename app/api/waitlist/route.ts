@@ -1,19 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/server/db';
-import { waitlist } from '@/shared/schema';
-import { eq } from 'drizzle-orm';
+import { waitlist, users, type WaitlistEntry } from '@/shared/schema';
+import { eq, desc } from 'drizzle-orm';
 
 // GET /api/waitlist - Get all waitlist entries (protected)
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication - to be implemented later
-    // const session = await getServerSession();
-    // if (!session || !session.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    // Get session cookie
+    const cookies = request.cookies;
+    const sessionCookie = cookies.get("session")?.value;
+    
+    // Check authentication
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    // Parse the user ID from the session cookie
+    const userId = parseInt(sessionCookie, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+    
+    // Check if user exists and is authorized
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     
     const entries = await db.query.waitlist.findMany({
-      orderBy: (entries, { desc }: { desc: any }) => [desc(entries.submittedAt)]
+      orderBy: (waitlist) => [desc(waitlist.submittedAt)]
     });
     
     return NextResponse.json(entries);
@@ -56,7 +74,7 @@ export async function POST(request: NextRequest) {
     const newEntry = await db.insert(waitlist)
       .values({
         email: body.email,
-        submittedAt: now
+        submittedAt: now.toISOString()
       })
       .returning();
     

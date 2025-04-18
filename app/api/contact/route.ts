@@ -1,18 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/server/db';
-import { contactMessages } from '@/shared/schema';
+import { contactMessages, users, type ContactMessage } from '@/shared/schema';
+import { eq, desc } from 'drizzle-orm';
 
 // GET /api/contact - Get all contact messages (protected)
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication - to be implemented later
-    // const session = await getServerSession();
-    // if (!session || !session.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    // Get session cookie
+    const cookies = request.cookies;
+    const sessionCookie = cookies.get("session")?.value;
+    
+    // Check authentication
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    // Parse the user ID from the session cookie
+    const userId = parseInt(sessionCookie, 10);
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+    
+    // Check if user exists and is authorized
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     
     const messages = await db.query.contactMessages.findMany({
-      orderBy: (messages, { desc }: { desc: any }) => [desc(messages.submittedAt)]
+      orderBy: (contactMessages) => [desc(contactMessages.submittedAt)]
     });
     
     return NextResponse.json(messages);
@@ -46,7 +65,7 @@ export async function POST(request: NextRequest) {
         email: body.email,
         subject: body.subject || '',
         message: body.message,
-        submittedAt: now,
+        submittedAt: now.toISOString(),
         read: false
       })
       .returning();

@@ -16,9 +16,10 @@ interface MetadataProps {
 }
 
 /**
- * Component to manage page metadata using direct DOM manipulation
- * Dynamically updates the document head based on provided metadata
- * Avoids React Helmet to prevent Replit metadata attributes
+ * Unified Page Metadata Component
+ * 
+ * This component works with base meta tags defined in index.html
+ * and updates them with page-specific values
  */
 export function PageMetadata({
   title,
@@ -41,62 +42,71 @@ export function PageMetadata({
     if (title) document.title = title;
     
     if (description) {
-      updateOrCreateTag('meta', { name: 'description', content: description });
+      updateMetaTag('meta', { name: 'description', content: description });
     }
     
     if (keywords) {
-      updateOrCreateTag('meta', { name: 'keywords', content: keywords });
+      updateMetaTag('meta', { name: 'keywords', content: keywords });
     }
     
     // Open Graph metadata
-    if (ogTitle) {
-      updateOrCreateTag('meta', { property: 'og:title', content: ogTitle });
+    if (ogTitle || title) {
+      updateMetaTag('meta', { property: 'og:title', content: ogTitle || title || '' });
     }
     
-    if (ogDescription) {
-      updateOrCreateTag('meta', { property: 'og:description', content: ogDescription });
+    if (ogDescription || description) {
+      updateMetaTag('meta', { property: 'og:description', content: ogDescription || description || '' });
     }
     
     if (ogImage) {
-      updateOrCreateTag('meta', { property: 'og:image', content: ogImage });
+      updateMetaTag('meta', { property: 'og:image', content: ogImage });
     }
     
     if (ogUrl) {
-      updateOrCreateTag('meta', { property: 'og:url', content: ogUrl });
+      updateMetaTag('meta', { property: 'og:url', content: ogUrl });
     }
     
-    updateOrCreateTag('meta', { property: 'og:type', content: 'website' });
+    updateMetaTag('meta', { property: 'og:type', content: 'website' });
     
     // Twitter Card metadata
-    updateOrCreateTag('meta', { name: 'twitter:card', content: twitterCard });
+    updateMetaTag('meta', { name: 'twitter:card', content: twitterCard });
     
-    if (twitterTitle) {
-      updateOrCreateTag('meta', { name: 'twitter:title', content: twitterTitle });
+    if (twitterTitle || ogTitle || title) {
+      updateMetaTag('meta', { 
+        name: 'twitter:title', 
+        content: twitterTitle || ogTitle || title || '' 
+      });
     }
     
-    if (twitterDescription) {
-      updateOrCreateTag('meta', { name: 'twitter:description', content: twitterDescription });
+    if (twitterDescription || ogDescription || description) {
+      updateMetaTag('meta', { 
+        name: 'twitter:description', 
+        content: twitterDescription || ogDescription || description || '' 
+      });
     }
     
-    if (twitterImage) {
-      updateOrCreateTag('meta', { name: 'twitter:image', content: twitterImage });
+    if (twitterImage || ogImage) {
+      updateMetaTag('meta', { 
+        name: 'twitter:image', 
+        content: twitterImage || ogImage || '' 
+      });
     }
     
     // Canonical URL
     if (canonicalUrl) {
-      updateOrCreateTag('link', { rel: 'canonical', href: canonicalUrl });
+      updateMetaTag('link', { rel: 'canonical', href: canonicalUrl });
     }
     
     // Remove any Replit metadata attributes
-    cleanReplitMetadata();
+    cleanReplitAttributes();
     
   }, [
     title, description, keywords, ogTitle, ogDescription, ogImage, ogUrl,
     twitterCard, twitterTitle, twitterDescription, twitterImage, canonicalUrl
   ]);
   
-  // Helper function to update or create meta/link tags
-  function updateOrCreateTag(
+  // Helper function to update meta tags
+  function updateMetaTag(
     tagName: 'meta' | 'link', 
     attributes: Record<string, string>
   ) {
@@ -129,12 +139,18 @@ export function PageMetadata({
   }
   
   // Clean up any Replit metadata attributes
-  function cleanReplitMetadata() {
-    const replitTags = document.head.querySelectorAll('[data-replit-metadata]');
-    replitTags.forEach(tag => {
-      tag.removeAttribute('data-replit-metadata');
-      tag.removeAttribute('data-component-name');
-      tag.removeAttribute('data-rh');
+  function cleanReplitAttributes() {
+    const allMetaTags = document.head.querySelectorAll('meta, link');
+    allMetaTags.forEach(tag => {
+      if (tag.hasAttribute('data-replit-metadata')) {
+        tag.removeAttribute('data-replit-metadata');
+      }
+      if (tag.hasAttribute('data-component-name')) {
+        tag.removeAttribute('data-component-name');
+      }
+      if (tag.hasAttribute('data-rh')) {
+        tag.removeAttribute('data-rh');
+      }
     });
   }
   

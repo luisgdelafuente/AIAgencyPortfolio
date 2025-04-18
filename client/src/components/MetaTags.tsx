@@ -9,9 +9,11 @@ interface MetaTagsProps {
 }
 
 /**
- * Reusable component for rendering meta tags across the site
- * Ensures all metadata comes from the database with no hardcoded values
- * Uses direct DOM manipulation instead of React Helmet to avoid Replit metadata attributes
+ * Enhanced Meta Tags component
+ * 
+ * This component updates the meta tags that exist in the index.html template
+ * We've added default metadata tags to the HTML template for better SEO
+ * This component updates those tags based on page-specific data
  */
 export default function MetaTags({ 
   metadata, 
@@ -19,10 +21,8 @@ export default function MetaTags({
   url,
   pageTitle
 }: MetaTagsProps) {
-  console.log('MetaTags rendering with:', { metadata, type, url, pageTitle });
-  
   // Define values once
-  const finalTitle = pageTitle || metadata.title || '';
+  const finalTitle = pageTitle || metadata.title || document.title || 'HAL149';
   const metaDescription = metadata.description || '';
   const canonicalUrl = getCanonicalUrl(metadata, url);
   const ogTitle = metadata.ogTitle || finalTitle;
@@ -30,45 +30,59 @@ export default function MetaTags({
   
   // Update meta tags when component mounts or props change
   React.useEffect(() => {
+    if (!metadata || Object.keys(metadata).length === 0) {
+      return; // Don't modify anything if we don't have metadata
+    }
+    
     // Basic metadata
-    document.title = finalTitle;
-    updateOrCreateTag('meta', { name: 'description', content: metaDescription });
+    if (finalTitle) document.title = finalTitle;
+    
+    if (metaDescription) {
+      updateMetaTag('meta', { name: 'description', content: metaDescription });
+    }
     
     if (metadata.keywords) {
-      updateOrCreateTag('meta', { name: 'keywords', content: metadata.keywords });
+      updateMetaTag('meta', { name: 'keywords', content: metadata.keywords });
     }
     
     // Canonical URL
-    updateOrCreateTag('link', { rel: 'canonical', href: canonicalUrl });
+    updateMetaTag('link', { rel: 'canonical', href: canonicalUrl });
     
     // Open Graph tags
-    updateOrCreateTag('meta', { property: 'og:title', content: ogTitle });
+    updateMetaTag('meta', { property: 'og:title', content: ogTitle });
+    
     if (ogDescription) {
-      updateOrCreateTag('meta', { property: 'og:description', content: ogDescription });
+      updateMetaTag('meta', { property: 'og:description', content: ogDescription });
     }
+    
     if (metadata.ogImage) {
-      updateOrCreateTag('meta', { property: 'og:image', content: metadata.ogImage });
+      updateMetaTag('meta', { property: 'og:image', content: metadata.ogImage });
     }
-    updateOrCreateTag('meta', { property: 'og:type', content: type });
+    
+    updateMetaTag('meta', { property: 'og:type', content: type });
+    
     if (url) {
-      updateOrCreateTag('meta', { property: 'og:url', content: url });
+      updateMetaTag('meta', { property: 'og:url', content: url });
     }
     
     // Twitter Card tags
-    updateOrCreateTag('meta', { 
+    updateMetaTag('meta', { 
       name: 'twitter:card', 
       content: metadata.ogImage ? 'summary_large_image' : 'summary'
     });
-    updateOrCreateTag('meta', { name: 'twitter:title', content: ogTitle });
+    
+    updateMetaTag('meta', { name: 'twitter:title', content: ogTitle });
+    
     if (ogDescription) {
-      updateOrCreateTag('meta', { name: 'twitter:description', content: ogDescription });
+      updateMetaTag('meta', { name: 'twitter:description', content: ogDescription });
     }
+    
     if (metadata.ogImage) {
-      updateOrCreateTag('meta', { name: 'twitter:image', content: metadata.ogImage });
+      updateMetaTag('meta', { name: 'twitter:image', content: metadata.ogImage });
     }
     
     // Remove any remaining Replit metadata attributes
-    cleanReplitMetadata();
+    cleanReplitAttributes();
     
   }, [finalTitle, metaDescription, canonicalUrl, ogTitle, ogDescription, metadata, type, url]);
   
@@ -85,8 +99,8 @@ export default function MetaTags({
     }
   }
   
-  // Helper function to update or create meta/link tags
-  function updateOrCreateTag(
+  // Helper function to update meta tags
+  function updateMetaTag(
     tagName: 'meta' | 'link', 
     attributes: Record<string, string>
   ) {
@@ -119,12 +133,18 @@ export default function MetaTags({
   }
   
   // Clean up any Replit metadata attributes
-  function cleanReplitMetadata() {
-    const replitTags = document.head.querySelectorAll('[data-replit-metadata]');
-    replitTags.forEach(tag => {
-      tag.removeAttribute('data-replit-metadata');
-      tag.removeAttribute('data-component-name');
-      tag.removeAttribute('data-rh');
+  function cleanReplitAttributes() {
+    const allMetaTags = document.head.querySelectorAll('meta, link');
+    allMetaTags.forEach(tag => {
+      if (tag.hasAttribute('data-replit-metadata')) {
+        tag.removeAttribute('data-replit-metadata');
+      }
+      if (tag.hasAttribute('data-component-name')) {
+        tag.removeAttribute('data-component-name');
+      }
+      if (tag.hasAttribute('data-rh')) {
+        tag.removeAttribute('data-rh');
+      }
     });
   }
   

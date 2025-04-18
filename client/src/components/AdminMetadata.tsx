@@ -8,7 +8,7 @@ interface AdminMetadataProps {
 
 /**
  * Component to set metadata for admin pages
- * Uses direct DOM manipulation instead of React Helmet
+ * Uses direct DOM manipulation to update existing meta tags
  */
 export function AdminMetadata({
   title,
@@ -18,23 +18,29 @@ export function AdminMetadata({
   
   React.useEffect(() => {
     // Set page title
-    document.title = title;
+    if (title) document.title = title;
     
     // Set meta description
-    updateOrCreateTag('meta', { name: 'description', content: description });
-    
-    // Set robots directive
-    if (noIndex) {
-      updateOrCreateTag('meta', { name: 'robots', content: 'noindex, nofollow' });
+    if (description) {
+      updateMetaTag('meta', { name: 'description', content: description });
     }
     
+    // Set robots directive for admin pages
+    if (noIndex) {
+      updateMetaTag('meta', { name: 'robots', content: 'noindex, nofollow' });
+    }
+    
+    // Also update OG tags for consistency
+    updateMetaTag('meta', { property: 'og:title', content: title });
+    updateMetaTag('meta', { property: 'og:description', content: description });
+    
     // Clean up any Replit metadata attributes
-    cleanReplitMetadata();
+    cleanReplitAttributes();
     
   }, [title, description, noIndex]);
   
-  // Helper function to update or create meta/link tags
-  function updateOrCreateTag(
+  // Helper function to update meta tags
+  function updateMetaTag(
     tagName: 'meta' | 'link', 
     attributes: Record<string, string>
   ) {
@@ -67,12 +73,18 @@ export function AdminMetadata({
   }
   
   // Clean up any Replit metadata attributes
-  function cleanReplitMetadata() {
-    const replitTags = document.head.querySelectorAll('[data-replit-metadata]');
-    replitTags.forEach(tag => {
-      tag.removeAttribute('data-replit-metadata');
-      tag.removeAttribute('data-component-name');
-      tag.removeAttribute('data-rh');
+  function cleanReplitAttributes() {
+    const allMetaTags = document.head.querySelectorAll('meta, link');
+    allMetaTags.forEach(tag => {
+      if (tag.hasAttribute('data-replit-metadata')) {
+        tag.removeAttribute('data-replit-metadata');
+      }
+      if (tag.hasAttribute('data-component-name')) {
+        tag.removeAttribute('data-component-name');
+      }
+      if (tag.hasAttribute('data-rh')) {
+        tag.removeAttribute('data-rh');
+      }
     });
   }
   

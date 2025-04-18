@@ -3,24 +3,23 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
 import { Toaster } from "@/components/ui/toaster";
-import { getPageMetadata } from "./lib/metadataUtils";
+import { defaultMetadata } from "./lib/staticMetadata";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export async function generateMetadata(): Promise<Metadata> {
-  // Try to fetch global metadata first, then fallback to home if needed
-  const metadata = await getPageMetadata('global').catch(() => getPageMetadata('home'));
-  
-  // Add some consistent fields regardless of database content
-  return {
-    ...metadata,
-    robots: "index, follow",
-    authors: [{ name: "HAL149", url: "https://hal149.com" }],
-    icons: {
-      icon: "/favicon.ico",
-    },
-  };
-}
+/**
+ * Root-level metadata that will be inherited by all pages
+ * Using the static approach recommended by Next.js 13+
+ */
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.png",
+  },
+  authors: [{ name: "HAL149", url: "https://hal149.com" }],
+  metadataBase: new URL('https://hal149.com'),
+};
 
 export default function RootLayout({
   children,

@@ -2,8 +2,12 @@
 
 export async function fetchPageContent(pageName: string) {
   try {
+    // For metadata critical requests, always use cache: 'no-store' to ensure fresh data
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/page-contents/${pageName}`, {
-      next: { revalidate: 60 } // Revalidate at most once per minute
+      cache: 'no-store', // Forces a fetch request every time, guaranteeing fresh data
+      headers: {
+        'x-metadata-request': 'true' // Signal that this is a metadata request
+      }
     });
     
     if (!response.ok) {
@@ -11,6 +15,12 @@ export async function fetchPageContent(pageName: string) {
     }
     
     const data = await response.json();
+    
+    // Debug output to help troubleshoot metadata issues
+    if (pageName.includes('home') || pageName.includes('global')) {
+      console.log(`Fetched metadata for ${pageName}:`, JSON.stringify(data));
+    }
+    
     return data;
   } catch (error) {
     console.error('Error fetching page content:', error);

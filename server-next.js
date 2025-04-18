@@ -11,28 +11,65 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 // Function to fetch metadata for a page from the API
-async function fetchMetadata(page) {
+async function fetchMetadata(page, specificSlug = null) {
   try {
-    // API is available at same origin during SSR
-    const apiUrl = `${process.env.API_URL || 'http://localhost:5000'}/api/page-contents/${page}`;
+    let apiUrl = '';
+    let isSpecificContent = false;
+    
+    // Determine if we're fetching a specific blog post or project
+    if (specificSlug && (page === 'blog' || page === 'projects')) {
+      if (page === 'blog') {
+        apiUrl = `${process.env.API_URL || 'http://localhost:5000'}/api/blog/${specificSlug}`;
+        isSpecificContent = true;
+      } else if (page === 'projects') {
+        apiUrl = `${process.env.API_URL || 'http://localhost:5000'}/api/projects/slug/${specificSlug}`;
+        isSpecificContent = true;
+      }
+    } else {
+      // Regular page content
+      apiUrl = `${process.env.API_URL || 'http://localhost:5000'}/api/page-contents/${page}`;
+    }
+    
     console.log(`Fetching metadata from: ${apiUrl}`);
     
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      console.error(`Error fetching metadata for ${page}: ${response.status} ${response.statusText}`);
+      console.error(`Error fetching metadata for ${page}${specificSlug ? '/' + specificSlug : ''}: ${response.status} ${response.statusText}`);
       return null;
     }
     
     const data = await response.json();
-    if (!data || !data.content) {
-      console.warn(`No content found for ${page}`);
+    if (!data) {
+      console.warn(`No data found for ${page}${specificSlug ? '/' + specificSlug : ''}`);
       return null;
     }
     
-    const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
-    
-    console.log(`Successfully fetched metadata for ${page}:`, content.metadata);
-    return content.metadata || null;
+    // Handle different response formats
+    if (isSpecificContent) {
+      // Blog posts and projects have their own structure
+      const metadata = {
+        title: data.title ? `${data.title} | HAL149` : defaultMetadata.title,
+        description: data.excerpt || data.description || defaultMetadata.description,
+        keywords: data.keywords || defaultMetadata.keywords,
+        canonical: `https://hal149.com/${page}/${data.slug || specificSlug}`,
+        ogTitle: data.title ? `${data.title} | HAL149` : defaultMetadata.ogTitle,
+        ogDescription: data.excerpt || data.description || defaultMetadata.ogDescription,
+        ogImage: data.image_url || defaultMetadata.ogImage
+      };
+      console.log(`Successfully created metadata for ${page}/${specificSlug}:`, metadata);
+      return metadata;
+    } else {
+      // Regular page content
+      if (!data.content) {
+        console.warn(`No content found for ${page}`);
+        return null;
+      }
+      
+      const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+      
+      console.log(`Successfully fetched metadata for ${page}:`, content.metadata);
+      return content.metadata || null;
+    }
   } catch (error) {
     console.error('Error fetching metadata:', error);
     return null;
@@ -87,7 +124,33 @@ app.prepare().then(() => {
     const { pathname } = parsedUrl;
     
     // Get page name from path
-    const pagePath = pathname === '/' ? 'home' : pathname.replace(/^\/+|\/+$/g, '').split('/')[0];
+    let pagePath = 'home';
+    let specificSlug = null;
+    
+    if (pathname !== '/') {
+      // Remove leading and trailing slashes, then split by remaining slashes
+      const pathParts = pathname.replace(/^\/+|\/+$/g, '').split('/');
+      
+      if (pathParts.length >= 1) {
+        // First level is the main page (blog, projects, etc.)
+        pagePath = pathParts[0];
+        
+        // Special handling for blog posts and project pages
+        if (pathParts.length >= 2) {
+          if (pagePath === 'blog') {
+            // For blog posts, try to fetch specific post metadata
+            specificSlug = pathParts[1];
+            console.log(`Detected blog post: ${specificSlug}`);
+          } else if (pagePath === 'projects') {
+            // For project pages, try to fetch specific project metadata
+            specificSlug = pathParts[1];
+            console.log(`Detected project page: ${specificSlug}`);
+          }
+        }
+      }
+    }
+    
+    console.log(`Resolved page path: ${pathname} -> ${pagePath}${specificSlug ? '/' + specificSlug : ''}`);
     
     // Only inject HTML for page requests, not for API or static assets
     if (
@@ -101,7 +164,7 @@ app.prepare().then(() => {
       // Override the renderToHTML method for this request only
       app.renderToHTML = async (req, res, pathname, query) => {
         // Fetch metadata from API
-        const metadata = await fetchMetadata(pagePath) || defaultMetadata;
+        const metadata = await fetchMetadata(pagePath, specificSlug) || defaultMetadata;
         
         // Get the original HTML
         let html = await originalRenderPage(req, res, pathname, query);

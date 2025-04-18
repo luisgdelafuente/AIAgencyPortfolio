@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from "react-helmet";
+import { AdminMetadata } from '@/components/AdminMetadata';
 import AdminNav from '@/components/AdminNav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
@@ -45,10 +45,11 @@ export default function AdminDashboard() {
 
   return (
     <>
-      <Helmet>
-        <title>Admin Dashboard | HAL149</title>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
+      <AdminMetadata 
+        title="Admin Dashboard | HAL149"
+        description="HAL149 admin dashboard to manage website content"
+        noIndex={true}
+      />
       
       <div className="min-h-screen bg-neutral-50">
         <AdminNav />

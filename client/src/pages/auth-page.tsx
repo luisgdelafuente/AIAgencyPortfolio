@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet";
+import { AdminMetadata } from "@/components/AdminMetadata";
 import { Redirect } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { z } from "zod";
@@ -56,10 +56,11 @@ export default function AuthPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Admin Login | HAL149 AI Agency</title>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
+      <AdminMetadata
+        title="Admin Login | HAL149 AI Agency" 
+        description="Admin login page for HAL149 AI Agency"
+        noIndex={true}
+      />
 
       <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
         <div className="w-full max-w-md">

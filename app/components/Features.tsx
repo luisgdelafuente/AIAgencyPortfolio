@@ -11,14 +11,9 @@ interface FeatureCardProps {
   description: string;
 }
 
-interface FeatureContent {
-  title: string;
-  description: string;
-}
-
 const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
   return (
-    <div className="flex flex-col items-center text-center p-6 bg-white rounded-lg border border-gray-100">
+    <div className="flex flex-col items-center text-center p-6 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
         {icon}
       </div>
@@ -30,9 +25,6 @@ const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
 
 export default function Features({ content = {}, isLoading = false }: { content?: any; isLoading?: boolean }) {
   const t = useTranslations();
-  
-  // Default features from translations
-  const defaultFeatures = t.features.items;
   
   if (isLoading) {
     return (
@@ -59,6 +51,22 @@ export default function Features({ content = {}, isLoading = false }: { content?
     );
   }
 
+  // Default features from translations
+  const defaultFeatures = t.features.items || [
+    {
+      title: 'Smart AI Models',
+      description: 'State-of-the-art machine learning models tailored for your specific needs.'
+    },
+    {
+      title: 'Instant Inference',
+      description: 'Lightning-fast processing with optimized inference pipelines.'
+    },
+    {
+      title: 'Data-Driven Insights',
+      description: 'Transform raw data into actionable business intelligence.'
+    }
+  ];
+
   // Icons for features
   const featureIcons = [
     <CircleDot key="ai" className="h-6 w-6 text-gray-600" />,
@@ -78,7 +86,7 @@ export default function Features({ content = {}, isLoading = false }: { content?
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {defaultFeatures.map((feature: FeatureContent, index: number) => (
+          {defaultFeatures.map((feature: any, index: number) => (
             <FeatureCard
               key={index}
               icon={featureIcons[index % featureIcons.length]}

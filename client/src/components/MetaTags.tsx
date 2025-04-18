@@ -34,8 +34,14 @@ export default function MetaTags({
       return; // Don't modify anything if we don't have metadata
     }
     
-    // Basic metadata
-    if (finalTitle) document.title = finalTitle;
+    // Basic metadata - find the title tag with the data-dynamic-meta attribute
+    if (finalTitle) {
+      document.title = finalTitle;
+      const titleTag = document.querySelector('title[data-dynamic-meta="title"]');
+      if (titleTag) {
+        titleTag.textContent = finalTitle;
+      }
+    }
     
     if (metaDescription) {
       updateMetaTag('meta', { name: 'description', content: metaDescription });
@@ -99,28 +105,38 @@ export default function MetaTags({
     }
   }
   
-  // Helper function to update meta tags
+  // Helper function to update meta tags - uses data-dynamic-meta where available
   function updateMetaTag(
     tagName: 'meta' | 'link', 
     attributes: Record<string, string>
   ) {
-    let selector = tagName;
+    let selector = '';
+    let dynamicAttribute = '';
     
-    // Build selector based on attributes
+    // Determine the data-dynamic-meta attribute name based on the attribute
     if (attributes.name) {
-      selector += `[name="${attributes.name}"]`;
+      selector = `${tagName}[name="${attributes.name}"]`;
+      dynamicAttribute = attributes.name;
     } else if (attributes.property) {
-      selector += `[property="${attributes.property}"]`;
+      selector = `${tagName}[property="${attributes.property}"]`;
+      dynamicAttribute = attributes.property;
     } else if (attributes.rel) {
-      selector += `[rel="${attributes.rel}"]`;
+      selector = `${tagName}[rel="${attributes.rel}"]`;
+      dynamicAttribute = attributes.rel;
     }
     
-    const existingTag = document.head.querySelector(selector);
+    // First try to find a tag with the data-dynamic-meta attribute
+    const dynamicTag = document.querySelector(`${tagName}[data-dynamic-meta="${dynamicAttribute}"]`);
+    const existingTag = dynamicTag || document.querySelector(selector);
     
     if (existingTag) {
       // Update existing tag
       Object.entries(attributes).forEach(([key, value]) => {
-        existingTag.setAttribute(key, value);
+        if (key === 'content' || key === 'href') {
+          existingTag.setAttribute(key, value);
+        } else {
+          existingTag.setAttribute(key, value);
+        }
       });
     } else {
       // Create new tag
@@ -128,6 +144,8 @@ export default function MetaTags({
       Object.entries(attributes).forEach(([key, value]) => {
         newTag.setAttribute(key, value);
       });
+      // Also add the data-dynamic-meta attribute for future updates
+      newTag.setAttribute('data-dynamic-meta', dynamicAttribute);
       document.head.appendChild(newTag);
     }
   }

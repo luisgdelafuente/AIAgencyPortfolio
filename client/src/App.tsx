@@ -2,6 +2,7 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { HelmetProvider } from "react-helmet-async";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Projects from "@/pages/Projects";
@@ -52,14 +53,16 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <TranslationProvider>
-          <AuthProvider>
-            <Router />
-            <Toaster />
-          </AuthProvider>
-        </TranslationProvider>
-      </LanguageProvider>
+      <HelmetProvider>
+        <LanguageProvider>
+          <TranslationProvider>
+            <AuthProvider>
+              <Router />
+              <Toaster />
+            </AuthProvider>
+          </TranslationProvider>
+        </LanguageProvider>
+      </HelmetProvider>
     </QueryClientProvider>
   );
 }

@@ -1,67 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import bcrypt from "bcrypt";
-import { db } from "@/server/db";
-import { users } from "@/shared/schema";
+import { db } from "../../../../server/db";
+import { users } from "../../../../shared/schema";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcrypt";
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await req.json();
-    
+    // Parse request body
+    const body = await request.json();
+    const { username, password } = body;
+
+    // Validate input
     if (!username || !password) {
       return NextResponse.json(
-        { success: false, message: "Username and password are required" },
+        { message: "Username and password are required" },
         { status: 400 }
       );
     }
-    
-    const userResults = await db.select()
+
+    // Fetch user from database
+    const result = await db
+      .select()
       .from(users)
       .where(eq(users.username, username))
       .limit(1);
-    
-    if (userResults.length === 0) {
+
+    const user = result[0];
+
+    // Check if user exists
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: "Invalid username or password" },
+        { message: "Invalid username or password" },
         { status: 401 }
       );
     }
-    
-    const user = userResults[0];
-    
+
+    // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!passwordMatch) {
       return NextResponse.json(
-        { success: false, message: "Invalid username or password" },
+        { message: "Invalid username or password" },
         { status: 401 }
       );
     }
-    
-    // Set session cookie with user ID
+
+    // Create session cookie
     cookies().set({
       name: "session",
-      value: user.id.toString(),
+      value: String(user.id),
       httpOnly: true,
       path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7 // 7 days
     });
 
-    // Don't send password back to client
-    const { password: userPassword, ...userWithoutPassword } = user;
-    
-    return NextResponse.json({ 
-      success: true,
+    // Return user data without the password
+    const { password: _, ...userWithoutPassword } = user;
+
+    return NextResponse.json({
       message: "Login successful",
-      user: userWithoutPassword
+      user: userWithoutPassword,
     });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { success: false, message: "An error occurred during login" },
+      { message: "An error occurred during login" },
       { status: 500 }
     );
   }

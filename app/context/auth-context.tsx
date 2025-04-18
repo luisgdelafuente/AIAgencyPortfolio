@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface User {
   id: number;
@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const login = async (username: string, password: string): Promise<void> => {
     setIsLoading(true);
@@ -46,9 +47,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(data.user);
       setIsAuthenticated(true);
+      
+      toast({
+        title: "Success",
+        description: "You have been logged in successfully.",
+        variant: "default",
+      });
+      
       router.push("/admin");
     } catch (error) {
       console.error("Login error:", error);
+      
+      toast({
+        title: "Login failed",
+        description: error instanceof Error ? error.message : "Invalid credentials",
+        variant: "destructive",
+      });
+      
       throw error;
     } finally {
       setIsLoading(false);
@@ -61,9 +76,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await fetch("/api/auth/logout", { method: "POST" });
       setUser(null);
       setIsAuthenticated(false);
+      
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully.",
+        variant: "default",
+      });
+      
       router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
+      
+      toast({
+        title: "Error",
+        description: "There was a problem logging out.",
+        variant: "destructive",
+      });
+      
       throw error;
     } finally {
       setIsLoading(false);

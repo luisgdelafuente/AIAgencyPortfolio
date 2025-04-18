@@ -1,57 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { db } from "@/server/db";
-import { users } from "@/shared/schema";
+import { db } from "../../../../server/db";
+import { users } from "../../../../shared/schema";
 import { eq } from "drizzle-orm";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const sessionCookie = cookies().get("session");
-    
-    if (!sessionCookie || !sessionCookie.value) {
-      return NextResponse.json({ 
+    // Get the session cookie
+    const sessionCookie = cookies().get("session")?.value;
+
+    if (!sessionCookie) {
+      return NextResponse.json({
         authenticated: false,
-        user: null 
+        user: null,
       });
     }
-    
-    const userId = parseInt(sessionCookie.value);
-    
+
+    // Parse the user ID from the session cookie
+    const userId = parseInt(sessionCookie, 10);
+
     if (isNaN(userId)) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         authenticated: false,
-        user: null 
+        user: null,
       });
     }
-    
-    const userResults = await db.select()
+
+    // Fetch the user from the database
+    const result = await db
+      .select()
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);
-    
-    if (userResults.length === 0) {
-      return NextResponse.json({ 
-        authenticated: false,
-        user: null 
-      });
-    }
-    
-    const user = userResults[0];
-    
-    // Don't send password back to client
-    const { password, ...userWithoutPassword } = user;
-    
-    return NextResponse.json({ 
-      authenticated: true,
-      user: userWithoutPassword
-    });
-  } catch (error) {
-    console.error("Error checking authentication:", error);
-    return NextResponse.json(
-      { 
+
+    const user = result[0];
+
+    if (!user) {
+      return NextResponse.json({
         authenticated: false,
         user: null,
-        error: "Error checking authentication"
+      });
+    }
+
+    // Return user data without the password
+    const { password: _, ...userWithoutPassword } = user;
+
+    return NextResponse.json({
+      authenticated: true,
+      user: userWithoutPassword,
+    });
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return NextResponse.json(
+      {
+        authenticated: false,
+        user: null,
+        message: "An error occurred during authentication check",
       },
       { status: 500 }
     );

@@ -7,7 +7,7 @@ import { asc } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   try {
     const contents = await db.query.pageContents.findMany({
-      orderBy: (contentsTable) => [asc(contentsTable.page)]
+      orderBy: [asc(pageContents.page)]
     });
     
     return NextResponse.json(contents);

@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
     
     const messages = await db.query.contactMessages.findMany({
-      orderBy: (messagesTable) => [desc(messagesTable.submittedAt)]
+      orderBy: [desc(contactMessages.submittedAt)]
     });
     
     return NextResponse.json(messages);

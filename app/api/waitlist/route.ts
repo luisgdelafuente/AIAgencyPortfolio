@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
     
     const entries = await db.query.waitlist.findMany({
-      orderBy: (waitlistTable) => [desc(waitlistTable.submittedAt)]
+      orderBy: [desc(waitlist.submittedAt)]
     });
     
     return NextResponse.json(entries);
@@ -70,11 +70,10 @@ export async function POST(request: NextRequest) {
     }
     
     // Add to waitlist
-    const now = new Date();
     const newEntry = await db.insert(waitlist)
       .values({
-        email: body.email,
-        submittedAt: now.toISOString()
+        email: body.email
+        // submittedAt will be set to default value by the database
       })
       .returning();
     

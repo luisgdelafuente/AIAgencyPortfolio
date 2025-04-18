@@ -9,7 +9,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { useLanguage, Language } from '../hooks/use-language';
+import { useLanguage, Language } from '@/hooks/use-language';
 
 export default function LanguageToggle() {
   const { language, setLanguage } = useLanguage();

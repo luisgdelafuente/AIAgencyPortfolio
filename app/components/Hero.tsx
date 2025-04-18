@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { useTranslations } from '../hooks/use-translations';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function Hero({ content = {}, isLoading = false }: { content?: any; isLoading?: boolean }) {
   const t = useTranslations();

@@ -2,9 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button, Skeleton } from '../components/ui';
 import { ChevronRight } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 import BlogCard from './BlogCard';
 import type { BlogPost } from '@/shared/schema';
 import { useTranslations } from '@/hooks/use-translations';

@@ -2,8 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button, Skeleton } from '../components/ui';
 import ProjectCard from './ProjectCard';
 import type { Project } from '@/shared/schema';
 import { useTranslations } from '@/hooks/use-translations';

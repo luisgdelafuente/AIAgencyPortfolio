@@ -10,9 +10,9 @@ echo "Express server running with PID: $EXPRESS_PID"
 echo "Waiting for Express server to start..."
 sleep 5
 
-# Start the Next.js custom server
-echo "Starting Next.js custom server..."
-NODE_ENV=development API_URL=http://localhost:5000 node server-next.cjs &
+# Start the Next.js Pages Router server with SSR
+echo "Starting Next.js server with proper SSR..."
+NODE_ENV=development API_URL=http://localhost:5000 npx next dev &
 NEXT_PID=$!
 echo "Next.js server running with PID: $NEXT_PID"
 
@@ -28,5 +28,5 @@ function cleanup {
 trap cleanup SIGINT SIGTERM
 
 # Keep the script running
-echo "Both servers are running. Press Ctrl+C to stop."
+echo "Both servers are running with SSR enabled. Press Ctrl+C to stop."
 wait

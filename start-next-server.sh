@@ -1,15 +1,10 @@
 #!/bin/bash
 
-# This script starts the Next.js server with the proper configuration for SSR
+# This script builds and runs Next.js in production mode with server-side rendering
+# Use this for proper SEO metadata that appears in the HTML source
 
-# Set environment variable for development mode
-export NODE_ENV=development
-export API_URL=http://localhost:5000
-
-# Build the Next.js app for proper SSR
-echo "Building Next.js app for Server-Side Rendering..."
+echo "Building Next.js application with SSR..."
 npx next build
 
-# Start the Next.js server
 echo "Starting Next.js server with SSR..."
 npx next start

@@ -7,7 +7,7 @@ import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import BlogCard from './BlogCard';
 import type { BlogPost } from '@/shared/schema';
-import { useTranslations } from '../hooks/use-translations';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface BlogSectionProps {
   posts: BlogPost[];

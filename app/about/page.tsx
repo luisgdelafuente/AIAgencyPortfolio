@@ -1,9 +1,41 @@
 import { fetchPageContent } from '../lib/api';
 import { Metadata } from 'next';
-import { getPageMetadata } from '../lib/metadataUtils';
+import { parseMetadata } from '../lib/staticMetadata';
 
+/**
+ * Explicitly define metadata for the about page using Next.js 13+ Metadata API
+ * This approach uses direct fetch to ensure reliable metadata handling
+ */
 export async function generateMetadata(): Promise<Metadata> {
-  return getPageMetadata('about');
+  // Fetch content directly with no cache to ensure fresh metadata
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/page-contents/about`, {
+    cache: 'no-store',
+    headers: { 'x-metadata-request': 'true' }
+  });
+  
+  if (!response.ok) {
+    console.error('Failed to fetch about page metadata');
+    return {}; // Let root layout handle default metadata
+  }
+  
+  const data = await response.json();
+  let pageContent = {};
+  
+  try {
+    pageContent = typeof data.content === 'string' 
+      ? JSON.parse(data.content) 
+      : data.content;
+  } catch (error) {
+    console.error('Error parsing about page metadata:', error);
+    return {}; // Let root layout handle default metadata
+  }
+  
+  // Use static metadata structure for Next.js
+  return {
+    title: 'About HAL149',
+    description: 'Learn about HAL149, your partner for AI-powered solutions and digital transformation.',
+    ...parseMetadata(pageContent)
+  };
 }
 
 // Parse content from string to JSON

@@ -1,14 +1,42 @@
 import { Metadata } from 'next';
 import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from '@/lib/api';
-import { getPageMetadata } from './lib/metadataUtils';
+import { parseMetadata } from './lib/staticMetadata';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import ProjectsSection from '@/components/ProjectsSection';
 import BlogSection from '@/components/BlogSection';
 import Waitlist from '@/components/Waitlist';
 
+/**
+ * Explicitly define metadata for the home page using Next.js 13+ static exports
+ * This approach is recommended over generateMetadata() for performance and reliability
+ */
 export async function generateMetadata(): Promise<Metadata> {
-  return getPageMetadata('home');
+  // Fetch content directly with no cache to ensure fresh metadata
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/page-contents/home`, {
+    cache: 'no-store',
+    headers: { 'x-metadata-request': 'true' }
+  });
+  
+  if (!response.ok) {
+    console.error('Failed to fetch home metadata');
+    return {}; // Let root layout handle default metadata
+  }
+  
+  const data = await response.json();
+  let pageContent = {};
+  
+  try {
+    pageContent = typeof data.content === 'string' 
+      ? JSON.parse(data.content) 
+      : data.content;
+  } catch (error) {
+    console.error('Error parsing home metadata:', error);
+    return {}; // Let root layout handle default metadata
+  }
+  
+  // Parse metadata format using our utility
+  return parseMetadata(pageContent);
 }
 
 // Parse content from string to JSON
@@ -30,6 +58,11 @@ export default async function Home() {
   
   // Parse the page content
   const pageContent = parseContent(pageContentData?.content);
+
+  // Log metadata for debugging
+  console.log('Home page metadata:', 
+    pageContent.metadata || {}
+  );
 
   return (
     <div className="bg-white">

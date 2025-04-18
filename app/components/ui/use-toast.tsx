@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { v4 as uuid } from "uuid";
-import { ToastActionElement, type ToastProps, Toast } from "@/components/ui/toast";
+import { ToastActionElement, type ToastProps } from "./toast";
 
 const TOAST_LIMIT = 5;
 const TOAST_REMOVE_DELAY = 1000 * 60 * 60 * 24; // 1 day

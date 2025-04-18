@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+
 import { db } from "@/server/db";
 import { users } from "@/shared/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
-    // Get the session cookie
-    const sessionCookie = cookies().get("session")?.value;
+    // Get the session cookie from the request
+    const sessionCookie = request.cookies.get("session")?.value;
 
     if (!sessionCookie) {
       return NextResponse.json({

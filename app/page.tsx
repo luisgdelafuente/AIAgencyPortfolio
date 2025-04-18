@@ -1,9 +1,9 @@
-import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from './lib/api';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import ProjectsSection from './components/ProjectsSection';
-import BlogSection from './components/BlogSection';
-import Waitlist from './components/Waitlist';
+import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from '@/lib/api';
+import Hero from '@/components/Hero';
+import Features from '@/components/Features';
+import ProjectsSection from '@/components/ProjectsSection';
+import BlogSection from '@/components/BlogSection';
+import Waitlist from '@/components/Waitlist';
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

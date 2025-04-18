@@ -1,9 +1,15 @@
+import { Metadata } from 'next';
 import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from '@/lib/api';
+import { getPageMetadata } from './lib/metadataUtils';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import ProjectsSection from '@/components/ProjectsSection';
 import BlogSection from '@/components/BlogSection';
 import Waitlist from '@/components/Waitlist';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata('home');
+}
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

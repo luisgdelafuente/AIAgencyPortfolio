@@ -1,13 +1,12 @@
 import { fetchPageContent, fetchBlogPosts } from '../lib/api';
 import { Metadata } from 'next';
+import { getPageMetadata } from '../lib/metadataUtils';
 import Link from 'next/link';
 import { formatDate } from '@/shared/utils';
 
-export const metadata: Metadata = {
-  title: 'AI Blog - Next-Generation Insights | HAL149',
-  description: 'Explore the latest advances in artificial intelligence, machine learning, and data insights from HAL149\'s research team.',
-  keywords: 'AI blog, machine learning blog, artificial intelligence insights, HAL149 research',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata('blog');
+}
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

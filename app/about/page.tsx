@@ -1,11 +1,10 @@
 import { fetchPageContent } from '../lib/api';
 import { Metadata } from 'next';
+import { getPageMetadata } from '../lib/metadataUtils';
 
-export const metadata: Metadata = {
-  title: 'About Us | HAL149',
-  description: 'Learn about our mission and vision at HAL149, your partner in AI solutions and digital transformation.',
-  keywords: 'about HAL149, AI company, AI consultancy, AI solutions team',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata('about');
+}
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

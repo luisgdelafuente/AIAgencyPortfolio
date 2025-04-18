@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
   try {
-    // Delete the session cookie
-    const cookieStore = cookies();
-    cookieStore.delete("session");
-
-    return NextResponse.json({ message: "Logout successful" });
+    // Create a response and delete the session cookie from it
+    const response = NextResponse.json({ message: "Logout successful" });
+    response.cookies.delete("session");
+    
+    return response;
   } catch (error) {
     console.error("Logout error:", error);
     return NextResponse.json(

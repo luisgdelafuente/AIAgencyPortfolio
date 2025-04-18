@@ -46,9 +46,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create session cookie
-    const cookieStore = cookies();
-    cookieStore.set({
+    // Return user data without the password
+    const { password: _, ...userWithoutPassword } = user;
+
+    // Create a response with the session cookie
+    const response = NextResponse.json({
+      message: "Login successful",
+      user: userWithoutPassword,
+    });
+
+    // Set cookie on the response
+    response.cookies.set({
       name: "session",
       value: String(user.id),
       httpOnly: true,
@@ -58,13 +66,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
     });
 
-    // Return user data without the password
-    const { password: _, ...userWithoutPassword } = user;
-
-    return NextResponse.json({
-      message: "Login successful",
-      user: userWithoutPassword,
-    });
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

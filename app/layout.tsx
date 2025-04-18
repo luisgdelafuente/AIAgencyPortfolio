@@ -3,12 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
 import { Toaster } from "@/components/ui/toaster";
+import MetadataWrapper from "@/components/MetadataWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
 /**
- * Root-level metadata with hardcoded values for proper SEO/meta tags
- * This ensures metadata is correctly served in both development/production modes
+ * Root-level metadata with sensible defaults
+ * These serve as fallback values before the MetadataWrapper updates them dynamically
  */
 export const metadata: Metadata = {
   title: {
@@ -74,6 +75,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
+          {/* Metadata wrapper component that dynamically loads and applies metadata */}
+          <MetadataWrapper />
           {children}
           <Toaster />
         </AuthProvider>

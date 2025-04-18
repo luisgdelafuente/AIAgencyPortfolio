@@ -1,19 +1,9 @@
-import { Metadata } from 'next';
 import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from '@/lib/api';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import ProjectsSection from '@/components/ProjectsSection';
 import BlogSection from '@/components/BlogSection';
 import Waitlist from '@/components/Waitlist';
-import ClientSideMetadata from '@/components/ClientSideMetadata';
-
-/**
- * Home page specific metadata
- * This will be merged with the root layout metadata
- */
-export const metadata: Metadata = {
-  title: 'HAL149 | Unlocking Your Business Potential with AI',
-}
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {
@@ -45,9 +35,6 @@ export default async function Home() {
 
   return (
     <div className="bg-white">
-      {/* Client-side metadata component */}
-      <ClientSideMetadata metadata={meta} />
-
       {/* Hero section */}
       <Hero content={pageContent} isLoading={!pageContentData} />
       

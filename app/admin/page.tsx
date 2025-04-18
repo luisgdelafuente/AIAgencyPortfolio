@@ -2,17 +2,30 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/auth-context';
+import { useAuth } from '../context/auth-context';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
-import MetaTags from '@/components/MetaTags';
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage,
+  Input,
+  Button,
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle,
+  Alert, 
+  AlertDescription 
+} from '../components/ui';
+import { useToast } from '../hooks/use-toast';
+import MetaTags from '../components/MetaTags';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -77,7 +90,11 @@ export default function AuthPage() {
 
   return (
     <>
-      <MetaTags metadata={metadata} url="https://hal149.com/admin/" />
+      <MetaTags 
+        title={metadata.title}
+        description={metadata.description}
+        ogUrl="https://hal149.com/admin/"
+      />
       
       <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">

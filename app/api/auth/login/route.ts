@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
     );
     
     // Set the token as an HTTP-only cookie
-    cookies().set({
+    const cookieStore = cookies();
+    cookieStore.set({
       name: 'auth_token',
       value: token,
       httpOnly: true,

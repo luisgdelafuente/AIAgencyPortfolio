@@ -100,9 +100,9 @@ export default async function BlogPost({ params }: Props) {
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <div 
-              className="prose prose-lg max-w-none"
+              className="prose prose-lg max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-gray-700 prose-a:text-blue-600 prose-img:rounded-lg"
               dangerouslySetInnerHTML={{ 
-                __html: marked.parse(post.content)
+                __html: marked.parse(post.content, { sanitize: false })
               }}
             />
           </div>

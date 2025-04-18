@@ -1,52 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/server/db';
-import { users } from '@/shared/schema';
-import { eq } from 'drizzle-orm';
-import jwt from 'jsonwebtoken';
-
-// Temporary secret key for JWT (should be in environment variables)
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
+import { cookies } from 'next/headers';
 
 // GET /api/auth/check - Check if user is authenticated
 export async function GET(request: NextRequest) {
   try {
-    // Extract token from request cookies directly
-    const token = request.cookies.get('auth_token');
+    // Get auth cookie
+    const cookieStore = cookies();
+    const authCookie = cookieStore.get('auth_session');
     
-    if (!token) {
-      return NextResponse.json({ authenticated: false });
-    }
-    
-    try {
-      // Verify the token
-      const decoded = jwt.verify(token.value, JWT_SECRET) as { userId: number, username: string };
-      
-      // Verify the user exists
-      const user = await db.query.users.findFirst({
-        where: eq(users.id, decoded.userId)
-      });
-      
-      if (!user) {
-        return NextResponse.json({ authenticated: false });
-      }
-      
+    if (!authCookie || !authCookie.value) {
       return NextResponse.json({
-        authenticated: true,
-        user: {
-          id: user.id,
-          username: user.username
-        }
+        authenticated: false,
+        user: null
       });
-    } catch (jwtError) {
-      // Token verification failed
-      console.error('Token verification failed:', jwtError);
-      return NextResponse.json({ authenticated: false });
     }
+    
+    // Parse cookie value
+    const sessionData = JSON.parse(authCookie.value);
+    
+    // Return authenticated user
+    return NextResponse.json({
+      authenticated: true,
+      user: {
+        id: sessionData.id,
+        username: sessionData.username
+      }
+    });
   } catch (error) {
-    console.error('Error checking authentication:', error);
-    return NextResponse.json(
-      { error: 'Authentication check failed', authenticated: false },
-      { status: 500 }
-    );
+    console.error('Auth check error:', error);
+    return NextResponse.json({
+      authenticated: false,
+      user: null
+    });
   }
 }

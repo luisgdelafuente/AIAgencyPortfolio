@@ -1,54 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 
-// Routes that require authentication
-const PROTECTED_ROUTES = [
-  '/admin',
-  '/admin/blog',
-  '/admin/projects',
-  '/admin/messages',
-  '/admin/settings',
-  '/admin/waitlist',
-  '/admin/content',
-  '/admin/dashboard'
-];
-
-// Temporary secret key for JWT (should be in environment variables)
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
-
-// Middleware for authentication
+// Middleware to handle authentication
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Check if the requested path is a protected route
-  if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-    // Access token directly from the cookies in the request
-    const token = request.cookies.get('auth_token');
-    
-    // If no token exists, redirect to login
-    if (!token) {
-      return NextResponse.redirect(new URL('/admin', request.url));
-    }
-    
-    try {
-      // Verify the token
-      const decoded = jwt.verify(token.value, JWT_SECRET);
-      
-      // Valid token, allow access
-      return NextResponse.next();
-    } catch (error) {
-      // Invalid token, redirect to login
-      return NextResponse.redirect(new URL('/admin', request.url));
-    }
+  // Skip middleware for API routes (they handle their own auth)
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next();
   }
   
-  // For non-protected routes, continue
+  // Skip middleware for non-admin routes
+  if (!request.nextUrl.pathname.startsWith('/admin')) {
+    return NextResponse.next();
+  }
+  
+  // Skip middleware for the login page itself
+  if (request.nextUrl.pathname === '/admin') {
+    return NextResponse.next();
+  }
+  
+  // Check if user is authenticated
+  const authCookie = request.cookies.get('auth_session');
+  
+  if (!authCookie || !authCookie.value) {
+    // Redirect to login page
+    return NextResponse.redirect(new URL('/admin', request.url));
+  }
+  
+  // Allow the request to proceed
   return NextResponse.next();
 }
 
-// Configure the middleware to run on specific paths
+// Configure the middleware to run only on specific paths
 export const config = {
-  matcher: [
-    '/admin/:path*'
-  ]
+  matcher: ['/admin/:path*'],
 };

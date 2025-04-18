@@ -1,171 +1,114 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui';
-import {
-  BarChart,
-  FileText,
-  FolderKanban,
-  Layout,
-  Users,
-  MessageSquare,
-  Settings,
-  LogOut,
-  Menu,
-  X
-} from 'lucide-react';
-
-const HAL149Logo = () => (
-  <div className="flex items-center">
-    <img src="/hallogoblack480.webp" alt="HAL149" className="h-9 sm:h-10 w-auto" />
-  </div>
-);
-
-// Custom hook to detect mobile screens
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
-    // Initial check
-    checkIsMobile();
-    
-    // Add event listener
-    window.addEventListener('resize', checkIsMobile);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', checkIsMobile);
-    };
-  }, []);
-
-  return isMobile;
-};
+import { LayoutDashboard, FileText, PenTool, Settings, Mail, List, LogOut } from 'lucide-react';
 
 export default function AdminNav() {
+  const { logout } = useAuth();
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const handleLogout = async () => {
-    try {
-      await logout();
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out"
-      });
-      if (isMobile) {
-        setSidebarOpen(false);
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-        variant: "destructive"
-      });
-    }
+    await logout();
+    window.location.href = '/admin';
   };
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => {
+    return pathname === path;
+  };
 
-  const navItems = [
-    { href: '/admin/dashboard', label: 'Dashboard', icon: <BarChart className="h-5 w-5 mr-2" /> },
-    { href: '/admin/blog', label: 'Blog Posts', icon: <FileText className="h-5 w-5 mr-2" /> },
-    { href: '/admin/projects', label: 'Projects', icon: <FolderKanban className="h-5 w-5 mr-2" /> },
-    { href: '/admin/content', label: 'Page Content', icon: <Layout className="h-5 w-5 mr-2" /> },
-    { href: '/admin/waitlist', label: 'Waitlist', icon: <Users className="h-5 w-5 mr-2" /> },
-    { href: '/admin/messages', label: 'Contact Messages', icon: <MessageSquare className="h-5 w-5 mr-2" /> },
-    { href: '/admin/settings', label: 'Site Settings', icon: <Settings className="h-5 w-5 mr-2" /> }
-  ];
-
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="p-4 mb-4">
-        <Link href="/" className="inline-block">
-          <HAL149Logo />
-        </Link>
+  return (
+    <div className="flex flex-col h-full border-r">
+      <div className="px-4 py-6">
+        <h1 className="text-2xl font-bold">Admin Panel</h1>
+        <p className="text-sm text-muted-foreground mt-1">Manage your website content</p>
       </div>
-
-      <nav className="space-y-1 p-2">
-        {navItems.map(item => (
-          <Link 
-            key={item.href} 
-            href={item.href}
-            onClick={() => isMobile && setSidebarOpen(false)}
-            className={`flex items-center px-4 py-2 rounded-md ${
-              isActive(item.href) 
-                ? 'bg-gray-100 text-gray-900 font-medium' 
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-            }`}
+      <nav className="space-y-1 px-2 flex-1">
+        <Link href="/admin/dashboard" passHref>
+          <Button
+            variant={isActive('/admin/dashboard') ? "default" : "ghost"}
+            className="w-full justify-start"
+            asChild
           >
-            {item.icon}
-            {item.label}
-          </Link>
-        ))}
+            <div className="flex items-center space-x-3">
+              <LayoutDashboard className="h-5 w-5" />
+              <span>Dashboard</span>
+            </div>
+          </Button>
+        </Link>
+        <Link href="/admin/blog" passHref>
+          <Button
+            variant={isActive('/admin/blog') ? "default" : "ghost"}
+            className="w-full justify-start"
+            asChild
+          >
+            <div className="flex items-center space-x-3">
+              <PenTool className="h-5 w-5" />
+              <span>Blog Posts</span>
+            </div>
+          </Button>
+        </Link>
+        <Link href="/admin/projects" passHref>
+          <Button
+            variant={isActive('/admin/projects') ? "default" : "ghost"}
+            className="w-full justify-start"
+            asChild
+          >
+            <div className="flex items-center space-x-3">
+              <FileText className="h-5 w-5" />
+              <span>Projects</span>
+            </div>
+          </Button>
+        </Link>
+        <Link href="/admin/content" passHref>
+          <Button
+            variant={isActive('/admin/content') ? "default" : "ghost"}
+            className="w-full justify-start"
+            asChild
+          >
+            <div className="flex items-center space-x-3">
+              <Settings className="h-5 w-5" />
+              <span>Page Content</span>
+            </div>
+          </Button>
+        </Link>
+        <Link href="/admin/messages" passHref>
+          <Button
+            variant={isActive('/admin/messages') ? "default" : "ghost"}
+            className="w-full justify-start"
+            asChild
+          >
+            <div className="flex items-center space-x-3">
+              <Mail className="h-5 w-5" />
+              <span>Messages</span>
+            </div>
+          </Button>
+        </Link>
+        <Link href="/admin/waitlist" passHref>
+          <Button
+            variant={isActive('/admin/waitlist') ? "default" : "ghost"}
+            className="w-full justify-start"
+            asChild
+          >
+            <div className="flex items-center space-x-3">
+              <List className="h-5 w-5" />
+              <span>Waitlist</span>
+            </div>
+          </Button>
+        </Link>
       </nav>
-
-      <div className="mt-auto p-4">
+      <div className="p-4 border-t">
         <Button 
           variant="outline" 
-          className="w-full justify-start"
+          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
           onClick={handleLogout}
         >
-          <LogOut className="h-5 w-5 mr-2" />
-          Logout
+          <LogOut className="h-5 w-5 mr-3" />
+          <span>Logout</span>
         </Button>
       </div>
     </div>
-  );
-
-  return (
-    <>
-      {/* Mobile Navigation */}
-      {isMobile && (
-        <>
-          <div className="fixed top-0 left-0 right-0 z-30 bg-white border-b p-4 flex items-center justify-between">
-            <Link href="/" className="inline-block">
-              <HAL149Logo />
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label="Toggle menu"
-            >
-              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
-          
-          {/* Mobile Sidebar (slides in) */}
-          <div 
-            className={`fixed inset-0 z-40 transform ${
-              sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            } transition-transform duration-300 ease-in-out lg:hidden`}
-          >
-            <div className="absolute inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)}></div>
-            <div className="relative bg-white w-64 h-full overflow-y-auto">
-              <SidebarContent />
-            </div>
-          </div>
-          
-          {/* Content padding for mobile header */}
-          <div className="h-16 lg:hidden"></div>
-        </>
-      )}
-      
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:flex-col lg:fixed lg:w-64 lg:h-screen lg:bg-white lg:border-r">
-        <SidebarContent />
-      </div>
-    </>
   );
 }

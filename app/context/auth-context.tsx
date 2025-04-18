@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const refreshAuth = async () => {
+  const refreshAuth = async (): Promise<void> => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/auth/check');
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/login', {
@@ -68,15 +68,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userData = await response.json();
       setUser(userData);
       setIsAuthenticated(true);
+      return true;
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     setIsLoading(true);
     try {
       await fetch('/api/auth/logout', {

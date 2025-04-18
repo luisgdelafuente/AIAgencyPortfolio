@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { db } from '@/server/db';
 import { users } from '@/shared/schema';
 import { eq } from 'drizzle-orm';
@@ -11,8 +10,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
 // GET /api/auth/check - Check if user is authenticated
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get('auth_token');
+    // Extract token from request cookies directly
+    const token = request.cookies.get('auth_token');
     
     if (!token) {
       return NextResponse.json({ authenticated: false });

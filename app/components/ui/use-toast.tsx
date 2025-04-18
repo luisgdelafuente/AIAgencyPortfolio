@@ -4,7 +4,7 @@ import * as React from "react"
 import type {
   ToastActionElement,
   ToastProps,
-} from "@/app/components/ui/toast"
+} from "@/components/ui/toast"
 
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
@@ -156,7 +156,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
+      onOpenChange: (open: boolean) => {
         if (!open) dismiss()
       },
     },

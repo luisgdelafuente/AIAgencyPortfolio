@@ -1,146 +1,136 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+  FilePenLine, 
+  MessageSquare, 
+  Folder, 
+  Users,
+  FileText
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 
-export default function AdminPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login, authenticated, loading } = useAuth();
-  const router = useRouter();
-  const { toast } = useToast();
-
-  // Redirect to dashboard if already authenticated
+export default function AdminDashboard() {
+  const [stats, setStats] = useState({
+    blogs: 0,
+    projects: 0,
+    messages: 0,
+    waitlist: 0,
+    pages: 0
+  });
+  
   useEffect(() => {
-    if (!loading && authenticated) {
-      router.push('/admin/dashboard');
-    }
-  }, [authenticated, loading, router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!username || !password) {
-      toast({
-        title: 'Error',
-        description: 'Please enter both username and password',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      const success = await login(username, password);
-      
-      if (success) {
-        toast({
-          title: 'Success',
-          description: 'Login successful',
+    async function fetchStats() {
+      try {
+        // Fetch blog count
+        const blogRes = await fetch('/api/blog');
+        const blogs = await blogRes.json();
+        
+        // Fetch projects count
+        const projectsRes = await fetch('/api/projects');
+        const projects = await projectsRes.json();
+        
+        // Fetch messages count
+        const messagesRes = await fetch('/api/contact');
+        const messages = await messagesRes.json();
+        
+        // Fetch waitlist count
+        const waitlistRes = await fetch('/api/waitlist');
+        const waitlist = await waitlistRes.json();
+        
+        // Fetch page contents count
+        const pagesRes = await fetch('/api/page-contents');
+        const pages = await pagesRes.json();
+        
+        setStats({
+          blogs: blogs.length,
+          projects: projects.length,
+          messages: messages.length,
+          waitlist: waitlist.length,
+          pages: pages.length
         });
-        router.push('/admin/dashboard');
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Invalid username or password',
-          variant: 'destructive',
-        });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
       }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred during login',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
     }
-  };
-
-  // Show loading state when checking authentication
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
+    
+    fetchStats();
+  }, []);
+  
   return (
-    <div className="flex h-screen items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <CardDescription>
-            Enter your credentials to access the admin panel
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label 
-                htmlFor="username" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Username
-              </label>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
-                disabled={isSubmitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <label 
-                htmlFor="password" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                disabled={isSubmitting}
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <span className="animate-spin mr-2">⟳</span> Logging in...
-                </>
-              ) : (
-                'Login'
-              )}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <p className="text-gray-600">Welcome to the HAL149 admin panel</p>
+      </div>
+      
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Link href="/admin/blog">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Blog Posts</CardTitle>
+              <FilePenLine className="h-5 w-5 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.blogs}</div>
+              <p className="text-xs text-gray-500">Total blog posts</p>
+            </CardContent>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/projects">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Projects</CardTitle>
+              <Folder className="h-5 w-5 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.projects}</div>
+              <p className="text-xs text-gray-500">Total projects</p>
+            </CardContent>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/messages">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Messages</CardTitle>
+              <MessageSquare className="h-5 w-5 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.messages}</div>
+              <p className="text-xs text-gray-500">Contact messages</p>
+            </CardContent>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/waitlist">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Waitlist</CardTitle>
+              <Users className="h-5 w-5 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.waitlist}</div>
+              <p className="text-xs text-gray-500">Waitlist entries</p>
+            </CardContent>
+          </Card>
+        </Link>
+        
+        <Link href="/admin/content">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg font-medium">Page Content</CardTitle>
+              <FileText className="h-5 w-5 text-gray-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.pages}</div>
+              <p className="text-xs text-gray-500">Managed page contents</p>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
     </div>
   );
 }

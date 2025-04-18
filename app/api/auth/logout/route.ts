@@ -1,20 +1,19 @@
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    // Clear session cookie
-    const cookieStore = cookies();
-    cookieStore.delete('session');
-
-    return NextResponse.json(
-      { message: 'Logged out successfully' },
-      { status: 200 }
-    );
+    // Delete the session cookie
+    cookies().delete("session");
+    
+    return NextResponse.json({ 
+      success: true,
+      message: "Logged out successfully" 
+    });
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error("Logout error:", error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { success: false, message: "An error occurred during logout" },
       { status: 500 }
     );
   }

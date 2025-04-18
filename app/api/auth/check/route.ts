@@ -1,45 +1,59 @@
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { db } from "@/server/db";
+import { users } from "@/shared/schema";
+import { eq } from "drizzle-orm";
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    // Get session cookie
-    const cookieStore = cookies();
-    const sessionCookie = cookieStore.get('session');
-
-    if (!sessionCookie) {
-      return NextResponse.json(
-        { authenticated: false },
-        { status: 200 }
-      );
+    const sessionCookie = cookies().get("session");
+    
+    if (!sessionCookie || !sessionCookie.value) {
+      return NextResponse.json({ 
+        authenticated: false,
+        user: null 
+      });
     }
-
-    // Parse session data
-    const sessionData = JSON.parse(sessionCookie.value);
-
-    // Check if session has required fields
-    if (!sessionData.userId || !sessionData.username) {
-      return NextResponse.json(
-        { authenticated: false },
-        { status: 200 }
-      );
+    
+    const userId = parseInt(sessionCookie.value);
+    
+    if (isNaN(userId)) {
+      return NextResponse.json({ 
+        authenticated: false,
+        user: null 
+      });
     }
-
+    
+    const userResults = await db.select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    
+    if (userResults.length === 0) {
+      return NextResponse.json({ 
+        authenticated: false,
+        user: null 
+      });
+    }
+    
+    const user = userResults[0];
+    
+    // Don't send password back to client
+    const { password, ...userWithoutPassword } = user;
+    
+    return NextResponse.json({ 
+      authenticated: true,
+      user: userWithoutPassword
+    });
+  } catch (error) {
+    console.error("Error checking authentication:", error);
     return NextResponse.json(
       { 
-        authenticated: true,
-        user: {
-          id: sessionData.userId,
-          username: sessionData.username
-        }
+        authenticated: false,
+        user: null,
+        error: "Error checking authentication"
       },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Auth check error:', error);
-    return NextResponse.json(
-      { authenticated: false },
-      { status: 200 }
+      { status: 500 }
     );
   }
 }

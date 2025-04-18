@@ -2,117 +2,131 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  LayoutDashboard,
-  FileText,
-  Folder,
-  MessageSquare,
-  ListChecks,
+import { usePathname } from "next/navigation";
+import { 
+  LayoutDashboard, 
+  FileText, 
+  MessageSquare, 
+  ClipboardList, 
   Settings,
-  LogOut,
-  Menu,
-  X
+  Menu, 
+  X,
+  LogOut
 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui";
+import { useAuth } from "@/hooks/use-auth";
 
-export function AdminNav() {
+export default function AdminNav() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const { logout } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-  
-  const navItems = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Blog", href: "/admin/blog", icon: FileText },
-    { name: "Projects", href: "/admin/projects", icon: Folder },
-    { name: "Messages", href: "/admin/messages", icon: MessageSquare },
-    { name: "Waitlist", href: "/admin/waitlist", icon: ListChecks },
-    { name: "Content", href: "/admin/content", icon: Settings },
-  ];
-  
+
   const toggleMobileMenu = () => {
-    setMobileOpen(!mobileOpen);
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-  
+
+  const navItems = [
+    {
+      name: "Dashboard",
+      href: "/admin",
+      icon: <LayoutDashboard className="w-5 h-5" />,
+      exact: true
+    },
+    {
+      name: "Blog",
+      href: "/admin/blog",
+      icon: <FileText className="w-5 h-5" />
+    },
+    {
+      name: "Projects",
+      href: "/admin/projects",
+      icon: <ClipboardList className="w-5 h-5" />
+    },
+    {
+      name: "Content",
+      href: "/admin/content",
+      icon: <FileText className="w-5 h-5" />
+    },
+    {
+      name: "Messages",
+      href: "/admin/messages",
+      icon: <MessageSquare className="w-5 h-5" />
+    },
+    {
+      name: "Waitlist",
+      href: "/admin/waitlist",
+      icon: <ClipboardList className="w-5 h-5" />
+    },
+    {
+      name: "Settings",
+      href: "/admin/settings",
+      icon: <Settings className="w-5 h-5" />
+    }
+  ];
+
+  const isActive = (href: string, exact = false) => {
+    if (exact) {
+      return pathname === href;
+    }
+    return pathname.startsWith(href);
+  };
+
   return (
     <>
-      {/* Mobile navigation toggle */}
-      <div className="fixed top-4 left-4 z-50 md:hidden">
-        <Button 
-          variant="outline" 
-          size="icon" 
+      {/* Mobile Menu Button */}
+      <div className="md:hidden flex justify-between items-center p-4 border-b">
+        <h1 className="text-xl font-bold">HAL149 Admin</h1>
+        <button
           onClick={toggleMobileMenu}
-          className="bg-white"
+          className="p-2 text-gray-600 hover:text-gray-900"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </Button>
+          {isMobileMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
+        </button>
       </div>
-      
-      {/* Sidebar navigation */}
-      <div 
-        className={`
-          fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r border-gray-200 transition-transform duration-200 ease-in-out
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} 
-          md:translate-x-0 md:relative
-        `}
+
+      {/* Sidebar for desktop & Mobile menu */}
+      <nav
+        className={`${
+          isMobileMenuOpen ? "block" : "hidden"
+        } md:block fixed md:static w-64 h-full bg-white border-r overflow-y-auto z-10`}
       >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-center h-16 px-4 border-b">
-            <h1 className="text-xl font-bold">HAL149 Admin</h1>
-          </div>
-          
-          <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href || 
-                (item.href !== "/admin" && pathname?.startsWith(item.href));
-              
-              return (
-                <Link 
-                  key={item.name} 
-                  href={item.href}
-                  className={`
-                    flex items-center px-4 py-2 rounded-md transition-colors
-                    ${isActive 
-                      ? 'bg-primary text-white' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                    }
-                  `}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <item.icon className="w-5 h-5 mr-3" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-          
-          <div className="p-4 border-t">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start text-gray-700 hover:bg-gray-100" 
-              onClick={handleLogout}
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              <span>Logout</span>
-            </Button>
-          </div>
+        <div className="p-4 border-b hidden md:block">
+          <h1 className="text-xl font-bold">HAL149 Admin</h1>
         </div>
-      </div>
-      
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div 
-          className="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden" 
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
+
+        <div className="p-4">
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.name}>
+                <Link href={item.href}>
+                  <div
+                    className={`flex items-center p-2 rounded-md hover:bg-gray-100 
+                      ${isActive(item.href, item.exact) ? "bg-gray-100 text-blue-600" : "text-gray-700"}`}
+                  >
+                    {item.icon}
+                    <span className="ml-3">{item.name}</span>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="p-4 border-t mt-auto">
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+            onClick={logout}
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+      </nav>
     </>
   );
 }

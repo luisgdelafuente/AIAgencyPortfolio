@@ -1,14 +1,17 @@
 'use client';
 
 /**
- * In our custom server approach, metadata is injected directly into the HTML.
- * This component is kept for compatibility but doesn't need to do any work.
+ * This component is no longer actively used as metadata is now handled directly by
+ * Next.js App Router metadata API in each page's generateMetadata function.
  * 
- * All metadata is now handled by our custom Express middleware in server-next.js
- * which intercepts requests and inserts metadata before the HTML is sent to the client.
+ * We keep this component for now to avoid breaking existing code, but its
+ * functionality has been replaced by the proper server-side generateMetadata functions
+ * in each page.
+ * 
+ * SEO-critical metadata is now guaranteed to be in the HTML source of each page.
  */
 export default function MetadataWrapper() {
   // No client-side metadata manipulation needed
-  // The custom server handles all the metadata injection
+  // The Next.js App Router metadata API handles all metadata
   return null;
 }

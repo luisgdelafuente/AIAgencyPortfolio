@@ -36,11 +36,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
       <body className="flex flex-col min-h-screen">
         <Navigation />
         <main className="flex-grow">

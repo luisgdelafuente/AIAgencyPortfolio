@@ -12,7 +12,7 @@ sleep 5
 
 # Start the Next.js custom server
 echo "Starting Next.js custom server..."
-NODE_ENV=development API_URL=http://localhost:5000 node server-next.js &
+NODE_ENV=development API_URL=http://localhost:5000 node server-next.cjs &
 NEXT_PID=$!
 echo "Next.js server running with PID: $NEXT_PID"
 

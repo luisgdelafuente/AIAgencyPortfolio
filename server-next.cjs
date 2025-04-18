@@ -3,7 +3,7 @@ const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
 const express = require('express');
-const fetch = require('node-fetch');
+// Use global fetch which is available in Node.js 18+
 
 // Set development mode based on environment
 const dev = process.env.NODE_ENV !== 'production';

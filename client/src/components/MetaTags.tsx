@@ -19,6 +19,7 @@ export default function MetaTags({
   url,
   pageTitle
 }: MetaTagsProps) {
+  console.log('MetaTags rendering with:', { metadata, type, url, pageTitle });
   // Final title to use - prioritize specific page title if provided
   const finalTitle = pageTitle || metadata.title || '';
   

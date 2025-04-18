@@ -26,6 +26,7 @@ export default function Home() {
 
   // Extract metadata with inheritance
   const metadata = extractMetadata(pageContent);
+  console.log('Home page metadata:', metadata);
   
   // Parse the JSON content
   const content = useMemo<HomeContent>(() => {

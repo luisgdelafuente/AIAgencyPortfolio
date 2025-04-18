@@ -1,179 +1,303 @@
 /**
  * Early-loading metadata script for HAL149
- * This script runs before React loads and fetches the correct
- * metadata for the current page from the API
+ * This script runs before React loads and directly updates meta tags based on the current URL
  */
 (function() {
-  // Get the current page path from the URL
-  function getCurrentPage() {
+  // Debugging flag
+  const DEBUG = true;
+  
+  // Log helper
+  function log(...args) {
+    if (DEBUG) console.log(...args);
+  }
+  
+  // Default metadata as fallback
+  const DEFAULT_METADATA = {
+    title: 'HAL149 | AI Agency',
+    description: 'HAL149 is your partner for AI-powered apps, automations, and strategic training programs',
+    keywords: 'ai applications, ai solutions, ai automations, industry ai, ai consulting, ai training programs',
+    canonical: 'https://hal149.com',
+    ogTitle: 'HAL149 | AI Agency',
+    ogDescription: 'HAL149 is your partner for AI-powered apps, automations, and strategic training programs',
+    ogImage: 'https://spebrqnqmrmeacntsrmp.supabase.co/storage/v1/object/public/assets//hallogoblack480.webp',
+    ogType: 'website'
+  };
+  
+  // Function to fetch JSON data with retry
+  async function fetchWithRetry(url, retries = 3, delay = 300) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          log(`Fetch attempt ${i+1} failed for ${url}: ${response.status}`);
+          throw new Error(`HTTP error ${response.status}`);
+        }
+        return await response.json();
+      } catch (error) {
+        if (i === retries - 1) {
+          log(`All ${retries} fetch attempts failed for ${url}:`, error);
+          return null;
+        }
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, delay));
+        // Increase delay for next retry
+        delay *= 1.5;
+      }
+    }
+    return null;
+  }
+  
+  // Determine the page type and slug from the URL
+  function getPageInfo() {
     const path = window.location.pathname;
     
-    // Special case for home page
-    if (path === '/' || path === '') return 'home';
-    
-    // Handle blog post routes
-    if (path.startsWith('/blog/') && path !== '/blog/') {
-      return 'blog';
+    // Special case: home page
+    if (path === '/' || path === '') {
+      return { 
+        pageName: 'home',
+        slug: null,
+        type: null
+      };
     }
     
-    // Handle project routes
-    if (path.startsWith('/projects/') && path !== '/projects/') {
-      return 'projects';
+    // Check for blog post
+    const blogPostMatch = path.match(/^\/blog\/([^/]+)\/?$/);
+    if (blogPostMatch) {
+      return {
+        pageName: 'blog',
+        slug: blogPostMatch[1],
+        type: 'blog'
+      };
     }
     
-    // For other routes, use the first part of the path
-    return path.replace(/^\/+/, '').split('/')[0];
+    // Check for project
+    const projectMatch = path.match(/^\/projects\/([^/]+)\/?$/);
+    if (projectMatch) {
+      return {
+        pageName: 'projects',
+        slug: projectMatch[1],
+        type: 'projects'
+      };
+    }
+    
+    // All other pages - take the first segment
+    const pageName = path.replace(/^\/+/, '').split('/')[0];
+    return {
+      pageName,
+      slug: null,
+      type: null
+    };
   }
   
-  // Extract slug from URL if it's a blog post or project
-  function getSlugInfo() {
-    const path = window.location.pathname;
-    
-    // Check if it's a blog post page
-    if (path.match(/^\/blog\/([^/]+)\/?$/)) {
-      const match = path.match(/^\/blog\/([^/]+)\/?$/);
-      return { slug: match ? match[1] : null, type: 'blog' };
-    }
-    
-    // Check if it's a project page
-    if (path.match(/^\/projects\/([^/]+)\/?$/)) {
-      const match = path.match(/^\/projects\/([^/]+)\/?$/);
-      return { slug: match ? match[1] : null, type: 'projects' };
-    }
-    
-    return { slug: null, type: null };
-  }
-  
-  // Function to fetch JSON data
-  async function fetchJSON(url) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      return await response.json();
-    } catch (error) {
-      console.error(`Error fetching ${url}:`, error);
-      return null;
-    }
-  }
-  
-  // Update meta tags based on data
-  function updateMetaTags(metadata) {
+  // Update all meta tags with the provided metadata
+  function updateAllMetaTags(metadata) {
     if (!metadata) return;
     
-    // Update title
-    if (metadata.title) {
-      document.title = metadata.title;
-      
-      // Also update any elements with data-dynamic-meta="title"
-      const titleElements = document.querySelectorAll('[data-dynamic-meta="title"]');
-      titleElements.forEach(el => {
-        if (el.tagName === 'TITLE') {
-          el.textContent = metadata.title;
-        } else {
-          el.setAttribute('content', metadata.title);
-        }
-      });
-    }
+    log('Updating meta tags with:', metadata);
     
-    // Helper to update meta tags
-    function updateMetaTag(name, content) {
+    // Document title
+    document.title = metadata.title || DEFAULT_METADATA.title;
+    
+    // Function to update meta tags with a specific attribute (name or property)
+    function updateMetaTag(attributeName, name, content) {
       if (!content) return;
       
-      // Regular meta tags
-      const elements = document.querySelectorAll(`[data-dynamic-meta="${name}"]`);
-      elements.forEach(el => {
-        if (el.tagName === 'LINK') {
-          el.setAttribute('href', content);
-        } else {
-          el.setAttribute('content', content);
-        }
-      });
+      // Try to find the tag
+      let tag = document.querySelector(`meta[${attributeName}="${name}"]`);
+      
+      // Create if it doesn't exist
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attributeName, name);
+        document.head.appendChild(tag);
+      }
+      
+      // Set the content
+      tag.setAttribute('content', content);
     }
     
-    // Update other meta tags
-    updateMetaTag('description', metadata.description);
-    updateMetaTag('keywords', metadata.keywords);
-    updateMetaTag('canonical', metadata.canonical);
-    updateMetaTag('og:title', metadata.ogTitle || metadata.title);
-    updateMetaTag('og:description', metadata.ogDescription || metadata.description);
-    updateMetaTag('og:image', metadata.ogImage);
-    updateMetaTag('og:url', metadata.canonical);
-    updateMetaTag('twitter:title', metadata.ogTitle || metadata.title);
-    updateMetaTag('twitter:description', metadata.ogDescription || metadata.description);
-    updateMetaTag('twitter:image', metadata.ogImage);
+    // Update all name-based meta tags
+    updateMetaTag('name', 'description', metadata.description);
+    updateMetaTag('name', 'keywords', metadata.keywords);
+    updateMetaTag('name', 'twitter:card', 'summary_large_image');
+    updateMetaTag('name', 'twitter:title', metadata.ogTitle || metadata.title);
+    updateMetaTag('name', 'twitter:description', metadata.ogDescription || metadata.description);
+    updateMetaTag('name', 'twitter:image', metadata.ogImage);
+    updateMetaTag('name', 'robots', 'index, follow');
+    
+    // Update all property-based meta tags (OpenGraph)
+    updateMetaTag('property', 'og:title', metadata.ogTitle || metadata.title);
+    updateMetaTag('property', 'og:description', metadata.ogDescription || metadata.description);
+    updateMetaTag('property', 'og:image', metadata.ogImage);
+    updateMetaTag('property', 'og:url', metadata.canonical);
+    updateMetaTag('property', 'og:type', metadata.ogType || 'website');
+    updateMetaTag('property', 'og:site_name', 'HAL149');
+    
+    // Update canonical
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', metadata.canonical || DEFAULT_METADATA.canonical);
+    
+    // Update any tags with data-dynamic-meta attribute for backwards compatibility
+    document.querySelectorAll('[data-dynamic-meta]').forEach(el => {
+      const metaType = el.getAttribute('data-dynamic-meta');
+      
+      // Handle special cases
+      switch (metaType) {
+        case 'title':
+          if (el.tagName === 'TITLE') {
+            el.textContent = metadata.title || DEFAULT_METADATA.title;
+          } else {
+            el.setAttribute('content', metadata.title || DEFAULT_METADATA.title);
+          }
+          break;
+        case 'canonical':
+          if (el.tagName === 'LINK') {
+            el.setAttribute('href', metadata.canonical || DEFAULT_METADATA.canonical);
+          }
+          break;
+        case 'og:title':
+          el.setAttribute('content', metadata.ogTitle || metadata.title || DEFAULT_METADATA.title);
+          break;
+        case 'og:description':
+          el.setAttribute('content', metadata.ogDescription || metadata.description || DEFAULT_METADATA.description);
+          break;
+        case 'twitter:title':
+          el.setAttribute('content', metadata.ogTitle || metadata.title || DEFAULT_METADATA.title);
+          break;
+        case 'twitter:description':
+          el.setAttribute('content', metadata.ogDescription || metadata.description || DEFAULT_METADATA.description);
+          break;
+        default:
+          // Standard case - just update content if the metadata has the same property
+          if (metadata[metaType]) {
+            if (el.tagName === 'LINK') {
+              el.setAttribute('href', metadata[metaType]);
+            } else {
+              el.setAttribute('content', metadata[metaType]);
+            }
+          }
+      }
+    });
+    
+    // Remove any Replit-specific meta tags
+    document.querySelectorAll('meta').forEach(tag => {
+      const content = tag.getAttribute('content');
+      if (
+        (content && content.includes('replit')) || 
+        tag.getAttribute('name')?.includes('replit') || 
+        tag.getAttribute('property')?.includes('replit')
+      ) {
+        tag.remove();
+      }
+    });
   }
   
-  // Parse content to extract metadata
-  function extractMetadata(pageContent) {
-    if (!pageContent || !pageContent.content) return null;
+  // Extract metadata from page content
+  function extractMetadataFromPageContent(pageContent) {
+    if (!pageContent || !pageContent.content) {
+      log('No page content or empty content');
+      return null;
+    }
     
     try {
+      // Parse content object if it's a string
       const contentObj = typeof pageContent.content === 'string'
         ? JSON.parse(pageContent.content)
         : pageContent.content;
       
-      return contentObj.metadata || null;
+      // Extract metadata from content object
+      if (contentObj.metadata) {
+        log('Found metadata in page content', contentObj.metadata);
+        return contentObj.metadata;
+      } else {
+        log('No metadata found in page content');
+        return null;
+      }
     } catch (error) {
-      console.error('Error parsing content:', error);
+      log('Error parsing page content', error);
       return null;
     }
   }
   
-  // Extract metadata from an item (blog post or project)
-  function extractItemMetadata(item) {
-    if (!item) return null;
+  // Extract metadata from a blog post or project
+  function extractMetadataFromItem(item, type) {
+    if (!item) {
+      log('No item data');
+      return null;
+    }
     
-    return {
-      title: item.title ? `${item.title} | HAL149` : '',
-      description: item.excerpt || item.description || '',
+    // Base URL for canonical links
+    const baseUrl = 'https://hal149.com';
+    
+    // Build metadata object
+    const metadata = {
+      title: item.title ? `${item.title} | HAL149` : DEFAULT_METADATA.title,
+      description: item.excerpt || item.description || DEFAULT_METADATA.description,
       keywords: item.tags || item.category || '',
-      canonical: item.slug ? `https://hal149.com/${item.type || 'blog'}/${item.slug}/` : '',
-      ogTitle: item.title ? `${item.title} | HAL149` : '',
-      ogDescription: item.excerpt || item.description || '',
-      ogImage: item.imageUrl || ''
+      canonical: item.slug ? `${baseUrl}/${type}/${item.slug}/` : DEFAULT_METADATA.canonical,
+      ogTitle: item.title ? `${item.title} | HAL149` : DEFAULT_METADATA.ogTitle,
+      ogDescription: item.excerpt || item.description || DEFAULT_METADATA.ogDescription,
+      ogImage: item.imageUrl || DEFAULT_METADATA.ogImage,
+      ogType: type === 'blog' ? 'article' : 'website'
     };
+    
+    log('Extracted metadata from item:', metadata);
+    return metadata;
   }
   
-  // Main function to load metadata
-  async function loadMetadata() {
-    // Get the current page
-    const currentPage = getCurrentPage();
-    console.log('Current page:', currentPage);
+  // Main function to load and apply metadata
+  async function loadAndApplyMetadata() {
+    // Get current page info
+    const { pageName, slug, type } = getPageInfo();
+    log('Page info:', { pageName, slug, type });
     
-    // Fetch page content
-    const pageContent = await fetchJSON(`/api/page-contents/${currentPage}`);
-    console.log('Page content:', pageContent);
+    // Always fetch the page content first
+    const pageContent = await fetchWithRetry(`/api/page-contents/${pageName}`);
+    log('Page content fetched:', pageContent);
     
-    // Extract metadata from page content
-    let metadata = extractMetadata(pageContent);
-    console.log('Initial metadata:', metadata);
+    // Extract base metadata from page content
+    let metadata = extractMetadataFromPageContent(pageContent);
+    log('Base metadata:', metadata);
     
-    // Check for slug-based content (blog post or project)
-    const { slug, type } = getSlugInfo();
+    // Default canonical URL based on current path
+    const pathname = window.location.pathname;
+    const defaultCanonical = `https://hal149.com${pathname === '/' ? '' : pathname}`;
+    
+    // If this is a blog post or project page, fetch the specific item
     if (slug && type) {
-      const itemData = await fetchJSON(`/api/${type}/${slug}`);
-      console.log('Item data:', itemData);
+      const itemData = await fetchWithRetry(`/api/${type}/${slug}`);
+      log('Item data fetched:', itemData);
       
       if (itemData) {
-        const itemMetadata = extractItemMetadata(itemData);
-        console.log('Item metadata:', itemMetadata);
+        // Extract metadata from the item and merge with page metadata
+        const itemMetadata = extractMetadataFromItem(itemData, type);
         
-        // Merge metadata, giving item metadata priority
         metadata = {
-          ...metadata,
-          ...itemMetadata
+          ...(metadata || {}),
+          ...(itemMetadata || {})
         };
+        
+        log('Combined metadata after item data:', metadata);
       }
     }
     
-    console.log('Final metadata:', metadata);
-    
-    // Update meta tags
-    if (metadata) {
-      updateMetaTags(metadata);
+    // Ensure we have canonical URLs
+    if (metadata && !metadata.canonical) {
+      metadata.canonical = defaultCanonical;
     }
+    
+    // Apply metadata to the page
+    updateAllMetaTags(metadata || DEFAULT_METADATA);
   }
   
   // Load metadata immediately
-  loadMetadata();
+  loadAndApplyMetadata();
+  
+  // Also load metadata after DOMContentLoaded for safety
+  document.addEventListener('DOMContentLoaded', loadAndApplyMetadata);
 })();

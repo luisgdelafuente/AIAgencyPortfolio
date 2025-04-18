@@ -19,13 +19,12 @@ import AdminWaitlist from "@/pages/AdminWaitlist";
 import AdminContent from "@/pages/AdminContent";
 import AdminMessages from "@/pages/AdminMessages";
 import AdminSettings from "@/pages/AdminSettings";
-import React from "react";
+import React, { useEffect } from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { LanguageProvider } from "@/hooks/use-language";
 import { TranslationProvider } from "@/hooks/use-translations";
 import { ProtectedRoute } from "./lib/protected-route";
-import { MetadataSync } from "@/components/MetadataSync";
-import DynamicHead from "@/components/DynamicHead";
+import { applyMetadata } from "./lib/direct-metadata";
 
 function Router() {
   return (
@@ -52,13 +51,31 @@ function Router() {
 }
 
 function App() {
+  // Apply metadata on page load and when URL changes
+  useEffect(() => {
+    // Apply metadata on initial load
+    applyMetadata();
+    
+    // Create a new URL listener
+    const handleURLChange = () => {
+      console.log("URL changed, updating metadata");
+      setTimeout(applyMetadata, 100); // Small delay to ensure everything is ready
+    };
+    
+    // Add event listener
+    window.addEventListener('popstate', handleURLChange);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('popstate', handleURLChange);
+    };
+  }, []);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <TranslationProvider>
           <AuthProvider>
-            {/* MetadataSync now includes DynamicHead component with dynamic values */}
-            <MetadataSync />
             <Router />
             <Toaster />
           </AuthProvider>

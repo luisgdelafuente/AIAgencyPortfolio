@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     // }
     
     const entries = await db.query.waitlist.findMany({
-      orderBy: (entries, { desc }) => [desc(entries.submittedAt)]
+      orderBy: (entries, { desc }: { desc: any }) => [desc(entries.submittedAt)]
     });
     
     return NextResponse.json(entries);
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Add to waitlist
-    const now = new Date().toISOString();
+    const now = new Date();
     const newEntry = await db.insert(waitlist)
       .values({
         email: body.email,

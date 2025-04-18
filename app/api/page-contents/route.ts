@@ -6,7 +6,7 @@ import { pageContents } from '@/shared/schema';
 export async function GET(request: NextRequest) {
   try {
     const contents = await db.query.pageContents.findMany({
-      orderBy: (contents, { asc }) => [asc(contents.page)]
+      orderBy: (contents, { asc }: { asc: any }) => [asc(contents.page)]
     });
     
     return NextResponse.json(contents);

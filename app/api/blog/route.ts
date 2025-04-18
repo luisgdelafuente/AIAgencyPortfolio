@@ -53,14 +53,14 @@ export async function POST(request: NextRequest) {
     }
     
     // Create the blog post
-    const date = new Date().toISOString();
+    const date = new Date();
     const newPost = await db.insert(blogPosts).values({
       title: body.title,
       slug: body.slug,
       content: body.content,
       excerpt: body.excerpt,
       imageUrl: body.imageUrl,
-      publishedAt: body.publishedAt || date
+      publishedAt: body.publishedAt ? new Date(body.publishedAt) : date
     }).returning();
     
     return NextResponse.json(newPost[0], { status: 201 });

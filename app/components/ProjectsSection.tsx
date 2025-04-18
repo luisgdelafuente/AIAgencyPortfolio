@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProjectCard from './ProjectCard';
-import type { Project } from '@shared/schema';
+import type { Project } from '@/shared/schema';
 import { useTranslations } from '../hooks/use-translations';
 
 interface ProjectsSectionProps {

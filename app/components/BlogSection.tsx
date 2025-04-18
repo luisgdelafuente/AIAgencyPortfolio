@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import BlogCard from './BlogCard';
-import type { BlogPost } from '@shared/schema';
+import type { BlogPost } from '@/shared/schema';
 import { useTranslations } from '../hooks/use-translations';
 
 interface BlogSectionProps {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Project } from '@shared/schema';
+import { Project } from '@/shared/schema';
 
 interface ProjectCardProps {
   project: Project;

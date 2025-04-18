@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { formatDate } from '@shared/utils';
-import { BlogPost } from '@shared/schema';
+import { formatDate } from '@/shared/utils';
+import { BlogPost } from '@/shared/schema';
 
 interface BlogCardProps {
   post: BlogPost;

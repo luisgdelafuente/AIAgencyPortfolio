@@ -1,7 +1,7 @@
 import { fetchPageContent, fetchBlogPosts } from '../lib/api';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { formatDate } from '@shared/utils';
+import { formatDate } from '@/shared/utils';
 
 export const metadata: Metadata = {
   title: 'AI Blog - Next-Generation Insights | HAL149',

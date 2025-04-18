@@ -87,30 +87,50 @@ const defaultMetadata = {
   ogImage: 'https://spebrqnqmrmeacntsrmp.supabase.co/storage/v1/object/public/assets//hallogoblack480.webp',
 };
 
+// Simple function to sanitize strings to prevent XSS
+function sanitizeHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Function to generate meta tags HTML from metadata object
 function generateMetaTags(metadata) {
   if (!metadata) metadata = defaultMetadata;
   
+  // Sanitize all metadata values
+  const title = sanitizeHTML(metadata.title || defaultMetadata.title);
+  const description = sanitizeHTML(metadata.description || defaultMetadata.description);
+  const keywords = sanitizeHTML(metadata.keywords || defaultMetadata.keywords);
+  const ogTitle = sanitizeHTML(metadata.ogTitle || metadata.title || defaultMetadata.ogTitle);
+  const ogDescription = sanitizeHTML(metadata.ogDescription || metadata.description || defaultMetadata.ogDescription);
+  const ogImage = sanitizeHTML(metadata.ogImage || defaultMetadata.ogImage);
+  const canonical = sanitizeHTML(metadata.canonical || defaultMetadata.canonical);
+  
   return `
-    <title>${metadata.title || defaultMetadata.title}</title>
-    <meta name="description" content="${metadata.description || defaultMetadata.description}" />
-    <meta name="keywords" content="${metadata.keywords || defaultMetadata.keywords}" />
+    <title>${title}</title>
+    <meta name="description" content="${description}" />
+    <meta name="keywords" content="${keywords}" />
     
     <!-- Open Graph -->
-    <meta property="og:title" content="${metadata.ogTitle || metadata.title || defaultMetadata.ogTitle}" />
-    <meta property="og:description" content="${metadata.ogDescription || metadata.description || defaultMetadata.ogDescription}" />
-    <meta property="og:image" content="${metadata.ogImage || defaultMetadata.ogImage}" />
-    <meta property="og:url" content="${metadata.canonical || defaultMetadata.canonical}" />
+    <meta property="og:title" content="${ogTitle}" />
+    <meta property="og:description" content="${ogDescription}" />
+    <meta property="og:image" content="${ogImage}" />
+    <meta property="og:url" content="${canonical}" />
     <meta property="og:type" content="website" />
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${metadata.ogTitle || metadata.title || defaultMetadata.ogTitle}" />
-    <meta name="twitter:description" content="${metadata.ogDescription || metadata.description || defaultMetadata.ogDescription}" />
-    <meta name="twitter:image" content="${metadata.ogImage || defaultMetadata.ogImage}" />
+    <meta name="twitter:title" content="${ogTitle}" />
+    <meta name="twitter:description" content="${ogDescription}" />
+    <meta name="twitter:image" content="${ogImage}" />
     
     <!-- Canonical -->
-    <link rel="canonical" href="${metadata.canonical || defaultMetadata.canonical}" />
+    <link rel="canonical" href="${canonical}" />
   `;
 }
 

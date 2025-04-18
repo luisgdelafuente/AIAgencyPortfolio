@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Helmet } from "react-helmet-async";
+import { AdminMetadata } from '@/components/AdminMetadata';
 import AdminNav from '@/components/AdminNav';
 import { useAuth } from '@/hooks/use-auth';
 import { 
@@ -294,10 +294,11 @@ export default function AdminBlog() {
   
   return (
     <>
-      <Helmet>
-        <title>Manage Blog Posts | HAL149 Admin</title>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
+      <AdminMetadata
+        title="Manage Blog Posts | HAL149 Admin"
+        description="Manage blog posts for HAL149 - AI solutions"
+        noIndex={true}
+      />
       
       <div className="min-h-screen bg-neutral-50">
         <AdminNav />

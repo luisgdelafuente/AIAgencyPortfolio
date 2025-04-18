@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Helmet } from "react-helmet-async";
+import { AdminMetadata } from '@/components/AdminMetadata';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
 import LoginForm from '@/components/LoginForm';
@@ -38,11 +38,11 @@ export default function Admin() {
 
   return (
     <>
-      <Helmet>
-        <title>Admin | HAL149</title>
-        <meta name="robots" content="noindex, nofollow" />
-        <meta name="description" content="Admin area for HAL149 - AI solutions" />
-      </Helmet>
+      <AdminMetadata
+        title="Admin | HAL149"
+        description="Admin area for HAL149 - AI solutions"
+        noIndex={true}
+      />
       
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="w-full max-w-md px-4">

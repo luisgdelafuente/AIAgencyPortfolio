@@ -52,8 +52,12 @@ export async function POST(request: NextRequest) {
     );
     
     // Set the token as an HTTP-only cookie
-    const cookieStore = cookies();
-    cookieStore.set({
+    const response = NextResponse.json({
+      id: user.id,
+      username: user.username
+    });
+    
+    response.cookies.set({
       name: 'auth_token',
       value: token,
       httpOnly: true,
@@ -63,11 +67,7 @@ export async function POST(request: NextRequest) {
       sameSite: 'strict'
     });
     
-    // Return user information (excluding password)
-    return NextResponse.json({
-      id: user.id,
-      username: user.username
-    });
+    return response;
   } catch (error) {
     console.error('Error logging in:', error);
     return NextResponse.json(

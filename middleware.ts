@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
 // Routes that require authentication
@@ -23,8 +22,8 @@ export async function middleware(request: NextRequest) {
   
   // Check if the requested path is a protected route
   if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-    const cookieStore = cookies();
-    const token = cookieStore.get('auth_token');
+    // Access token directly from the cookies in the request
+    const token = request.cookies.get('auth_token');
     
     // If no token exists, redirect to login
     if (!token) {

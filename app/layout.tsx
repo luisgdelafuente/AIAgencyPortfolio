@@ -1,31 +1,23 @@
-import '../client/src/index.css';
-import { Toaster } from "@/components/ui/toaster";
-import { queryClient } from "@/lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/hooks/use-auth";
-import { LanguageProvider } from "@/hooks/use-language";
-import { TranslationProvider } from "@/hooks/use-translations";
-import React from "react";
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { Metadata } from 'next';
+import { ReactNode } from 'react';
+
+// We'll import the proper provider components once the migration is more complete
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'HAL149',
   description: 'AI-powered agency website',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <QueryClientProvider client={queryClient}>
-          <LanguageProvider>
-            <TranslationProvider>
-              <AuthProvider>
-                {children}
-                <Toaster />
-              </AuthProvider>
-            </TranslationProvider>
-          </LanguageProvider>
-        </QueryClientProvider>
+      <body className={inter.className}>
+        {/* For now, we're directly rendering children while we complete the migration */}
+        {children}
       </body>
     </html>
   );

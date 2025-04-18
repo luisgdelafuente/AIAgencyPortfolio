@@ -1,17 +1,6 @@
 'use client';
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import BlogSection from '@/components/BlogSection';
-import ProjectsSection from '@/components/ProjectsSection';
-import Waitlist from '@/components/Waitlist';
-import MetaTags from '@/components/MetaTags';
-import { useQuery } from '@tanstack/react-query';
-import { PageContent } from '@shared/schema';
-import { extractMetadata } from '@/lib/metadata';
-import { useMemo } from 'react';
+import Link from 'next/link';
 
 interface HomeContent {
   // Home page specific fields

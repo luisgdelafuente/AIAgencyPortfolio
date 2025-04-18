@@ -1,18 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  images: {
-    domains: ['images.unsplash.com', 'spebrqnqmrmeacntsrmp.supabase.co'], // Add domains for image optimization
-  },
-  // Handle serverless functions to match Express routes
+  // Enable static file serving
+  output: 'standalone',
+  
+  // Rewrites API requests to our Express backend
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: '/api/:path*',
+        destination: 'http://localhost:5000/api/:path*',
       },
     ];
+  },
+  
+  // Configure images domains for loading from external sources
+  images: {
+    domains: ['spebrqnqmrmeacntsrmp.supabase.co', 'localhost'],
+  },
+  
+  // Enable typechecking during build
+  typescript: {
+    ignoreBuildErrors: false,
   },
 };
 

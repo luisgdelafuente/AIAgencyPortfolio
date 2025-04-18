@@ -6,6 +6,15 @@ export * from "./button";
 // Form elements
 export * from "./input";
 export * from "./textarea";
+export * from "./label";
+export * from "./form";
+
+// Navigation components
+export * from "./sheet";
+export * from "./dropdown-menu";
+
+// Data presentation
+export * from "./table";
 
 // Toast related components
 export * from "./toast";

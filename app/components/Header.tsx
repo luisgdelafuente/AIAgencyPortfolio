@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useTranslations } from '../hooks/use-translations';
+import { useTranslations } from '@/hooks/use-translations';
 
 const HAL149Logo = () => (
   <div className="flex items-center">

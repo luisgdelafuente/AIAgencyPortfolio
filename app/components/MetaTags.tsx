@@ -1,33 +1,51 @@
-'use client';
-
-import React, { useEffect } from 'react';
-
-interface MetadataProps {
-  title: string;
-  description: string;
-  keywords?: string;
-  canonical?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  noIndex?: boolean;
-}
+import { Metadata } from "next"
 
 interface MetaTagsProps {
-  metadata: MetadataProps;
-  type?: 'website' | 'article';
-  url: string;
+  metadata: {
+    title: string
+    description: string
+    keywords: string
+    canonical: string
+    ogTitle: string
+    ogDescription: string
+    ogImage: string
+  }
+  type?: "article" | "website" | "book" | "profile"
+  url?: string
 }
 
-// In Next.js App Router, we use the Metadata API instead of Head
-// This component is kept for backward compatibility during migration
-// It logs what would be rendered but doesn't actually modify metadata
-export default function MetaTags({ metadata, type = 'website', url }: MetaTagsProps) {
-  useEffect(() => {
-    console.log('MetaTags rendering with:', { metadata, type, url });
-  }, [metadata, type, url]);
-
-  // In App Router, this component doesn't need to render anything
-  // as metadata is handled by the Metadata API at page level
-  return null;
+export function MetaTags({ metadata, type = "website", url = "https://hal149.com" }: MetaTagsProps) {
+  console.log("MetaTags rendering with:", { metadata, type, url })
+  return null
 }
+
+export function generateMetadata({ 
+  metadata, 
+  type = "website", 
+  url = "https://hal149.com" 
+}: MetaTagsProps): Metadata {
+  return {
+    title: metadata.title,
+    description: metadata.description,
+    keywords: metadata.keywords,
+    alternates: {
+      canonical: metadata.canonical || url,
+    },
+    openGraph: {
+      title: metadata.ogTitle || metadata.title,
+      description: metadata.ogDescription || metadata.description,
+      url: url,
+      siteName: "HAL149",
+      images: metadata.ogImage ? [metadata.ogImage] : [],
+      type: type,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: metadata.ogTitle || metadata.title,
+      description: metadata.ogDescription || metadata.description,
+      images: metadata.ogImage ? [metadata.ogImage] : [],
+    },
+  }
+}
+
+export default MetaTags

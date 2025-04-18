@@ -1,76 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { db } from '@/server/db';
 import { users } from '@/shared/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 
-// Temporary secret key for JWT (should be in environment variables)
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
-
-// POST /api/auth/login - Log in a user
+// POST /api/auth/login - Login endpoint
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const { username, password } = body;
     
-    // Validate the request body
-    if (!body.username || !body.password) {
+    if (!username || !password) {
       return NextResponse.json(
         { error: 'Username and password are required' },
         { status: 400 }
       );
     }
     
-    // Find the user
-    const user = await db.query.users.findFirst({
-      where: eq(users.username, body.username)
+    // Find user
+    const userResult = await db.query.users.findFirst({
+      where: eq(users.username, username)
     });
     
-    if (!user) {
+    if (!userResult) {
       return NextResponse.json(
         { error: 'Invalid username or password' },
         { status: 401 }
       );
     }
     
-    // Compare passwords
-    const passwordMatch = await bcrypt.compare(body.password, user.password);
+    // Compare password
+    const match = await bcrypt.compare(password, userResult.password);
     
-    if (!passwordMatch) {
+    if (!match) {
       return NextResponse.json(
         { error: 'Invalid username or password' },
         { status: 401 }
       );
     }
     
-    // Create JWT token
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    
-    // Set the token as an HTTP-only cookie
-    const response = NextResponse.json({
-      id: user.id,
-      username: user.username
-    });
-    
-    response.cookies.set({
-      name: 'auth_token',
-      value: token,
+    // Set cookie
+    const cookieStore = cookies();
+    cookieStore.set('auth_session', JSON.stringify({
+      id: userResult.id,
+      username: userResult.username
+    }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24, // 24 hours
-      path: '/',
-      sameSite: 'strict'
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: '/'
     });
     
-    return response;
+    // Return success with user data (excluding password)
+    return NextResponse.json({
+      authenticated: true,
+      user: {
+        id: userResult.id,
+        username: userResult.username
+      }
+    });
   } catch (error) {
-    console.error('Error logging in:', error);
+    console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Login failed' },
+      { error: 'An error occurred during login' },
       { status: 500 }
     );
   }

@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
-// POST /api/auth/logout - Log out a user
+// POST /api/auth/logout - Logout endpoint
 export async function POST(request: NextRequest) {
   try {
-    // Clear the auth token cookie
-    const response = NextResponse.json({ success: true });
-    response.cookies.delete('auth_token');
+    // Clear the auth cookie
+    const cookieStore = cookies();
+    cookieStore.delete('auth_session');
     
-    return response;
+    // Return success
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error logging out:', error);
+    console.error('Logout error:', error);
     return NextResponse.json(
-      { error: 'Logout failed' },
+      { error: 'An error occurred during logout' },
       { status: 500 }
     );
   }

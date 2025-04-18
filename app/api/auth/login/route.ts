@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create session cookie
-    cookies().set({
+    const cookieStore = cookies();
+    cookieStore.set({
       name: "session",
       value: String(user.id),
       httpOnly: true,

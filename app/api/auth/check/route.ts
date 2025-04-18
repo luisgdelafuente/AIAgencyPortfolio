@@ -7,7 +7,8 @@ import { eq } from "drizzle-orm";
 export async function GET(request: NextRequest) {
   try {
     // Get the session cookie
-    const sessionCookie = cookies().get("session")?.value;
+    const cookieStore = cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
 
     if (!sessionCookie) {
       return NextResponse.json({

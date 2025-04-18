@@ -2,8 +2,9 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import { Metadata } from 'next';
 import { ReactNode } from 'react';
-
-// We'll import the proper provider components once the migration is more complete
+import Providers from './components/Providers';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,8 +17,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* For now, we're directly rendering children while we complete the migration */}
-        {children}
+        <Providers>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow pt-16">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

@@ -1,36 +1,45 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get auth cookie
+    // Get session cookie
     const cookieStore = cookies();
-    const authCookie = cookieStore.get('auth_session');
+    const sessionCookie = cookieStore.get('session');
 
-    if (!authCookie || !authCookie.value) {
-      return NextResponse.json({ authenticated: false });
+    if (!sessionCookie) {
+      return NextResponse.json(
+        { authenticated: false },
+        { status: 200 }
+      );
     }
 
-    // Parse user data from cookie
-    const userData = JSON.parse(authCookie.value);
+    // Parse session data
+    const sessionData = JSON.parse(sessionCookie.value);
 
-    if (!userData || !userData.id || !userData.username) {
-      return NextResponse.json({ authenticated: false });
+    // Check if session has required fields
+    if (!sessionData.userId || !sessionData.username) {
+      return NextResponse.json(
+        { authenticated: false },
+        { status: 200 }
+      );
     }
 
-    // Return authentication state and user data
-    return NextResponse.json({
-      authenticated: true,
-      user: {
-        id: userData.id,
-        username: userData.username
-      }
-    });
+    return NextResponse.json(
+      { 
+        authenticated: true,
+        user: {
+          id: sessionData.userId,
+          username: sessionData.username
+        }
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Auth check error:', error);
-    return NextResponse.json({ 
-      authenticated: false,
-      message: 'An error occurred during authentication check' 
-    }, { status: 500 });
+    return NextResponse.json(
+      { authenticated: false },
+      { status: 200 }
+    );
   }
 }

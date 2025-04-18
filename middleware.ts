@@ -8,31 +8,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Skip the middleware for the admin login page
-  if (request.nextUrl.pathname === '/admin') {
-    return NextResponse.next();
-  }
-
   // Skip the middleware for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
 
-  // Check for the auth cookie
-  const authCookie = request.cookies.get('auth_session');
+  // Check for the session cookie
+  const sessionCookie = request.cookies.get('session');
 
-  // If there's no auth cookie, redirect to the admin login page
-  if (!authCookie || !authCookie.value) {
-    return NextResponse.redirect(new URL('/admin', request.url));
+  // If there's no session cookie, redirect to the login page
+  if (!sessionCookie || !sessionCookie.value) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   try {
-    // Parse the auth cookie value
-    const userData = JSON.parse(authCookie.value);
+    // Parse the session cookie value
+    const sessionData = JSON.parse(sessionCookie.value);
     
     // Check if the cookie contains valid user data
-    if (!userData || !userData.id || !userData.username) {
-      return NextResponse.redirect(new URL('/admin', request.url));
+    if (!sessionData || !sessionData.userId || !sessionData.username) {
+      return NextResponse.redirect(new URL('/login', request.url));
     }
     
     // If everything is good, proceed to the requested page
@@ -40,7 +35,7 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     // If there's an error parsing the cookie, redirect to the login page
     console.error('Auth middleware error:', error);
-    return NextResponse.redirect(new URL('/admin', request.url));
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 }
 

@@ -1,121 +1,115 @@
-'use client';
+"use client";
 
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useState, useEffect, ReactNode } from "react";
 
-// User type based on your existing schema
 interface User {
   id: number;
   username: string;
 }
 
-// Auth context type
-interface AuthContextType {
+export interface AuthContextType {
+  isAuthenticated: boolean;
+  isLoading: boolean;
   user: User | null;
-  authenticated: boolean;
-  loading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
-// Default context
-const defaultContext: AuthContextType = {
+export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
+  isLoading: true,
   user: null,
-  authenticated: false,
-  loading: true,
-  login: async () => false,
+  login: async () => ({ success: false, message: "Not implemented" }),
   logout: async () => {},
-};
+  checkAuth: async () => {},
+});
 
-// Create context
-export const AuthContext = createContext<AuthContextType>(defaultContext);
-
-// Provider component
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  // Check if user is authenticated on page load
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/check');
-        const data = await response.json();
-        
-        if (data.authenticated) {
-          setUser(data.user);
-          setAuthenticated(true);
-        } else {
-          setUser(null);
-          setAuthenticated(false);
-        }
-      } catch (error) {
-        console.error('Authentication check failed:', error);
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/check");
+      const data = await response.json();
+      
+      setIsAuthenticated(data.authenticated);
+      if (data.authenticated && data.user) {
+        setUser(data.user);
+      } else {
         setUser(null);
-        setAuthenticated(false);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     checkAuth();
   }, []);
 
-  // Login function
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        setUser(data.user);
-        setAuthenticated(true);
-        return true;
+      if (response.ok) {
+        await checkAuth();
+        return { success: true, message: data.message };
       } else {
-        return false;
+        return { success: false, message: data.message };
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      return false;
+      console.error("Login error:", error);
+      return { success: false, message: "An error occurred during login" };
     }
   };
 
-  // Logout function
-  const logout = async (): Promise<void> => {
+  const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       
+      setIsAuthenticated(false);
       setUser(null);
-      setAuthenticated(false);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout error:", error);
     }
-  };
-
-  const contextValue: AuthContextType = {
-    user,
-    authenticated,
-    loading,
-    login,
-    logout,
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        user,
+        login,
+        logout,
+        checkAuth,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}

@@ -25,6 +25,7 @@ import { LanguageProvider } from "@/hooks/use-language";
 import { TranslationProvider } from "@/hooks/use-translations";
 import { ProtectedRoute } from "./lib/protected-route";
 import { MetadataSync } from "@/components/MetadataSync";
+import DynamicHead from "@/components/DynamicHead";
 
 function Router() {
   return (
@@ -56,6 +57,7 @@ function App() {
       <LanguageProvider>
         <TranslationProvider>
           <AuthProvider>
+            {/* MetadataSync now includes DynamicHead component with dynamic values */}
             <MetadataSync />
             <Router />
             <Toaster />

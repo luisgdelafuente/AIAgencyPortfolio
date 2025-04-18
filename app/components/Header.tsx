@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button, Sheet, SheetContent, SheetTrigger } from '../components/ui';
 import { Menu } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTranslations } from '@/hooks/use-translations';
 
 const HAL149Logo = () => (

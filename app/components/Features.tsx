@@ -3,7 +3,7 @@
 import React from 'react';
 import { CircleDot, Sparkles, BarChart3 } from 'lucide-react';
 import { useTranslations } from '@/hooks/use-translations';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '../components/ui';
 
 interface FeatureCardProps {
   icon: React.ReactNode;

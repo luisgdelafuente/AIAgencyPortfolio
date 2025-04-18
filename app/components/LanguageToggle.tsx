@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { 
+  Button, 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
+} from '../components/ui';
 import { useLanguage, Language } from '@/hooks/use-language';
 
 export default function LanguageToggle() {

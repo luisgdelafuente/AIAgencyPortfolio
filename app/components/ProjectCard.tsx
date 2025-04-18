@@ -11,10 +11,10 @@ interface ProjectCardProps {
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md">
-      {project.image_url && (
+      {project.imageUrl && (
         <div className="h-48 relative overflow-hidden">
           <img 
-            src={project.image_url} 
+            src={project.imageUrl} 
             alt={project.title} 
             className="w-full h-full object-cover"
           />

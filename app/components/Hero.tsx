@@ -1,79 +1,64 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useTranslations } from '../hooks/use-translations';
 import { Skeleton } from '@/components/ui/skeleton';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { useTranslations } from '../hooks/use-translations';
 
-interface HeroContent {
-  heroTitle?: string;
-  heroSubtitle?: string;
-  heroCta?: string;
-  blogCta?: string;
-  comingSoon?: string;
-  featuresTitle?: string;
-  featuresSubtitle?: string;
-  [key: string]: any;
-}
-
-export default function Hero({ content, isLoading }: { content: HeroContent, isLoading: boolean }) {
+export default function Hero({ content = {}, isLoading = false }: { content?: any; isLoading?: boolean }) {
   const t = useTranslations();
   
-  // Loading state with skeletons
   if (isLoading) {
     return (
-      <section className="pt-32 pb-16 bg-white">
-        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex flex-col items-center gap-6">
-              <Skeleton className="h-12 w-3/4 max-w-2xl" />
-              <Skeleton className="h-4 w-1/2 max-w-xl" />
-              <div className="flex gap-4 mt-8">
-                <Skeleton className="h-10 w-28" />
-                <Skeleton className="h-10 w-28" />
-              </div>
+      <div className="relative overflow-hidden bg-gray-900 text-white">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-8">
+          <div className="max-w-3xl">
+            <Skeleton className="h-12 w-80 bg-gray-800" />
+            <Skeleton className="h-12 w-64 bg-gray-800 mt-2" />
+            <Skeleton className="h-4 w-full bg-gray-800 mt-6" />
+            <Skeleton className="h-4 w-5/6 bg-gray-800 mt-2" />
+            <Skeleton className="h-4 w-4/6 bg-gray-800 mt-2" />
+            <div className="mt-8 flex gap-4">
+              <Skeleton className="h-10 w-32 bg-gray-800" />
+              <Skeleton className="h-10 w-32 bg-gray-800" />
             </div>
           </div>
         </div>
-      </section>
+      </div>
     );
   }
-  
+
   return (
-    <section className="pt-32 pb-16 bg-white">
-      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center px-4 py-1 mb-6 rounded-full bg-gray-100 text-gray-900">
-            <span className="text-sm font-medium">Coming Soon!</span>
-          </div>
-          {content.heroTitle && (
-            <h1 className="text-4xl sm:text-7xl font-bold text-gray-900 tracking-tight max-w-[85%] mx-auto sm:leading-[1.2]">
-              {content.heroTitle.split(' ').length > 2 
-                ? <>
-                    {content.heroTitle.split(' ').slice(0, -2).join(' ')} <span className="text-gray-900">{content.heroTitle.split(' ').slice(-2).join(' ')}</span>
-                  </>
-                : content.heroTitle
-              }
-            </h1>
-          )}
-          {content.heroSubtitle && (
-            <p className="mt-6 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
-              {content.heroSubtitle}
-            </p>
-          )}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="px-6 py-3 bg-black text-white rounded-md font-medium">
-              <Link href="/blog">{content.blogCta || t.hero.readBlog}</Link>
+    <div className="relative overflow-hidden bg-gray-900 text-white">
+      <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-8">
+        <div className="max-w-3xl">
+          <h1 className="block text-4xl font-bold sm:text-5xl lg:text-6xl">
+            {content.heroTitle || t.hero.title}
+          </h1>
+          <p className="mt-6 text-lg text-gray-300">
+            {content.heroSubtitle || t.hero.subtitle}
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <Button asChild size="lg">
+              <Link href="#waitlist">
+                {content.heroPrimaryText || t.hero.cta}
+              </Link>
             </Button>
-            {content.heroCta && (
-              <Button asChild variant="outline" size="lg" className="px-6 py-3 rounded-md border border-gray-300 text-gray-700 hover:border-gray-400">
-                <a href="#waitlist">{content.heroCta}</a>
-              </Button>
-            )}
+            <Button asChild variant="outline" size="lg" className="bg-transparent text-white border-white hover:bg-gray-800">
+              <Link href="/blog" className="inline-flex items-center">
+                {content.heroSecondaryText || t.hero.readBlog}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
-    </section>
+      
+      {/* Optional background pattern */}
+      <div className="absolute inset-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMCAxMCkiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGNpcmNsZSBzdHJva2U9IiMwMDAiIHN0cm9rZS1vcGFjaXR5PSIuMDUiIHN0cm9rZS13aWR0aD0iMSIgcj0iMSIvPjwvZz48L3N2Zz4=')] opacity-5 z-0" aria-hidden="true">
+      </div>
+    </div>
   );
 }

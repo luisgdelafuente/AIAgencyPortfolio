@@ -39,6 +39,7 @@ export const defaultMetadata: Metadata = {
 // Function to extract metadata from page content
 export function extractMetadataFromContent(pageContent: PageContent | null): Metadata {
   if (!pageContent) {
+    console.error('No page content available for metadata extraction');
     return defaultMetadata;
   }
 
@@ -47,11 +48,21 @@ export function extractMetadataFromContent(pageContent: PageContent | null): Met
     
     // If there's no metadata in the content, return default
     if (!content.metadata) {
+      console.warn('No metadata found in page content, using defaults');
       return defaultMetadata;
     }
     
     // Extract metadata from content
     const metadata = content.metadata;
+    console.log('Page metadata from database:', metadata);
+    
+    // For debugging purposes
+    console.log(`Metadata URL: ${metadata.canonical || 'https://hal149.com'}`);
+    
+    // Construct OpenGraph images array
+    const ogImages = metadata.ogImage 
+      ? [{ url: metadata.ogImage, width: 1200, height: 630, alt: metadata.title || 'HAL149' }]
+      : defaultMetadata.openGraph?.images;
     
     // Combine with default metadata, favoring the content's values
     return {
@@ -59,29 +70,27 @@ export function extractMetadataFromContent(pageContent: PageContent | null): Met
       description: metadata.description || defaultMetadata.description,
       keywords: metadata.keywords || defaultMetadata.keywords,
       openGraph: {
-        ...defaultMetadata.openGraph,
-        title: metadata.ogTitle || metadata.title || defaultMetadata.openGraph?.title,
-        description: metadata.ogDescription || metadata.description || defaultMetadata.openGraph?.description,
-        images: metadata.ogImage 
-          ? [
-              {
-                url: metadata.ogImage,
-                width: 1200,
-                height: 630,
-                alt: metadata.title || 'HAL149',
-              },
-            ]
-          : defaultMetadata.openGraph?.images,
+        type: 'website',
+        locale: 'en_US',
+        url: metadata.canonical || 'https://hal149.com',
+        siteName: 'HAL149',
+        title: metadata.ogTitle || metadata.title || defaultMetadata.title,
+        description: metadata.ogDescription || metadata.description || defaultMetadata.description,
+        images: ogImages,
       },
       twitter: {
-        ...defaultMetadata.twitter,
-        title: metadata.title || defaultMetadata.twitter?.title,
-        description: metadata.description || defaultMetadata.twitter?.description,
-        images: metadata.ogImage 
-          ? [metadata.ogImage]
-          : defaultMetadata.twitter?.images,
+        card: 'summary_large_image',
+        title: metadata.title || defaultMetadata.title,
+        description: metadata.description || defaultMetadata.description,
+        images: metadata.ogImage ? [metadata.ogImage] : defaultMetadata.twitter?.images,
       },
-      robots: metadata.robots || defaultMetadata.robots,
+      robots: {
+        index: true,
+        follow: true,
+      },
+      alternates: {
+        canonical: metadata.canonical || 'https://hal149.com',
+      },
     };
   } catch (error) {
     console.error('Error parsing page content:', error);
@@ -110,11 +119,12 @@ export function createMetadata(
     title: pageTitle,
     description: pageDescription,
     openGraph: {
-      ...defaultMetadata.openGraph,
+      type: (pageType === 'blog' || pageType === 'projects' ? 'article' : 'website'),
+      locale: 'en_US',
+      url: pageUrl,
+      siteName: 'HAL149',
       title: pageTitle || undefined,
       description: pageDescription || undefined,
-      url: pageUrl || undefined,
-      type: (pageType === 'blog' || pageType === 'projects' ? 'article' : 'website') as any,
       images: data.image 
         ? [
             {
@@ -127,12 +137,14 @@ export function createMetadata(
         : defaultMetadata.openGraph?.images,
     },
     twitter: {
-      ...defaultMetadata.twitter,
+      card: 'summary_large_image',
       title: pageTitle || undefined,
       description: pageDescription || undefined,
-      images: data.image 
-        ? [data.image]
-        : defaultMetadata.twitter?.images,
+      images: data.image ? [data.image] : defaultMetadata.twitter?.images,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
     alternates: {
       canonical: canonical,

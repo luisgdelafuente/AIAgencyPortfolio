@@ -1,128 +1,111 @@
 "use client";
 
-import { createContext, useState, useEffect, ReactNode } from "react";
-import { toast } from "@/hooks/use-toast";
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { Toast } from "@/components/ui/toast";
 
 interface User {
   id: number;
   username: string;
+  role: string;
 }
 
-interface AuthState {
-  isAuthenticated: boolean;
+interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-}
-
-interface AuthContextType extends AuthState {
-  login: (username: string, password: string) => Promise<{success: boolean, message: string}>;
+  isAuthenticated: boolean;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  checkAuth: () => Promise<boolean>;
+  checkAuth: () => Promise<void>;
 }
 
-const initialState: AuthState = {
-  isAuthenticated: false,
-  user: null,
-  isLoading: true
-};
+export const AuthContext = React.createContext<AuthContextType | null>(null);
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = React.useState<User | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
+  const router = useRouter();
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>(initialState);
-
-  const checkAuth = async (): Promise<boolean> => {
-    try {
-      const response = await fetch("/api/auth/check", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      const data = await response.json();
-      setState({
-        isAuthenticated: data.authenticated,
-        user: data.user || null,
-        isLoading: false
-      });
-      
-      return data.authenticated;
-    } catch (error) {
-      console.error("Error checking authentication:", error);
-      setState({
-        ...state,
-        isLoading: false
-      });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const login = async (username: string, password: string): Promise<{success: boolean, message: string}> => {
+  const login = async (username: string, password: string): Promise<void> => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setState({
-          isAuthenticated: true,
-          user: data.user,
-          isLoading: false
-        });
-        return { success: true, message: "Login successful" };
-      } else {
-        return { success: false, message: data.message || "Login failed" };
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
       }
+
+      setUser(data.user);
+      setIsAuthenticated(true);
+      router.push("/admin");
     } catch (error) {
       console.error("Login error:", error);
-      return { success: false, message: "An error occurred during login" };
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async (): Promise<void> => {
+    setIsLoading(true);
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      
-      setState({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false
-      });
-      
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out",
-      });
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+      setIsAuthenticated(false);
+      router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const checkAuth = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/auth/check");
+      const data = await response.json();
+
+      setIsAuthenticated(data.authenticated);
+      setUser(data.user);
+    } catch (error) {
+      console.error("Auth check error:", error);
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check authentication on component mount
+  React.useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const contextValue = React.useMemo(
+    () => ({
+      user,
+      isLoading,
+      isAuthenticated,
+      login,
+      logout,
+      checkAuth,
+    }),
+    [user, isLoading, isAuthenticated]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        ...state,
-        login,
-        logout,
-        checkAuth
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

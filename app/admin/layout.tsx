@@ -1,42 +1,31 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/use-auth";
-import { AdminNav } from "@/components/AdminNav";
-import { Toaster } from "@/components/ui/toaster";
+import * as React from "react";
+import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+import AdminNav from "@/components/AdminNav";
 
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isLoading, isAuthenticated, router]);
-  
-  if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-  
-  if (!isAuthenticated) {
-    return null;
-  }
+  const pathname = usePathname();
+  const title = React.useMemo(() => {
+    const path = pathname?.split("/").pop() || "dashboard";
+    return path.charAt(0).toUpperCase() + path.slice(1);
+  }, [pathname]);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen">
       <AdminNav />
-      <main className="flex-1 p-8 overflow-y-auto bg-gray-100">
+      <div className="flex-1 overflow-auto p-8">
         <div className="max-w-5xl mx-auto">
+          <h1 className="text-2xl font-bold mb-6">{title}</h1>
           {children}
         </div>
-      </main>
-      <Toaster />
+      </div>
     </div>
   );
 }

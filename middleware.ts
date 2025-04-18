@@ -1,45 +1,41 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-// This middleware will run before all requests
 export async function middleware(request: NextRequest) {
-  // Only run this middleware for admin routes
-  if (!request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.next();
+  // Get the path of the request
+  const path = request.nextUrl.pathname;
+
+  // Define public paths that don't need authentication
+  const isPublicPath = 
+    path === "/login" || 
+    !path.startsWith("/admin");
+
+  // Get the session cookie
+  const sessionCookie = request.cookies.get("session");
+  const isAuthenticated = !!sessionCookie?.value;
+
+  // If the path is a public path and user is authenticated, redirect to admin
+  if (isPublicPath && isAuthenticated && path === "/login") {
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
 
-  // Skip the middleware for API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    return NextResponse.next();
+  // If the path is not a public path and user is not authenticated, redirect to login
+  if (!isPublicPath && !isAuthenticated) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Check for the session cookie
-  const sessionCookie = request.cookies.get('session');
-
-  // If there's no session cookie, redirect to the login page
-  if (!sessionCookie || !sessionCookie.value) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  try {
-    // Parse the session cookie value
-    const sessionData = JSON.parse(sessionCookie.value);
-    
-    // Check if the cookie contains valid user data
-    if (!sessionData || !sessionData.userId || !sessionData.username) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-    
-    // If everything is good, proceed to the requested page
-    return NextResponse.next();
-  } catch (error) {
-    // If there's an error parsing the cookie, redirect to the login page
-    console.error('Auth middleware error:', error);
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  return NextResponse.next();
 }
 
-// Configure the matcher to run this middleware only for admin routes
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|hallogoblack480.webp).*)",
+  ],
 };

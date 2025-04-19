@@ -1,12 +1,13 @@
 import { fetchPageContent } from '../lib/api';
 import { Metadata } from 'next';
-import { getPageMetadata } from '../lib/metadataUtils';
 import ContactForm from './ContactForm';
 import { marked } from 'marked';
 
-export async function generateMetadata(): Promise<Metadata> {
-  return getPageMetadata('contact');
-}
+export const metadata: Metadata = {
+  title: 'Contact Us | HAL149',
+  description: 'Get in touch with the HAL149 team for AI consulting, custom solutions, or any questions about our services.',
+  keywords: 'contact HAL149, AI consulting, AI services, get in touch',
+};
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

@@ -1,11 +1,12 @@
 import { fetchPageContent, fetchFeaturedProjects } from '../lib/api';
 import { Metadata } from 'next';
-import { getPageMetadata } from '../lib/metadataUtils';
 import Link from 'next/link';
 
-export async function generateMetadata(): Promise<Metadata> {
-  return getPageMetadata('projects');
-}
+export const metadata: Metadata = {
+  title: 'AI Projects & Case Studies | HAL149',
+  description: 'Explore our portfolio of successful AI implementations and innovative solutions across various industries.',
+  keywords: 'AI projects, machine learning portfolio, HAL149 case studies, artificial intelligence implementations',
+};
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

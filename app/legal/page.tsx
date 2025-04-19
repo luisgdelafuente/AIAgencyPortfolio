@@ -1,11 +1,12 @@
 import { fetchPageContent } from '../lib/api';
 import { Metadata } from 'next';
-import { getPageMetadata } from '../lib/metadataUtils';
 import { marked } from 'marked';
 
-export async function generateMetadata(): Promise<Metadata> {
-  return getPageMetadata('legal');
-}
+export const metadata: Metadata = {
+  title: 'Legal Information | HAL149',
+  description: 'Terms of Service, Privacy Policy, and Cookie Policy for HAL149, your trusted AI solutions provider.',
+  keywords: 'HAL149 legal, terms of service, privacy policy, cookie policy, AI services legal, data privacy',
+};
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

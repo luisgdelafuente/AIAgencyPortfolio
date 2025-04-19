@@ -1,29 +1,48 @@
-import { fetchFeaturedProjects, fetchProjectBySlug, fetchProjects } from '../../lib/api';
+import { fetchFeaturedProjects } from '../../lib/api';
 import { marked } from 'marked';
 import { Metadata, ResolvingMetadata } from 'next';
-import { getProjectMetadata } from '../../lib/metadataUtils';
 import Link from 'next/link';
 
 type Props = {
   params: { slug: string }
 };
 
-// Generate metadata for the project page using server-side data fetching
+// Generate metadata for the page
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // Use our dedicated project metadata function that fetches the project directly
-  // This is important for SEO as it ensures metadata is in the HTML source
-  return getProjectMetadata(params.slug);
+  // Fetch all projects and find the one with matching slug
+  const projects = await fetchFeaturedProjects();
+  const project = projects.find(project => project.slug === params.slug);
+  
+  // If no project is found, return default metadata
+  if (!project) {
+    return {
+      title: 'Project Not Found | HAL149',
+      description: 'The requested project could not be found.',
+    };
+  }
+  
+  // Return metadata based on the project
+  return {
+    title: `${project.title} | HAL149 Projects`,
+    description: project.description,
+    keywords: `${project.title}, ${project.category}, HAL149 projects, AI solutions`,
+    openGraph: {
+      title: project.title,
+      description: project.description,
+      images: project.imageUrl ? [project.imageUrl] : undefined,
+    },
+  };
 }
 
 export default async function ProjectPage({ params }: Props) {
-  // Fetch the specific project by slug - server-side fetch for SEO
-  const project = await fetchProjectBySlug(params.slug);
+  // Fetch all projects
+  const projects = await fetchFeaturedProjects();
   
-  // Also fetch all projects for related content
-  const projects = await fetchProjects();
+  // Find the project with matching slug
+  const project = projects.find(project => project.slug === params.slug);
   
   // If project doesn't exist, show a not found message
   if (!project) {

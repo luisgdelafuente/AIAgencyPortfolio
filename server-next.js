@@ -17,8 +17,8 @@ app.prepare().then(() => {
       res.statusCode = 500;
       res.end('Internal Server Error');
     });
-  }).listen(port, '0.0.0.0', (err) => {
+  }).listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Next.js ready on http://0.0.0.0:${port}`);
+    console.log(`> Next.js ready on http://localhost:${port}`);
   });
 });

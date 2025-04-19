@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { slugify } from "../shared/utils";
-import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema, insertPageContentSchema, insertContactMessageSchema } from "../shared/schema";
+import { insertBlogPostSchema, insertProjectSchema, insertWaitlistSchema, insertPageContentSchema, insertContactMessageSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { setupAuth } from "./auth";

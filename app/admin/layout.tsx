@@ -1,31 +1,55 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { ReactNode } from "react";
-import { usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
-import AdminNav from "@/components/AdminNav";
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import AdminNav from '@/components/AdminNav';
+import { Toaster } from '@/components/ui/toaster';
 
-interface AdminLayoutProps {
-  children: ReactNode;
-}
+// This layout is applied to all admin/* routes except the login page
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, checkAuth } = useAuth();
+  const router = useRouter();
 
-export default function AdminLayout({ children }: AdminLayoutProps) {
-  const pathname = usePathname();
-  const title = React.useMemo(() => {
-    const path = pathname?.split("/").pop() || "dashboard";
-    return path.charAt(0).toUpperCase() + path.slice(1);
-  }, [pathname]);
+  useEffect(() => {
+    // Check authentication status when the component mounts
+    const verifyAuth = async () => {
+      // Only redirect if we've checked auth status and user is not authenticated
+      const isAuthed = await checkAuth();
+      if (!isAuthed) {
+        router.push('/admin');
+      }
+    };
+    
+    verifyAuth();
+  }, [checkAuth, router]);
 
-  return (
-    <div className="flex h-screen">
-      <AdminNav />
-      <div className="flex-1 overflow-auto p-8">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">{title}</h1>
-          {children}
+  // If not authenticated, show a simple loading state
+  // The useEffect above will redirect to login page
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-lg">Loading...</p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Admin sidebar navigation */}
+      <AdminNav />
+      
+      {/* Main content */}
+      <div className="flex-1 flex flex-col">
+        <main className="flex-1 p-6 overflow-y-auto">
+          {children}
+        </main>
+      </div>
+      
+      <Toaster />
     </div>
   );
 }

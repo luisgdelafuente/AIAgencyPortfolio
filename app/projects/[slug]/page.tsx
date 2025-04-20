@@ -169,7 +169,7 @@ export default async function ProjectPage({ params }: Props) {
                       aria-label={`Read more about ${relatedProject.title} project`}
                       title={`View details for ${relatedProject.title}`}
                     >
-                      Read more
+                      Read more about {relatedProject.title}
                       <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>

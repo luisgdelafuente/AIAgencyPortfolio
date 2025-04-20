@@ -370,7 +370,7 @@ export default function AdminProjects() {
                           size="sm"
                           asChild
                         >
-                          <Link href={`/projects/${project.slug}`} target="_blank">
+                          <Link href={`/projects/${project.slug}/`} target="_blank">
                             <Eye className="w-4 h-4" />
                           </Link>
                         </Button>

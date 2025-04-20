@@ -73,7 +73,7 @@ export default function Projects() {
               )}
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
               {isLoading ? (
                 // Skeleton loaders while data is loading
                 Array(4).fill(0).map((_, i) => (
@@ -93,7 +93,7 @@ export default function Projects() {
                   <ProjectCard key={project.id} project={project} />
                 ))
               ) : (
-                <div className="col-span-2 text-center py-12">
+                <div className="col-span-3 text-center py-12">
                   <p className="text-gray-500">No projects available yet.</p>
                 </div>
               )}

@@ -75,9 +75,11 @@ export default async function Projects() {
                     </div>
                   )}
                   <div className="p-6">
-                    <span className="inline-block px-3 py-1 text-xs font-medium bg-gray-100 rounded-full mb-3">
-                      {project.category || 'Project'}
-                    </span>
+                    <div className="mb-3">
+                      <span className="text-sm text-gray-500">
+                        {project.category || 'Project'}
+                      </span>
+                    </div>
                     <h2 className="text-xl font-bold mb-2 line-clamp-2">
                       <Link href={`/projects/${project.slug}/`} className="hover:text-gray-600 transition-colors">
                         {project.title}
@@ -90,7 +92,7 @@ export default async function Projects() {
                       aria-label={`Read more about ${project.title} project`}
                       title={`View details for ${project.title}`}
                     >
-                      Read more about {project.title}
+                      Read more
                       <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>

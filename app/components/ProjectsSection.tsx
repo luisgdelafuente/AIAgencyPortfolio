@@ -68,9 +68,11 @@ export default function ProjectsSection({ projects, isLoading = false }: Project
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.projects.subtitle}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          {[...projects]
+            .sort((a, b) => new Date(b.publishedAt || b.createdAt || 0).getTime() - new Date(a.publishedAt || a.createdAt || 0).getTime())
+            .map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
         </div>
         <div className="text-center">
           <Button asChild variant="outline" size="lg">

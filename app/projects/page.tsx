@@ -62,8 +62,10 @@ export default async function Projects() {
       <section className="py-16">
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           {projects && projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project: any) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...projects]
+                .sort((a, b) => new Date(b.publishedAt || b.createdAt || 0).getTime() - new Date(a.publishedAt || a.createdAt || 0).getTime())
+                .map((project: any) => (
                 <article key={project.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md">
                   {project.imageUrl && (
                     <div className="h-48 relative overflow-hidden">

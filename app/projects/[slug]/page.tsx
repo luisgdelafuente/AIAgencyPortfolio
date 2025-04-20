@@ -158,13 +158,13 @@ export default async function ProjectPage({ params }: Props) {
                       {relatedProject.category}
                     </span>
                     <h3 className="text-xl font-bold mb-2 line-clamp-2">
-                      <Link href={`/projects/${relatedProject.slug}`} className="hover:text-gray-600 transition-colors">
+                      <Link href={`/projects/${relatedProject.slug}/`} className="hover:text-gray-600 transition-colors">
                         {relatedProject.title}
                       </Link>
                     </h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{relatedProject.description}</p>
                     <Link
-                      href={`/projects/${relatedProject.slug}`}
+                      href={`/projects/${relatedProject.slug}/`}
                       className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
                       aria-label={`Read more about ${relatedProject.title} project`}
                       title={`View details for ${relatedProject.title}`}
@@ -180,7 +180,7 @@ export default async function ProjectPage({ params }: Props) {
             </div>
             <div className="text-center mt-10">
               <Link 
-                href="/projects" 
+                href="/projects/" 
                 className="inline-flex items-center justify-center h-12 px-6 font-medium border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 View All Projects
@@ -198,7 +198,7 @@ export default async function ProjectPage({ params }: Props) {
             Contact us to discuss how we can build a custom AI solution tailored to your specific business needs.
           </p>
           <Link 
-            href="/contact" 
+            href="/contact/" 
             className="inline-flex items-center justify-center h-12 px-6 font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
           >
             Contact Us

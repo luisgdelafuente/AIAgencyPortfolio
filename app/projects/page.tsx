@@ -79,13 +79,13 @@ export default async function Projects() {
                       {project.category || 'Project'}
                     </span>
                     <h2 className="text-xl font-bold mb-2 line-clamp-2">
-                      <Link href={`/projects/${project.slug}`} className="hover:text-gray-600 transition-colors">
+                      <Link href={`/projects/${project.slug}/`} className="hover:text-gray-600 transition-colors">
                         {project.title}
                       </Link>
                     </h2>
                     <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
                     <Link
-                      href={`/projects/${project.slug}`}
+                      href={`/projects/${project.slug}/`}
                       className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
                       aria-label={`Read more about ${project.title} project`}
                       title={`View details for ${project.title}`}
@@ -120,7 +120,7 @@ export default async function Projects() {
             {pageContent.ctaText || 'Get in touch to discuss how our AI solutions can help your organization achieve its goals.'}
           </p>
           <Link 
-            href="/contact" 
+            href="/contact/" 
             className="inline-flex items-center justify-center h-12 px-6 font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
           >
             {pageContent.ctaButton || 'Contact Us'}

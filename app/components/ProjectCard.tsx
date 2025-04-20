@@ -27,7 +27,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <h3 className="text-xl font-bold mb-2">{project.title}</h3>
         <p className="text-gray-600 mb-4 line-clamp-2">{project.description}</p>
         <Link 
-          href={`/projects/${project.slug}`}
+          href={`/projects/${project.slug}/`}
           className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
           aria-label={`Read more about ${project.title} project`}
           title={`View details for ${project.title}`}

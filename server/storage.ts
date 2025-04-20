@@ -5,7 +5,7 @@ import {
   waitlist, type WaitlistEntry, type InsertWaitlistEntry,
   pageContents, type PageContent, type InsertPageContent,
   contactMessages, type ContactMessage, type InsertContactMessage
-} from "@shared/schema";
+} from "../shared/schema";
 
 export interface IStorage {
   // User methods

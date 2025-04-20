@@ -1,138 +1,24 @@
-import express from 'express';
+// server-next.js - A simple script to run Next.js
+import { createServer } from 'http';
+import { parse } from 'url';
 import next from 'next';
-import cors from 'cors';
-import compression from 'compression';
-// Import the path module to help resolve file paths
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-// Get the current file's directory
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// This will dynamically import TypeScript files using tsx
-const { createTables } = await import('./server/createTables.ts');
-const { db } = await import('./server/db.ts');
-const { registerRoutes } = await import('./server/routes.ts');
-
-// Initialize Next.js
-const port = process.env.PORT || 5000; // Use port 5000 to match previous setup
 const dev = process.env.NODE_ENV !== 'production';
-const nextApp = next({ dev });
-const handle = nextApp.getRequestHandler();
+const app = next({ dev });
+const handle = app.getRequestHandler();
+const port = parseInt(process.env.PORT || '3000', 10);
 
-// Database initialization
-async function checkSupabaseTables() {
-  console.log('Checking if Supabase tables exist...');
-  await createTables();
-  console.log('Table check completed. Tables need to be created manually in Supabase dashboard if they don\'t exist.');
-  console.log(`Table structure:
-- users: id, username, password
-- blog_posts: id, title, slug, excerpt, content, image_url, published_at
-- projects: id, title, slug, description, content, category, image_url, is_featured
-- waitlist: id, email, submitted_at
-- page_contents: id, page, content, updated_at
-- contact_messages: id, name, email, subject, message, submitted_at, read`);
-}
-
-// Prepare and start the server
-nextApp.prepare().then(async () => {
-  const server = express();
-  
-  // Check database tables
-  await checkSupabaseTables();
-  
-  // Enable compression for all responses
-  server.use(compression({
-    level: 6,
-    threshold: 0,
-    filter: () => true
-  }));
-  
-  // Redirect Replit domain to custom domain
-  server.use((req, res, next) => {
-    const host = req.header('host');
+app.prepare().then(() => {
+  createServer((req, res) => {
+    const parsedUrl = parse(req.url, true);
     
-    // Check if it's a Replit domain
-    if (host && host.includes('replit.app')) {
-      // Get the path including query string
-      const fullPath = req.url;
-      const customDomain = 'hal149.com';
-      
-      // Redirect to the same path on the custom domain
-      return res.redirect(301, `https://${customDomain}${fullPath}`);
-    }
-    
-    next();
+    handle(req, res, parsedUrl).catch(err => {
+      console.error('Error occurred handling request:', err);
+      res.statusCode = 500;
+      res.end('Internal Server Error');
+    });
+  }).listen(port, (err) => {
+    if (err) throw err;
+    console.log(`> Next.js ready on http://localhost:${port}`);
   });
-  
-  // Configure CORS
-  server.use(cors({
-    origin: true,
-    credentials: true
-  }));
-  
-  // Add additional headers for CORS and security
-  server.use((req, res, next) => {
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-  });
-  
-  server.use(express.json());
-  server.use(express.urlencoded({ extended: false }));
-  
-  // Logging middleware for API routes
-  server.use((req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      const start = Date.now();
-      const path = req.path;
-      let capturedJsonResponse;
-      
-      const originalResJson = res.json;
-      res.json = function (bodyJson, ...args) {
-        capturedJsonResponse = bodyJson;
-        return originalResJson.apply(res, [bodyJson, ...args]);
-      };
-      
-      res.on("finish", () => {
-        const duration = Date.now() - start;
-        let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-        
-        if (capturedJsonResponse) {
-          logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-        }
-        
-        if (logLine.length > 80) {
-          logLine = logLine.slice(0, 79) + "…";
-        }
-        
-        console.log(logLine);
-      });
-    }
-    next();
-  });
-  
-  // Register the existing API routes
-  // This maintains compatibility with the current Express setup
-  // while allowing Next.js to handle frontend rendering
-  await registerRoutes(server);
-  
-  // Let Next.js handle everything else
-  server.all('*', (req, res) => {
-    return handle(req, res);
-  });
-  
-  // Start the server
-  server.listen(port, '0.0.0.0', () => {
-    console.log(`> Ready on http://localhost:${port}`);
-  });
-}).catch(err => {
-  console.error('Error starting server:', err);
-  process.exit(1);
 });

@@ -1,169 +1,219 @@
 'use client';
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { BlogPost, Project, WaitlistEntry, ContactMessage } from '@shared/schema';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatDate } from '@shared/utils';
-import { Mail, FileText, Briefcase, Users } from 'lucide-react';
-import { AdminMetadata } from '@/components/AdminMetadata';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function AdminDashboard() {
-  // Fetch data for the dashboard
-  const { data: blogPosts } = useQuery<BlogPost[]>({
-    queryKey: ['/api/blog'],
-  });
-  
-  const { data: projects } = useQuery<Project[]>({
-    queryKey: ['/api/projects'],
-  });
-  
-  const { data: waitlistEntries } = useQuery<WaitlistEntry[]>({
-    queryKey: ['/api/waitlist'],
-  });
-  
-  const { data: contactMessages } = useQuery<ContactMessage[]>({
-    queryKey: ['/api/contact'],
-  });
-  
-  // Calculate unread messages
-  const unreadMessages = contactMessages?.filter(msg => !msg.read).length || 0;
-  
-  // Get the latest blog post and project
-  const latestBlogPost = blogPosts && blogPosts.length > 0 ? blogPosts[0] : null;
-  const latestProject = projects && projects.length > 0 ? projects[0] : null;
-  
-  return (
-    <>
-      <AdminMetadata 
-        title="Dashboard | Admin" 
-        noIndex={true}
-      />
-      
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        
-        {/* Stats overview */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{blogPosts?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {latestBlogPost 
-                  ? `Last updated: ${formatDate(latestBlogPost.publishedAt)}`
-                  : 'No posts yet'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Projects</CardTitle>
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{projects?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {latestProject
-                  ? `Latest: ${latestProject.title}`
-                  : 'No projects yet'}
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Waitlist</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{waitlistEntries?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                Total subscribers
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Messages</CardTitle>
-              <Mail className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{contactMessages?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">
-                {unreadMessages > 0 ? `${unreadMessages} unread` : 'All read'}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Recent content */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Recent blog posts */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Blog Posts</CardTitle>
-              <CardDescription>Latest published articles</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {blogPosts && blogPosts.length > 0 ? (
-                <div className="space-y-4">
-                  {blogPosts.slice(0, 5).map(post => (
-                    <div key={post.id} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded bg-gray-200 flex-shrink-0 overflow-hidden">
-                        {post.imageUrl && (
-                          <img 
-                            src={post.imageUrl} 
-                            alt={post.title}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{post.title}</p>
-                        <p className="text-xs text-gray-500">{formatDate(post.publishedAt)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500">No blog posts yet</p>
-              )}
-            </CardContent>
-          </Card>
-          
-          {/* Recent messages */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Messages</CardTitle>
-              <CardDescription>Latest contact form submissions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {contactMessages && contactMessages.length > 0 ? (
-                <div className="space-y-4">
-                  {contactMessages.slice(0, 5).map(message => (
-                    <div key={message.id} className="flex items-start gap-3">
-                      <div className={`w-2 h-2 rounded-full mt-2 ${message.read ? 'bg-gray-300' : 'bg-blue-500'}`} />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{message.subject}</p>
-                        <p className="text-xs mb-1">From: {message.name} ({message.email})</p>
-                        <p className="text-xs text-gray-500">{formatDate(message.submittedAt)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-500">No messages yet</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+// Dashboard data type
+interface DashboardData {
+  blogCount: number;
+  projectCount: number;
+  messageCount: number;
+  waitlistCount: number;
+  activityData: { name: string; count: number }[];
+}
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch counts
+        const [blogRes, projectsRes, messagesRes, waitlistRes] = await Promise.all([
+          fetch('/api/blog'),
+          fetch('/api/projects'),
+          fetch('/api/contact'),
+          fetch('/api/waitlist')
+        ]);
+
+        const blogs = await blogRes.json();
+        const projects = await projectsRes.json();
+        const messages = await messagesRes.json();
+        const waitlist = await waitlistRes.json();
+
+        // Create activity data (for chart)
+        const activityData = [
+          { name: 'Blog Posts', count: blogs.length },
+          { name: 'Projects', count: projects.length },
+          { name: 'Messages', count: messages.length },
+          { name: 'Waitlist', count: waitlist.length }
+        ];
+
+        setData({
+          blogCount: blogs.length,
+          projectCount: projects.length,
+          messageCount: messages.length,
+          waitlistCount: waitlist.length,
+          activityData
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome back, {user?.username || 'Admin'}!
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data?.blogCount || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Total blog posts
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Projects</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data?.projectCount || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Total projects
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Messages</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data?.messageCount || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Contact messages
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Waitlist</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{data?.waitlistCount || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Waitlist subscribers
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 grid-cols-1">
+        <Card>
+          <CardHeader>
+            <CardTitle>Content Overview</CardTitle>
+            <CardDescription>
+              Distribution of content across your website
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={data?.activityData || []}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

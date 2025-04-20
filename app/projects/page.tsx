@@ -1,110 +1,130 @@
-'use client';
+import { fetchPageContent, fetchFeaturedProjects } from '../lib/api';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
-import React, { useMemo } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { useQuery } from '@tanstack/react-query';
-import { Project, PageContent } from '@shared/schema';
-import { Skeleton } from '@/components/ui/skeleton';
-import MetaTags from '@/components/MetaTags';
-import { extractMetadata } from '@/lib/metadata';
-import ProjectCard from '@/components/ProjectCard';
+export const metadata: Metadata = {
+  title: 'AI Projects & Case Studies | HAL149',
+  description: 'Explore our portfolio of successful AI implementations and innovative solutions across various industries.',
+  keywords: 'AI projects, machine learning portfolio, HAL149 case studies, artificial intelligence implementations',
+};
 
-export default function Projects() {
-  // Fetch projects
-  const { data: projects, isLoading: isLoadingProjects } = useQuery<Project[]>({
-    queryKey: ['/api/projects'],
-  });
-
-  // Fetch page metadata
-  const { data: pageContent, isLoading: isLoadingContent } = useQuery<PageContent>({
-    queryKey: ['/api/page-contents/projects'],
-  });
-
-  // Extract metadata with defaults
-  const metadata = extractMetadata(pageContent);
-
-  // Parse the content
-  const content = useMemo(() => {
-    if (!pageContent?.content) return {};
-    
-    try {
-      return typeof pageContent.content === 'string'
-        ? JSON.parse(pageContent.content)
-        : pageContent.content;
-    } catch (error) {
-      console.error('Error parsing projects page content JSON:', error);
-      return {};
-    }
-  }, [pageContent]);
-
-  // Loading state with skeletons
-  const isLoading = isLoadingProjects || isLoadingContent;
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow pt-24 pb-16">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
-              <Skeleton className="h-12 w-1/3 mx-auto" />
-              <Skeleton className="h-6 w-2/3 mx-auto mt-4" />
-            </div>
-            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg">
-                  <Skeleton className="h-48 w-full" />
-                  <div className="p-6 flex-grow">
-                    <Skeleton className="h-6 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+// Parse content from string to JSON
+const parseContent = (content: string | undefined) => {
+  if (!content) return {};
+  try {
+    return typeof content === 'string' ? JSON.parse(content) : content;
+  } catch (error) {
+    console.error('Error parsing JSON content:', error);
+    return {};
   }
+};
+
+export default async function Projects() {
+  // Fetch data using server components
+  const pageContentData = await fetchPageContent('projects');
+  const projects = await fetchFeaturedProjects();
+  
+  // Parse the page content
+  const pageContent = parseContent(pageContentData?.content);
 
   return (
-    <>
-      <MetaTags 
-        metadata={metadata} 
-        url="https://hal149.com/projects/" 
-      />
-      
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow pt-24 pb-16">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                {content.projectsTitle || 'Our Projects'}
-              </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                {content.projectsSubtitle || 'Innovative and impactful projects we\'ve built'}
-              </p>
-            </div>
-            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-              {projects && projects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-              
-              {/* Show "No projects" message if projects array is empty */}
-              {projects && projects.length === 0 && (
-                <div className="col-span-full text-center py-10">
-                  <p className="text-xl text-gray-600">No projects available yet.</p>
-                </div>
-              )}
+    <div className="bg-white">
+      {/* Hero Section */}
+      <section className="bg-gray-900 text-white py-20">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl font-bold sm:text-5xl mb-4">
+              {pageContent.projectsTitle || 'Our AI Projects'}
+            </h1>
+            <p className="text-xl text-gray-300">
+              {pageContent.projectsSubtitle || 'Innovative AI solutions delivering real business value'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Project Filters - Future Enhancement */}
+      {/* <section className="py-8 bg-gray-50">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-medium">Filter by category</h2>
+            <div className="flex gap-2">
+              <button className="px-4 py-2 bg-gray-900 text-white rounded-md">All</button>
+              <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md">AI Applications</button>
+              <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md">Machine Learning</button>
+              <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-md">Data Analysis</button>
             </div>
           </div>
-        </main>
-        <Footer />
-      </div>
-    </>
+        </div>
+      </section> */}
+
+      {/* Projects Grid */}
+      <section className="py-16">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
+          {projects && projects.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((project: any) => (
+                <article key={project.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md">
+                  {project.imageUrl && (
+                    <div className="h-48 relative overflow-hidden">
+                      <img 
+                        src={project.imageUrl} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <span className="inline-block px-3 py-1 text-xs font-medium bg-gray-100 rounded-full mb-3">
+                      {project.category || 'Project'}
+                    </span>
+                    <h2 className="text-xl font-bold mb-2 line-clamp-2">
+                      <Link href={`/projects/${project.slug}`} className="hover:text-gray-600 transition-colors">
+                        {project.title}
+                      </Link>
+                    </h2>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
+                    >
+                      View Project
+                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <h2 className="text-xl font-medium text-gray-900 mb-2">No projects found</h2>
+              <p className="text-gray-600">
+                Check back soon for our portfolio of AI projects!
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            {pageContent.ctaTitle || 'Ready to Transform Your Business with AI?'}
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
+            {pageContent.ctaText || 'Get in touch to discuss how our AI solutions can help your organization achieve its goals.'}
+          </p>
+          <Link 
+            href="/contact" 
+            className="inline-flex items-center justify-center h-12 px-6 font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+          >
+            {pageContent.ctaButton || 'Contact Us'}
+          </Link>
+        </div>
+      </section>
+    </div>
   );
 }

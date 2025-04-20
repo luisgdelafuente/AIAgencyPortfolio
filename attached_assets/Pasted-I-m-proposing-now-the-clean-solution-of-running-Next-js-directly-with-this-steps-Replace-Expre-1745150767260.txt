@@ -1,0 +1,87 @@
+I´m proposing now the clean solution of running Next.js directly, with this steps: 
+
+Replace Express with a server-next.js Entrypoint
+
+1. Create a file: server-next.js
+This will become the custom server entry point, combining Next.js with Express if needed.
+// server-next.js
+import express from 'express'
+import next from 'next'
+
+const port = process.env.PORT || 3000
+const dev = process.env.NODE_ENV !== 'production'
+const app = next({ dev })
+const handle = app.getRequestHandler()
+
+app.prepare().then(() => {
+  const server = express()
+
+  // (Optional) Example: custom API route
+  server.get('/api/hello', (req, res) => {
+    res.json({ message: 'Hello from Express + Next.js' })
+  })
+
+  // Let Next.js handle everything else
+  server.all('*', (req, res) => {
+    return handle(req, res)
+  })
+
+  server.listen(port, () => {
+    console.log(`> Ready on http://localhost:${port}`)
+  })
+})
+
+
+2. Update package.json Scripts
+Make sure to add:
+json
+"scripts": {
+  "dev": "node server-next.js",
+  "build": "next build",
+  "start": "NODE_ENV=production node server-next.js"
+}
+This ensures both development and production environments run the same entrypoint.
+
+3. Update .replit File
+Update the .replit config like this:
+
+run = "npm run dev"
+
+[deployment]
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start"]
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+Remove any port 5000 or Vite references — you're now running everything on Next.js + Express under port 3000.
+
+4. Use app/ or pages/ for Pages and Metadata
+Continue building your app using the app/ directory (preferred) or pages/. You'll get full SSR, SEO, and dynamic Open Graph support like this:
+
+// app/[slug]/page.tsx
+export async function generateMetadata({ params }) {
+  const data = await fetch(`https://your-api.com/${params.slug}`).then(res => res.json())
+  return {
+    title: data.title,
+    description: data.description,
+    openGraph: {
+      title: data.title,
+      description: data.description,
+      images: [data.image],
+    }
+  }
+}
+
+
+Done!
+With server-next.js, you:
+
+Run Next.js properly via custom Express server
+
+Can keep using custom middleware / APIs if needed
+
+Get SSR + metadata support working in Replit
+
+Avoid double-server issues from vite + express

@@ -59,7 +59,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             title={`Read more about ${project.title}`}
             className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal py-1 px-2 hover:bg-gray-50 rounded-md"
           >
-            <span>Read more about {project.title}</span>
+            <span>Read more</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>

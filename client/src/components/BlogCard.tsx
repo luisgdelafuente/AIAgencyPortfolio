@@ -33,7 +33,7 @@ export default function BlogCard({ post }: BlogCardProps) {
           title={`Read more about ${post.title}`}
           className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal py-1 px-2 hover:bg-gray-50 rounded-md"
         >
-          <span>Read more about {post.title}</span>
+          <span>Read more</span>
           <ChevronRight className="w-4 h-4" />
         </Link>
       </div>

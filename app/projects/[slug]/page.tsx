@@ -155,22 +155,16 @@ export default async function ProjectPage({ params }: Props) {
                       {relatedProject.category}
                     </span>
                     <h3 className="text-xl font-bold mb-2 line-clamp-2">
-                      <Link href={`/projects/${relatedProject.slug}/`} className="hover:text-gray-600 transition-colors">
+                      <Link 
+                        href={`/projects/${relatedProject.slug}/`} 
+                        className="hover:text-gray-600 transition-colors"
+                        aria-label={`Read more about ${relatedProject.title} project`}
+                        title={`View details for ${relatedProject.title}`}
+                      >
                         {relatedProject.title}
                       </Link>
                     </h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{relatedProject.description}</p>
-                    <Link
-                      href={`/projects/${relatedProject.slug}/`}
-                      className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
-                      aria-label={`Read more about ${relatedProject.title} project`}
-                      title={`View details for ${relatedProject.title}`}
-                    >
-                      Read more
-                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
                   </div>
                 </article>
               ))}

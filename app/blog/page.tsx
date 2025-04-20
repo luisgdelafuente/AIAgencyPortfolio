@@ -67,22 +67,16 @@ export default async function Blog() {
                       </time>
                     </div>
                     <h2 className="text-xl font-bold mb-2 line-clamp-2">
-                      <Link href={`/blog/${post.slug}/`} className="hover:text-gray-600 transition-colors">
+                      <Link 
+                        href={`/blog/${post.slug}/`} 
+                        className="hover:text-gray-600 transition-colors"
+                        aria-label={`Read more about ${post.title} article`}
+                        title={`Read more about ${post.title}`}
+                      >
                         {post.title}
                       </Link>
                     </h2>
                     <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
-                    <Link
-                      href={`/blog/${post.slug}/`}
-                      className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
-                      aria-label={`Read more about ${post.title} article`}
-                      title={`Read more about ${post.title}`}
-                    >
-                      Read more
-                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
                   </div>
                 </article>
               ))}

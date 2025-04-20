@@ -25,19 +25,19 @@ export default function BlogCard({ post }: BlogCardProps) {
             {formatDate(post.publishedAt)}
           </span>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-3">{post.title}</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-3">
+          <Link 
+            href={`/blog/${post.slug}/`}
+            aria-label={`Read more about ${post.title} article`}
+            title={`Read more about ${post.title}`}
+            className="hover:text-gray-600 transition-colors"
+          >
+            {post.title}
+          </Link>
+        </h3>
         <p className="text-gray-600 mb-4 line-clamp-3">
           {post.excerpt}
         </p>
-        <Link 
-          href={`/blog/${post.slug}/`} 
-          aria-label={`Read more about ${post.title} article`}
-          title={`Read more about ${post.title}`}
-          className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal py-1 px-2 hover:bg-gray-50 rounded-md"
-        >
-          <span>Read more</span>
-          <ChevronRight className="w-4 h-4" />
-        </Link>
       </div>
     </div>
   );

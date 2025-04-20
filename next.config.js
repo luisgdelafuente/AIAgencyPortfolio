@@ -1,17 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static file serving
+  // Enable static file serving for standalone deployment
   output: 'standalone',
-  
-  // Rewrites API requests to our Express backend
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*',
-      },
-    ];
-  },
   
   // Configure images domains for loading from external sources
   images: {
@@ -22,6 +12,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  
+  // Configure server settings
+  serverExternalPackages: ['drizzle-orm'],
 };
 
 export default nextConfig;

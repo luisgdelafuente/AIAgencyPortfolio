@@ -2,8 +2,11 @@ import express from 'express';
 import next from 'next';
 import cors from 'cors';
 import compression from 'compression';
+// We'll use the existing createTables function and db from server
 import { createTables } from './server/createTables.js';
 import { db } from './server/db.js';
+// Import routes to maintain API compatibility
+import { registerRoutes } from './server/routes.js';
 
 // Initialize Next.js
 const port = process.env.PORT || 5000; // Use port 5000 to match previous setup
@@ -108,13 +111,10 @@ nextApp.prepare().then(async () => {
     next();
   });
   
-  // Import existing API routes
-  // We'll migrate these properly in Phase 2
-  server.use('/api', (req, res, next) => {
-    // For now, this is a placeholder for our API routes
-    // Will be replaced with actual route handlers
-    next();
-  });
+  // Register the existing API routes
+  // This maintains compatibility with the current Express setup
+  // while allowing Next.js to handle frontend rendering
+  await registerRoutes(server);
   
   // Let Next.js handle everything else
   server.all('*', (req, res) => {

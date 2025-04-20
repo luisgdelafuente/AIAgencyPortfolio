@@ -166,9 +166,11 @@ export default async function ProjectPage({ params }: Props) {
                     <Link
                       href={`/projects/${relatedProject.slug}`}
                       className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
+                      aria-label={`Read more about ${relatedProject.title} project`}
+                      title={`View details for ${relatedProject.title}`}
                     >
-                      View Project
-                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      Read more
+                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>

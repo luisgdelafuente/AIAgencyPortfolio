@@ -55,11 +55,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           )}
           <Link 
             href={`/projects/${project.slug}/`} 
-            aria-label={`Read the details of ${project.title} project`}
-            title="Read the project details"
+            aria-label={`Read more about ${project.title} project`}
+            title={`Read more about ${project.title}`}
             className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-normal py-1 px-2 hover:bg-gray-50 rounded-md"
           >
-            <span>Read more</span>
+            <span>Read more about {project.title}</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>

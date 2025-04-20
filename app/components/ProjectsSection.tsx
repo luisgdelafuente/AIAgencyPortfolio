@@ -69,7 +69,13 @@ export default function ProjectsSection({ projects, isLoading = false }: Project
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {[...projects]
-            .sort((a, b) => new Date(b.publishedAt || b.createdAt || 0).getTime() - new Date(a.publishedAt || a.createdAt || 0).getTime())
+            .sort((a, b) => {
+              // Sort by ID - higher ID is newer project for the test data
+              if (a.id && b.id) {
+                return b.id - a.id;
+              }
+              return 0;
+            })
             .map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}

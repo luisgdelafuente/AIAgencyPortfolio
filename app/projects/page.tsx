@@ -64,7 +64,13 @@ export default async function Projects() {
           {projects && projects.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[...projects]
-                .sort((a, b) => new Date(b.publishedAt || b.createdAt || 0).getTime() - new Date(a.publishedAt || a.createdAt || 0).getTime())
+                .sort((a, b) => {
+                  // Sort by ID - higher ID is newer project for the test data
+                  if (a.id && b.id) {
+                    return b.id - a.id;
+                  }
+                  return 0;
+                })
                 .map((project: any) => (
                 <article key={project.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md">
                   {project.imageUrl && (

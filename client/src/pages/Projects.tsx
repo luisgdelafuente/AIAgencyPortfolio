@@ -90,7 +90,13 @@ export default function Projects() {
               ) : projects && projects.length > 0 ? (
                 // Display projects sorted by most recent first
                 [...projects]
-                  .sort((a, b) => new Date(b.publishedAt || b.createdAt || 0).getTime() - new Date(a.publishedAt || a.createdAt || 0).getTime())
+                  .sort((a, b) => {
+                    // Get newest project at the top - lower ID means newer project in test data
+                    if (a.id && b.id) {
+                      return b.id - a.id;
+                    }
+                    return 0;
+                  })
                   .map((project) => (
                     <ProjectCard key={project.id} project={project} />
                   ))

@@ -84,9 +84,6 @@ export default async function ProjectPage({ params }: Props) {
         )}
         <div className="relative max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="max-w-3xl">
-            <span className="inline-block px-3 py-1 text-xs font-medium bg-white/20 text-white rounded-full mb-4">
-              {project.category}
-            </span>
             <h1 className="text-4xl font-bold sm:text-5xl mb-4">
               {project.title}
             </h1>

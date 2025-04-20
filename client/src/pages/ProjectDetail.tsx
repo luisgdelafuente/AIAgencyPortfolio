@@ -80,12 +80,9 @@ export default function ProjectDetailPage() {
             <>
               <div className="bg-neutral-50 py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <Link href="/projects" className="inline-flex items-center text-neutral-600 hover:text-neutral-900 mb-6">
+                  <Link href="/projects/" className="inline-flex items-center text-neutral-600 hover:text-neutral-900 mb-6">
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back to projects
                   </Link>
-                  <span className="inline-block px-3 py-1 text-xs font-medium bg-neutral-200 text-neutral-800 rounded-full mb-4">
-                    {project.category}
-                  </span>
                   <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
                   <p className="text-xl text-neutral-600">{project.description}</p>
                 </div>

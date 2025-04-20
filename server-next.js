@@ -2,11 +2,18 @@ import express from 'express';
 import next from 'next';
 import cors from 'cors';
 import compression from 'compression';
-// We'll use the existing createTables function and db from server
-import { createTables } from './server/createTables.js';
-import { db } from './server/db.js';
-// Import routes to maintain API compatibility
-import { registerRoutes } from './server/routes.js';
+// Import the path module to help resolve file paths
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the current file's directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// This will dynamically import TypeScript files using tsx
+const { createTables } = await import('./server/createTables.ts');
+const { db } = await import('./server/db.ts');
+const { registerRoutes } = await import('./server/routes.ts');
 
 // Initialize Next.js
 const port = process.env.PORT || 5000; // Use port 5000 to match previous setup

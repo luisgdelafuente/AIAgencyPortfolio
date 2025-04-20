@@ -19,9 +19,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         />
       </div>
       <div className="p-6">
-        <span className="inline-block px-3 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full mb-4">
-          {project.category}
-        </span>
+        <div className="mb-3">
+          <span className="text-sm text-gray-500">
+            {project.category || 'Project'}
+          </span>
+        </div>
         <h3 className="text-xl font-bold text-gray-900 mb-3">{project.title}</h3>
         <p className="text-gray-600 mb-4 line-clamp-3">
           {project.description}

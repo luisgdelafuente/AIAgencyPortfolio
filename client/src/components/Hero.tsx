@@ -65,7 +65,7 @@ export default function Hero() {
             <span className="text-sm font-medium">Coming Soon!</span>
           </div>
           {content.heroTitle && (
-            <h1 className="text-4xl sm:text-7xl font-bold text-gray-900 tracking-tight max-w-[70%] mx-auto sm:leading-[1.2]">
+            <h1 className="text-4xl sm:text-7xl font-bold text-gray-900 tracking-tight max-w-full sm:max-w-[70%] mx-auto sm:leading-[1.2]">
               {content.heroTitle.split(' ').length > 2 
                 ? <>
                     {content.heroTitle.split(' ').slice(0, -2).join(' ')} <span className="text-gray-900">{content.heroTitle.split(' ').slice(-2).join(' ')}</span>

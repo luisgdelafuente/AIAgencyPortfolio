@@ -1,84 +1,74 @@
 export const enTranslations = {
-  common: {
-    learnMore: 'Learn More',
-    viewAll: 'View All',
-    contactUs: 'Contact Us',
-    getStarted: 'Get Started',
-    readMore: 'Read More',
-    exploreProjects: 'Explore Projects',
-    latestBlogPosts: 'Latest Blog Posts',
-    featuredProjects: 'Featured Projects',
-    poweredBy: 'Powered by',
-  },
+  // Navigation
   nav: {
     home: 'Home',
-    about: 'About',
-    services: 'Services',
-    blog: 'Blog',
     projects: 'Projects',
-    contact: 'Contact',
-    admin: 'Admin'
-  },
-  home: {
-    hero: {
-      title: 'Next-Generation AI Solutions',
-      subtitle: 'Expert AI solutions for businesses seeking innovation and transformation',
-      cta: 'Explore Solutions'
-    },
-    features: {
-      title: 'Our Services',
-      subtitle: 'Cutting-edge AI solutions for your business',
-      items: [
-        {
-          title: 'Smart AI Models',
-          description: 'State-of-the-art machine learning models tailored for your specific needs.'
-        },
-        {
-          title: 'Instant Inference',
-          description: 'Lightning-fast processing with optimized inference pipelines.'
-        },
-        {
-          title: 'Data-Driven Insights',
-          description: 'Transform raw data into actionable business intelligence.'
-        }
-      ]
-    }
-  },
-  projects: {
-    title: 'Our Projects',
-    subtitle: 'Exploring our AI solutions in action',
-    noProjects: 'No projects to display at this time.'
-  },
-  blog: {
-    title: 'Our Blog',
-    subtitle: 'Latest news and insights about AI',
-    noPosts: 'No posts to display at this time.'
-  },
-  about: {
-    title: 'About HAL149',
-    subtitle: 'AI Innovation Partner',
-    ourStory: 'Our Story',
-    ourTeam: 'Our Team',
-    ourMission: 'Our Mission'
-  },
-  contact: {
-    title: 'Contact Us',
-    subtitle: 'Get in touch with our team',
-    name: 'Name',
-    email: 'Email',
-    subject: 'Subject',
-    message: 'Message',
-    send: 'Send Message',
-    success: 'Your message has been sent successfully!',
-    error: 'There was a problem sending your message. Please try again.'
-  },
-  footer: {
+    blog: 'Blog',
     about: 'About',
-    services: 'Services',
     contact: 'Contact',
     legal: 'Legal',
+  },
+  
+  // Hero Section
+  hero: {
+    title: 'Industry-Specific AI Applications',
+    subtitle: 'Transform data into insights, automate workflows, and stay ahead of the competition.',
+    cta: 'Join Waitlist',
+    readBlog: 'Read Our Blog',
+  },
+  
+  // Features Section
+  features: {
+    title: 'Why Choose Us',
+    subtitle: 'We offer cutting-edge AI solutions tailored to your industry needs',
+    items: [
+      {
+        title: 'Smart AI Models',
+        description: 'State-of-the-art machine learning models tailored for your specific needs.'
+      },
+      {
+        title: 'Instant Inference',
+        description: 'Lightning-fast processing with optimized inference pipelines.'
+      },
+      {
+        title: 'Data-Driven Insights',
+        description: 'Transform raw data into actionable business intelligence.'
+      }
+    ]
+  },
+  
+  // Projects Section
+  projects: {
+    title: 'Featured Projects',
+    subtitle: 'See how our AI solutions are transforming industries',
+    cta: 'View All Projects',
+    noProjects: 'No projects available yet.'
+  },
+  
+  // Blog Section
+  blog: {
+    title: 'Latest From Our Blog',
+    subtitle: 'Stay updated with the latest news in AI and technology',
+    cta: 'View All Posts',
+    noPosts: 'No blog posts available yet.'
+  },
+  
+  // Footer
+  footer: {
+    rights: 'All rights reserved.',
+    company: 'Company',
+    resources: 'Resources',
+    language: 'Language',
+    documentation: 'Documentation',
     privacy: 'Privacy Policy',
     terms: 'Terms of Service',
-    copyright: '© 2025 HAL149. All rights reserved.'
+    version: 'v.0.1.0'
+  },
+  
+  // Common
+  common: {
+    loading: 'Loading...',
+    error: 'An error occurred',
+    retry: 'Retry'
   }
 };

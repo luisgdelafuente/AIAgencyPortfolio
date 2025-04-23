@@ -1,9 +1,0 @@
-# Allow all search engines
-User-agent: *
-Allow: /
-
-# Specify the canonical domain
-Host: hal149.com
-
-# Sitemap for the main domain
-Sitemap: https://hal149.com/sitemap.xml

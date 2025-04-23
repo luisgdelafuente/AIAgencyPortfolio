@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Textarea, Button } from '../components/ui';
-import { useToast } from '@/components/providers/toast-provider';
+import { useToast } from '../hooks/use-toast';
 
 // Contact form schema
 const contactFormSchema = z.object({

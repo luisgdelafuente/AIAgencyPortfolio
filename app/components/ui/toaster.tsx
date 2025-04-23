@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast } from "@/components/providers/toast-provider";
+import { useToast } from "@/components/ui/use-toast";
 import { Toast } from "@/components/ui/toast";
 
 export function Toaster() {

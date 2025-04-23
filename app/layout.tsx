@@ -2,15 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/auth-context";
-import { Toaster } from "@/components/providers/toaster";
-import { ToastProvider } from "@/components/providers/toast-provider";
-import { LanguageProvider } from "@/hooks/use-language";
-import { TranslationProvider } from "@/hooks/use-translations";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000'),
   title: "HAL149 | Next-Generation AI Solutions",
   description: "Expert AI solutions for businesses seeking innovation and transformation",
   keywords: "AI, artificial intelligence, machine learning, data analysis, digital transformation",
@@ -51,16 +47,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToastProvider>
-          <LanguageProvider>
-            <TranslationProvider>
-              <AuthProvider>
-                {children}
-                <Toaster />
-              </AuthProvider>
-            </TranslationProvider>
-          </LanguageProvider>
-        </ToastProvider>
+        <AuthProvider>
+          {children}
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

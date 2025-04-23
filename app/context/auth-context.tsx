@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/components/providers/toast-provider";
+import { useToast } from "@/components/ui/use-toast";
 
 interface User {
   id: number;

@@ -82,7 +82,7 @@ export default function ProjectsSection({ projects, isLoading = false }: Project
         </div>
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href="/projects/">{t.common.exploreProjects}</Link>
+            <Link href="/projects/">{t.projects.cta}</Link>
           </Button>
         </div>
       </div>

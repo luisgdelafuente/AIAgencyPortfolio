@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button, Input } from '../components/ui';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/providers/toast-provider';
 
 export default function Waitlist() {
   const { toast } = useToast();

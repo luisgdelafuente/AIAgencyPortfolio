@@ -1,0 +1,93 @@
+Migration Checklist (for Replit Agent)
+Goal: Migrate project to pure Next.js
+Design constraint: No visual or functional UI changes allowed
+
+🔁 1. Backup the existing project
+Create a backup/ folder in the root
+
+Copy the current src/, public/, and server/ folders into backup/
+
+🧹 2. Remove non-Next tooling
+Delete the following if present:
+
+vite.config.ts
+
+Any custom server/index.ts code that runs Express
+
+Do not delete shared logic or backend API handlers yet
+
+🏗 3. Set up Next.js directory structure
+Create these folders in the root:
+
+/app         # if using App Router (Next.js 13+)
+  page.tsx   # main landing page
+  layout.tsx # shared layout wrapper
+
+/public      # for static assets like images
+
+/styles      # if Tailwind, put globals here
+
+/utils       # move existing helper functions here
+
+/lib         # shared logic (DB, API client, etc.)
+
+/components  # all React components
+Or if App Router isn't being used, use the legacy:
+
+/pages
+  index.tsx
+  [other-pages].tsx
+
+🚚 4. Move frontend code
+Move all React components and pages into /components and /app or /pages
+
+Preserve existing folder structure for organization
+
+Ensure all imports are updated (@/components/... etc.)
+
+✅ Do not modify any JSX, styling, or layout
+
+⚙️ 5. Migrate API routes (if needed)
+If server/index.ts contains backend logic (auth, data fetching, etc.):
+
+Move each Express route to /pages/api/route-name.ts or /app/api/.../route.ts
+
+✅ Keep same function names and return structure
+✅ Do not alter logic, just port it
+
+📦 6. Update package.json dependencies (if editable)
+Remove:
+
+express, compression, cors, vite, tsx, etc.
+
+Ensure Next.js scripts exist:
+
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
+}
+⚠️ If package.json is not editable, continue to Step 7 (we'll run Next manually)
+
+🔄 7. Update .replit config to run Next.js (without changing file)
+Since you can't modify .replit, override the command by renaming:
+
+Rename server/index.ts → server-next.ts
+
+Inside server-next.ts, add:
+
+import next from 'next'
+import { createServer } from 'http'
+
+const app = next({ dev: true })
+const handle = app.getRequestHandler()
+
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res)
+  }).listen(5000, () => {
+    console.log('> Ready on http://localhost:5000')
+  })
+})
+
+This hijacks the Express start and launches the Next app on port 5000 (as required by .replit).

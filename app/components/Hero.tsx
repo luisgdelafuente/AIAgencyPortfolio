@@ -34,20 +34,20 @@ export default function Hero({ content = {}, isLoading = false }: { content?: an
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-8">
         <div className="max-w-3xl">
           <h1 className="block text-[calc(1rem+2px)] font-bold sm:text-[calc(1.5rem+2px)] lg:text-[calc(2.25rem+2px)] max-w-[80%] mx-auto">
-            {content.heroTitle || t.hero.title}
+            {content.heroTitle || t.home.hero.title}
           </h1>
           <p className="mt-6 text-lg text-gray-300">
-            {content.heroSubtitle || t.hero.subtitle}
+            {content.heroSubtitle || t.home.hero.subtitle}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button asChild size="lg">
               <Link href="#waitlist">
-                {content.heroPrimaryText || t.hero.cta}
+                {content.heroPrimaryText || t.home.hero.cta}
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="bg-transparent text-white border-white hover:bg-gray-800">
               <Link href="/blog" className="inline-flex items-center">
-                {content.heroSecondaryText || t.hero.readBlog}
+                {content.heroSecondaryText || t.common.readMore}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

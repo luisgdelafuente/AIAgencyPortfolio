@@ -38,6 +38,8 @@ export async function GET() {
         content TEXT,
         category TEXT,
         image_url TEXT,
+        github_url TEXT,
+        demo_url TEXT,
         is_featured BOOLEAN DEFAULT false,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

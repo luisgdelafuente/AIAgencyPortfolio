@@ -76,7 +76,7 @@ export default function BlogSection({ posts, isLoading = false }: BlogSectionPro
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
             <Link href="/blog" className="inline-flex items-center">
-              {t.blog.cta}
+              {t.common.readMore}
               <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>

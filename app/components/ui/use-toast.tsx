@@ -102,4 +102,4 @@ export function useToast() {
   return context;
 }
 
-export { type ToastProps, type ToasterToast, type Toast };
+export { ToastProvider, type ToastProps, type ToasterToast, type Toast };

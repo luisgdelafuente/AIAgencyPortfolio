@@ -1,9 +1,6 @@
 import { fetchPageContent, fetchBlogPosts, fetchFeaturedProjects } from '@/lib/api';
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import ProjectsSection from '@/components/ProjectsSection';
-import BlogSection from '@/components/BlogSection';
 import Waitlist from '@/components/Waitlist';
+import HomeComponentsWrapper from '@/components/client-wrappers/HomeComponentsWrapper';
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {
@@ -27,17 +24,15 @@ export default async function Home() {
 
   return (
     <div className="bg-white">
-      {/* Hero section */}
-      <Hero content={pageContent} isLoading={!pageContentData} />
-      
-      {/* Features section */}
-      <Features content={pageContent} isLoading={!pageContentData} />
-      
-      {/* Projects section */}
-      <ProjectsSection projects={featuredProjects || []} isLoading={!featuredProjects} />
-      
-      {/* Blog section */}
-      <BlogSection posts={blogPosts || []} isLoading={!blogPosts} />
+      {/* Main content components wrapped in client component */}
+      <HomeComponentsWrapper 
+        pageContent={pageContent}
+        pageContentLoaded={!!pageContentData}
+        featuredProjects={featuredProjects || []} 
+        projectsLoaded={!!featuredProjects}
+        blogPosts={blogPosts || []} 
+        blogPostsLoaded={!!blogPosts}
+      />
       
       {/* Waitlist section */}
       <Waitlist />

@@ -102,7 +102,7 @@ export default function Features() {
   }
   
   // Don't render anything if no features
-  if (!content.features || content.features.length === 0) {
+  if (!content.features || !Array.isArray(content.features) || content.features.length === 0) {
     return null;
   }
 
@@ -123,7 +123,7 @@ export default function Features() {
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {content.features && content.features.map((feature, index) => (
+          {Array.isArray(content.features) && content.features.map((feature, index) => (
             <FeatureCard
               key={index}
               icon={featureIcons[index % featureIcons.length]}

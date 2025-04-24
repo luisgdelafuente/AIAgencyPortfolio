@@ -1,11 +1,16 @@
-// This file has been migrated to Next.js API routes
-// Backend logic is now located in the app/api directory
-// This file is kept for reference but is not used in the Next.js application
 
-import { registerRoutes } from "./routes";
+// This is an automatic redirector to the Next.js server
+import { execSync } from 'child_process';
+import { join } from 'path';
 
-// Original Express server code has been removed as part of Next.js migration
-// The API routes are now handled by Next.js API routes in app/api directory
-
-// Export any utility functions that might be needed by Next.js API routes
-export { registerRoutes };
+console.log('Redirecting to Next.js server...');
+try {
+  // Make sure the script is executable
+  execSync('chmod +x ./start-next.sh', { stdio: 'inherit' });
+  
+  // Run the Next.js server using our start script
+  execSync('bash ./start-next.sh', { stdio: 'inherit' });
+} catch (error) {
+  console.error('Failed to start Next.js server:', error);
+  process.exit(1);
+}

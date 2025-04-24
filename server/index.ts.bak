@@ -1,0 +1,12 @@
+
+// This is an automatic redirector to the Next.js server
+import { execSync } from 'child_process';
+import { join } from 'path';
+
+console.log('Redirecting to Next.js server...');
+try {
+  execSync('bash -c "./run-next.sh"', { stdio: 'inherit' });
+} catch (error) {
+  console.error('Failed to start Next.js server:', error);
+  process.exit(1);
+}

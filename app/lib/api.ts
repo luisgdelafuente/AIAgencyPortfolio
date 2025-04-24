@@ -1,8 +1,24 @@
 // API utility functions for fetching data
 
+// Helper function to ensure we have a valid base URL for API requests
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  
+  // If we're in a browser environment, use the current origin
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // If we're in a server environment, use a default origin
+  return 'http://localhost:5000';
+}
+
 export async function fetchPageContent(pageName: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/page-contents/${pageName}`, {
+    const baseUrl = getBaseUrl();
+    const url = new URL(`/api/page-contents/${pageName}`, baseUrl);
+    
+    const response = await fetch(url.toString(), {
       next: { revalidate: 60 } // Revalidate at most once per minute
     });
     
@@ -20,7 +36,10 @@ export async function fetchPageContent(pageName: string) {
 
 export async function fetchBlogPosts() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/blog`, {
+    const baseUrl = getBaseUrl();
+    const url = new URL('/api/blog', baseUrl);
+    
+    const response = await fetch(url.toString(), {
       next: { revalidate: 60 }
     });
     
@@ -38,7 +57,10 @@ export async function fetchBlogPosts() {
 
 export async function fetchFeaturedProjects() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/projects/featured`, {
+    const baseUrl = getBaseUrl();
+    const url = new URL('/api/projects/featured', baseUrl);
+    
+    const response = await fetch(url.toString(), {
       next: { revalidate: 60 }
     });
     

@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { ToastProvider } from "@/components/ui/use-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,10 +49,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

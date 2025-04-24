@@ -5,21 +5,31 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(dateString: string | Date): string {
-  if (!dateString) return '';
-  
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
+// Generate random ID
+export function generateId(length = 8): string {
+  return Math.random().toString(36).substring(2, 2 + length);
 }
 
-export function truncateText(text: string, maxLength: number = 100): string {
-  if (!text || text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + '...';
+// Create a slug from a string
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/&/g, "-and-") // Replace & with 'and'
+    .replace(/[^\w\-]+/g, "") // Remove all non-word characters
+    .replace(/\-\-+/g, "-") // Replace multiple - with single -
+    .replace(/^-+/, "") // Trim - from start of text
+    .replace(/-+$/, ""); // Trim - from end of text
+}
+
+// Format date function
+export function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }

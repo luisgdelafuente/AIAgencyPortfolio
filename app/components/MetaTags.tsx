@@ -1,135 +1,44 @@
-'use client';
-
 import React from 'react';
-import { Metadata } from '@/lib/metadata';
+import Head from 'next/head';
 
 interface MetaTagsProps {
-  metadata: Metadata;
-  type?: 'website' | 'article';
-  url?: string;
-  pageTitle?: string; // Optional explicit page title that overrides metadata.title
+  title?: string;
+  description?: string;
+  keywords?: string;
+  ogImage?: string;
+  ogUrl?: string;
+  ogType?: string;
 }
 
-/**
- * Reusable component for rendering meta tags across the site
- * Ensures all metadata comes from the database with no hardcoded values
- * Uses direct DOM manipulation instead of React Helmet to avoid Replit metadata attributes
- */
-export default function MetaTags({ 
-  metadata, 
-  type = 'website',
-  url,
-  pageTitle
+export default function MetaTags({
+  title = 'HAL149 | AI Agency',
+  description = 'Next-generation AI solutions for modern businesses. We develop cutting-edge AI applications to transform your digital presence.',
+  keywords = 'AI, artificial intelligence, machine learning, deep learning, AI agency, digital transformation',
+  ogImage = '/hallogoblack480.webp',
+  ogUrl = 'https://hal149.ai',
+  ogType = 'website'
 }: MetaTagsProps) {
-  console.log('MetaTags rendering with:', { metadata, type, url, pageTitle });
+  const fullTitle = title.includes('HAL149') ? title : `${title} | HAL149`;
   
-  // Define values once
-  const finalTitle = pageTitle || metadata.title || '';
-  const metaDescription = metadata.description || '';
-  const canonicalUrl = getCanonicalUrl(metadata, url);
-  const ogTitle = metadata.ogTitle || finalTitle;
-  const ogDescription = metadata.ogDescription || metaDescription;
-  
-  // Update meta tags when component mounts or props change
-  React.useEffect(() => {
-    // Basic metadata
-    document.title = finalTitle;
-    updateOrCreateTag('meta', { name: 'description', content: metaDescription });
-    
-    if (metadata.keywords) {
-      updateOrCreateTag('meta', { name: 'keywords', content: metadata.keywords });
-    }
-    
-    // Canonical URL
-    updateOrCreateTag('link', { rel: 'canonical', href: canonicalUrl });
-    
-    // Open Graph tags
-    updateOrCreateTag('meta', { property: 'og:title', content: ogTitle });
-    if (ogDescription) {
-      updateOrCreateTag('meta', { property: 'og:description', content: ogDescription });
-    }
-    if (metadata.ogImage) {
-      updateOrCreateTag('meta', { property: 'og:image', content: metadata.ogImage });
-    }
-    updateOrCreateTag('meta', { property: 'og:type', content: type });
-    if (url) {
-      updateOrCreateTag('meta', { property: 'og:url', content: url });
-    }
-    
-    // Twitter Card tags
-    updateOrCreateTag('meta', { 
-      name: 'twitter:card', 
-      content: metadata.ogImage ? 'summary_large_image' : 'summary'
-    });
-    updateOrCreateTag('meta', { name: 'twitter:title', content: ogTitle });
-    if (ogDescription) {
-      updateOrCreateTag('meta', { name: 'twitter:description', content: ogDescription });
-    }
-    if (metadata.ogImage) {
-      updateOrCreateTag('meta', { name: 'twitter:image', content: metadata.ogImage });
-    }
-    
-    // Remove any remaining Replit metadata attributes
-    cleanReplitMetadata();
-    
-  }, [finalTitle, metaDescription, canonicalUrl, ogTitle, ogDescription, metadata, type, url]);
-  
-  // Helper function to get canonical URL
-  function getCanonicalUrl(metadata: Metadata, url?: string): string {
-    if (metadata.canonical && metadata.canonical.startsWith('http')) {
-      return metadata.canonical;
-    } else if (metadata.canonical && !metadata.canonical.startsWith('http')) {
-      return `https://hal149.com${metadata.canonical.startsWith('/') ? '' : '/'}${metadata.canonical}`;
-    } else if (url) {
-      return url;
-    } else {
-      return `https://hal149.com${window.location.pathname}`;
-    }
-  }
-  
-  // Helper function to update or create meta/link tags
-  function updateOrCreateTag(
-    tagName: 'meta' | 'link', 
-    attributes: Record<string, string>
-  ) {
-    let selector = tagName;
-    
-    // Build selector based on attributes
-    if (attributes.name) {
-      selector += `[name="${attributes.name}"]`;
-    } else if (attributes.property) {
-      selector += `[property="${attributes.property}"]`;
-    } else if (attributes.rel) {
-      selector += `[rel="${attributes.rel}"]`;
-    }
-    
-    const existingTag = document.head.querySelector(selector);
-    
-    if (existingTag) {
-      // Update existing tag
-      Object.entries(attributes).forEach(([key, value]) => {
-        existingTag.setAttribute(key, value);
-      });
-    } else {
-      // Create new tag
-      const newTag = document.createElement(tagName);
-      Object.entries(attributes).forEach(([key, value]) => {
-        newTag.setAttribute(key, value);
-      });
-      document.head.appendChild(newTag);
-    }
-  }
-  
-  // Clean up any Replit metadata attributes
-  function cleanReplitMetadata() {
-    const replitTags = document.head.querySelectorAll('[data-replit-metadata]');
-    replitTags.forEach(tag => {
-      tag.removeAttribute('data-replit-metadata');
-      tag.removeAttribute('data-component-name');
-      tag.removeAttribute('data-rh');
-    });
-  }
-  
-  // This component doesn't render anything visible
-  return null;
+  return (
+    <>
+      <title>{fullTitle}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      
+      {/* Open Graph / Facebook */}
+      <meta property="og:type" content={ogType} />
+      <meta property="og:url" content={ogUrl} />
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={ogImage} />
+      
+      {/* Twitter */}
+      <meta property="twitter:card" content="summary_large_image" />
+      <meta property="twitter:url" content={ogUrl} />
+      <meta property="twitter:title" content={fullTitle} />
+      <meta property="twitter:description" content={description} />
+      <meta property="twitter:image" content={ogImage} />
+    </>
+  );
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '../../../server/db';
-import { pageContents, type PageContent } from '../../../shared/schema';
+import { db } from '@/server/db';
+import { pageContents, type PageContent } from '@/shared/schema';
 import { asc } from 'drizzle-orm';
 
 // GET /api/page-contents - Get all page contents

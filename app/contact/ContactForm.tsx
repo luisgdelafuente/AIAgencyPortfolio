@@ -4,17 +4,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Form } from '@/components/ui/form';
-import { FormControl } from '@/components/ui/form';
-import { FormField } from '@/components/ui/form';
-import { FormItem } from '@/components/ui/form';
-import { FormLabel } from '@/components/ui/form';
-import { FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { apiPost } from '@/lib/api';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, Input, Textarea, Button } from '../components/ui';
+import { useToast } from '../hooks/use-toast';
 
 // Contact form schema
 const contactFormSchema = z.object({
@@ -44,7 +35,17 @@ export default function ContactForm() {
   const onSubmit = async (values: ContactFormValues) => {
     setIsSubmitting(true);
     try {
-      await apiPost('/api/contact', values);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(values)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit the form');
+      }
       
       toast({
         title: 'Message Sent',

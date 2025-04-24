@@ -1,8 +1,1 @@
-{
-  "/api/blog/route": "app/api/blog/route.js",
-  "/api/projects/featured/route": "app/api/projects/featured/route.js",
-  "/api/page-contents/[page]/route": "app/api/page-contents/[page]/route.js",
-  "/api/auth/check/route": "app/api/auth/check/route.js",
-  "/page": "app/page.js",
-  "/projects/page": "app/projects/page.js"
-}
+{}

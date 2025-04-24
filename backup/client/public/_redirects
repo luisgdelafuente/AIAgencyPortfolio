@@ -1,6 +1,0 @@
-# Redirect Replit domain traffic to your custom domain
-https://hal149.replit.app/* https://hal149.com/:splat 301!
-
-# Handle SPA routing for the custom domain
-/api/*  /api/:splat  200
-/*  /index.html  200

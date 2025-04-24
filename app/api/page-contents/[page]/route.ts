@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '../../../../server/db';
-import { pageContents } from '../../../../shared/schema';
+import { db } from '@/server/db';
+import { pageContents } from '@/shared/schema';
 import { eq } from 'drizzle-orm';
 
 // GET /api/page-contents/[page] - Get page content by page name
@@ -9,8 +9,7 @@ export async function GET(
   { params }: { params: { page: string } }
 ) {
   try {
-    // In Next.js App Router, dynamic params need to be properly awaited
-    const page = params.page;
+    const { page } = params;
     
     if (!page) {
       return NextResponse.json(
@@ -52,8 +51,7 @@ export async function PUT(
     //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // }
     
-    // In Next.js App Router, dynamic params need to be properly awaited
-    const page = params.page;
+    const { page } = params;
     
     if (!page) {
       return NextResponse.json(

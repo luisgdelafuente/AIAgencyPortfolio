@@ -53,3 +53,57 @@ export async function fetchFeaturedProjects() {
     return [];
   }
 }
+
+// Client-side API helper functions for mutations
+export async function apiPost(endpoint: string, data: any) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    const errorMessage = errorData?.message || response.statusText || 'An error occurred';
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+export async function apiPut(endpoint: string, data: any) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}${endpoint}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    const errorMessage = errorData?.message || response.statusText || 'An error occurred';
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+export async function apiDelete(endpoint: string) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}${endpoint}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    const errorMessage = errorData?.message || response.statusText || 'An error occurred';
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useTranslations } from '../hooks/use-translations';
+import { useTranslations } from '@/hooks/use-translations';
 import LanguageToggle from './LanguageToggle';
 
 const HAL149Logo = () => (

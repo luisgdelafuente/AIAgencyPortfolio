@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button, Sheet, SheetContent, SheetTrigger } from '../components/ui';
+import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTranslations } from '@/hooks/use-translations';
 
 const HAL149Logo = () => (
@@ -14,7 +15,6 @@ const HAL149Logo = () => (
 );
 
 export default function Header() {
-  // Use Next.js usePathname hook instead of Wouter's useLocation
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const t = useTranslations();

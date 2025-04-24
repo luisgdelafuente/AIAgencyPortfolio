@@ -17,10 +17,28 @@ const parseContent = (content: string | undefined) => {
 };
 
 export default async function Home() {
-  // Fetch data using server components
-  const pageContentData = await fetchPageContent('home');
-  const featuredProjects = await fetchFeaturedProjects();
-  const blogPosts = await fetchBlogPosts();
+  // Fetch data using server components with error handling
+  let pageContentData = null;
+  let featuredProjects = [];
+  let blogPosts = [];
+  
+  try {
+    pageContentData = await fetchPageContent('home');
+  } catch (error) {
+    console.error('Error fetching page content:', error);
+  }
+  
+  try {
+    featuredProjects = await fetchFeaturedProjects() || [];
+  } catch (error) {
+    console.error('Error fetching featured projects:', error);
+  }
+  
+  try {
+    blogPosts = await fetchBlogPosts() || [];
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+  }
   
   // Parse the page content
   const pageContent = parseContent(pageContentData?.content);
@@ -28,16 +46,16 @@ export default async function Home() {
   return (
     <div className="bg-white">
       {/* Hero section */}
-      <Hero content={pageContent} isLoading={!pageContentData} />
+      <Hero />
       
       {/* Features section */}
-      <Features content={pageContent} isLoading={!pageContentData} />
+      <Features />
       
       {/* Projects section */}
-      <ProjectsSection projects={featuredProjects || []} isLoading={!featuredProjects} />
+      <ProjectsSection projects={featuredProjects} isLoading={featuredProjects.length === 0} />
       
       {/* Blog section */}
-      <BlogSection posts={blogPosts || []} isLoading={!blogPosts} />
+      <BlogSection posts={blogPosts} isLoading={blogPosts.length === 0} />
       
       {/* Waitlist section */}
       <Waitlist />

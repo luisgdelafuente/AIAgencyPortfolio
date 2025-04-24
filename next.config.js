@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nextConfig = {
   // Enable static file serving
   output: 'standalone',
@@ -33,6 +39,15 @@ const nextConfig = {
   publicRuntimeConfig: {
     // Will be available on both server and client
     staticFolder: '/public',
+  },
+  
+  // Setup path aliases for proper module resolution
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@shared': path.join(__dirname, './shared'),
+    };
+    return config;
   },
   
   // Ensure API routes work properly

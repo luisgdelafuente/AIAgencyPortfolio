@@ -11,15 +11,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
+    "/api/projects/featured/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/projects/featured/route.js"
+    ],
     "/api/page-contents/[page]/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/page-contents/[page]/route.js"
     ],
-    "/_not-found/page": [
+    "/api/auth/check/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/api/auth/check/route.js"
+    ],
+    "/api/blog/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/blog/route.js"
     ]
   }
 }

@@ -26,6 +26,8 @@
       "@/hooks/*": ["./app/hooks/*"],
       "@/context/*": ["./app/context/*"],
       "@/shared/*": ["./shared/*"],
+      "@shared/*": ["./shared/*"],
+      "@shared": ["./shared"],
       "@/server/*": ["./server/*"],
       "@client/*": ["./client/src/*"]
     }

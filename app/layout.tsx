@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/context/auth-context";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "./components/ui/toaster";
+import Providers from "./components/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: "Expert AI solutions for businesses seeking innovation and transformation",
   keywords: "AI, artificial intelligence, machine learning, data analysis, digital transformation",
   robots: "index, follow",
+  metadataBase: new URL('https://hal149.com'),
   authors: [{ name: "HAL149", url: "https://hal149.com" }],
   openGraph: {
     title: "HAL149 | Next-Generation AI Solutions",
@@ -39,8 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { ToastProvider } from "@/components/ui/use-toast";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -49,12 +48,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToastProvider>
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
-        </ToastProvider>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

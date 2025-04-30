@@ -27,14 +27,25 @@ export async function generateMetadata(
   
   // Return metadata based on the post
   return {
-    title: `${post.title} | HAL149 Blog`,
+    title: `${post.title} | HAL149`,
     description: post.excerpt,
     keywords: `${post.title}, HAL149 blog, AI insights`,
     openGraph: {
-      title: post.title,
+      title: `${post.title} | HAL149`,
+      description: post.excerpt,
+      images: post.imageUrl ? [post.imageUrl] : undefined,
+      type: 'article',
+      url: `https://hal149.com/blog/${post.slug}/`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${post.title} | HAL149`,
       description: post.excerpt,
       images: post.imageUrl ? [post.imageUrl] : undefined,
     },
+    alternates: {
+      canonical: `https://hal149.com/blog/${post.slug}/`,
+    }
   };
 }
 

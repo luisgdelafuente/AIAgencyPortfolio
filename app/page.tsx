@@ -4,6 +4,27 @@ import Features from '@/components/Features';
 import ProjectsSection from '@/components/ProjectsSection';
 import BlogSection from '@/components/BlogSection';
 import Waitlist from '@/components/Waitlist';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'HAL149 | Unlocking Your Business Potential with AI',
+  description: 'HAL149 is your partner for AI-powered apps, automations, strategic training and transformation programs',
+  keywords: 'ai applications, ai solutions, ai automations, industry ai, ai consulting, ai training programs',
+  openGraph: {
+    title: 'HAL149 | Unlocking Your Business Potential with AI',
+    description: 'HAL149 is your partner for AI-powered apps, automations, strategic training and transformation programs',
+    url: 'https://hal149.com/',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HAL149 | Unlocking Your Business Potential with AI',
+    description: 'HAL149 is your partner for AI-powered apps, automations, strategic training and transformation programs',
+  },
+  alternates: {
+    canonical: 'https://hal149.com/',
+  }
+};
 
 // Parse content from string to JSON
 const parseContent = (content: string | undefined) => {

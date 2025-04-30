@@ -7,6 +7,20 @@ export const metadata: Metadata = {
   title: 'AI Blog - Next-Generation Insights | HAL149',
   description: 'Explore the latest advances in artificial intelligence, machine learning, and data insights from HAL149\'s research team.',
   keywords: 'AI blog, machine learning blog, artificial intelligence insights, HAL149 research',
+  openGraph: {
+    title: 'AI Blog - Next-Generation Insights | HAL149',
+    description: 'Explore the latest advances in artificial intelligence, machine learning, and data insights from HAL149\'s research team.',
+    url: 'https://hal149.com/blog/',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Blog - Next-Generation Insights | HAL149',
+    description: 'Explore the latest advances in artificial intelligence, machine learning, and data insights from HAL149\'s research team.',
+  },
+  alternates: {
+    canonical: 'https://hal149.com/blog/',
+  }
 };
 
 // Parse content from string to JSON

@@ -1,4 +1,4 @@
-import { fetchBlogPosts } from '../../lib/api';
+import { fetchBlogPosts, fetchBlogPostBySlug } from '../../lib/api';
 import { formatDate } from '@shared/utils';
 import { marked } from 'marked';
 import { Metadata, ResolvingMetadata } from 'next';
@@ -13,9 +13,8 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // Fetch all blog posts and find the one with matching slug
-  const posts = await fetchBlogPosts();
-  const post = posts.find(post => post.slug === params.slug);
+  // Fetch the blog post with the matching slug directly
+  const post = await fetchBlogPostBySlug(params.slug);
   
   // If no post is found, return default metadata
   if (!post) {
@@ -50,11 +49,11 @@ export async function generateMetadata(
 }
 
 export default async function BlogPost({ params }: Props) {
-  // Fetch all blog posts
-  const posts = await fetchBlogPosts();
+  // Fetch the blog post with the matching slug directly
+  const post = await fetchBlogPostBySlug(params.slug);
   
-  // Find the post with matching slug
-  const post = posts.find(post => post.slug === params.slug);
+  // Fetch all blog posts for related posts
+  const posts = await fetchBlogPosts();
   
   // If post doesn't exist, show a not found message
   if (!post) {

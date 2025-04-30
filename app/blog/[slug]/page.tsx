@@ -3,6 +3,7 @@ import { formatDate } from '@shared/utils';
 import { marked } from 'marked';
 import { Metadata, ResolvingMetadata } from 'next';
 import Link from 'next/link';
+import HeadMetadataWrapper from '@/components/HeadMetadataWrapper';
 
 type Props = {
   params: { slug: string }

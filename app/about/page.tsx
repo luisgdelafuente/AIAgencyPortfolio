@@ -5,6 +5,20 @@ export const metadata: Metadata = {
   title: 'About Us | HAL149',
   description: 'Learn about our mission and vision at HAL149, your partner in AI solutions and digital transformation.',
   keywords: 'about HAL149, AI company, AI consultancy, AI solutions team',
+  openGraph: {
+    title: 'About Us | HAL149',
+    description: 'Learn about our mission and vision at HAL149, your partner in AI solutions and digital transformation.',
+    url: 'https://hal149.com/about/',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us | HAL149',
+    description: 'Learn about our mission and vision at HAL149, your partner in AI solutions and digital transformation.',
+  },
+  alternates: {
+    canonical: 'https://hal149.com/about/',
+  }
 };
 
 // Parse content from string to JSON

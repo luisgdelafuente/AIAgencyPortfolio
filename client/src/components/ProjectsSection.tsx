@@ -64,10 +64,10 @@ export default function ProjectsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {isLoading ? (
             // Skeleton loaders while data is loading
-            Array(2).fill(0).map((_, i) => (
+            Array(3).fill(0).map((_, i) => (
               <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm">
                 <Skeleton className="w-full h-64" />
                 <div className="p-6">
@@ -79,12 +79,20 @@ export default function ProjectsSection() {
               </div>
             ))
           ) : projects && projects.length > 0 ? (
-            // Display projects
-            projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))
+            // Display projects sorted by most recent first
+            [...projects]
+              .sort((a, b) => {
+                // Sort by ID - higher ID is newer project for the test data
+                if (a.id && b.id) {
+                  return b.id - a.id;
+                }
+                return 0;
+              })
+              .map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))
           ) : (
-            <div className="col-span-2 text-center py-12">
+            <div className="col-span-3 text-center py-12">
               <p className="text-gray-500">{t.projects.noProjects}</p>
             </div>
           )}

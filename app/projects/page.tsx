@@ -62,8 +62,16 @@ export default async function Projects() {
       <section className="py-16">
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           {projects && projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project: any) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...projects]
+                .sort((a, b) => {
+                  // Sort by ID - higher ID is newer project for the test data
+                  if (a.id && b.id) {
+                    return b.id - a.id;
+                  }
+                  return 0;
+                })
+                .map((project: any) => (
                 <article key={project.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md">
                   {project.imageUrl && (
                     <div className="h-48 relative overflow-hidden">
@@ -75,24 +83,22 @@ export default async function Projects() {
                     </div>
                   )}
                   <div className="p-6">
-                    <span className="inline-block px-3 py-1 text-xs font-medium bg-gray-100 rounded-full mb-3">
-                      {project.category || 'Project'}
-                    </span>
+                    <div className="mb-3">
+                      <span className="text-sm text-gray-500">
+                        {project.category || 'Project'}
+                      </span>
+                    </div>
                     <h2 className="text-xl font-bold mb-2 line-clamp-2">
-                      <Link href={`/projects/${project.slug}`} className="hover:text-gray-600 transition-colors">
+                      <Link 
+                        href={`/projects/${project.slug}/`} 
+                        className="hover:text-gray-600 transition-colors"
+                        aria-label={`Read more about ${project.title} project`}
+                        title={`View details for ${project.title}`}
+                      >
                         {project.title}
                       </Link>
                     </h2>
                     <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
-                    <Link
-                      href={`/projects/${project.slug}`}
-                      className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
-                    >
-                      View Project
-                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
                   </div>
                 </article>
               ))}
@@ -118,7 +124,7 @@ export default async function Projects() {
             {pageContent.ctaText || 'Get in touch to discuss how our AI solutions can help your organization achieve its goals.'}
           </p>
           <Link 
-            href="/contact" 
+            href="/contact/" 
             className="inline-flex items-center justify-center h-12 px-6 font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
           >
             {pageContent.ctaButton || 'Contact Us'}

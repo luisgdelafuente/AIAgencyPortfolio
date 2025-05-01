@@ -68,13 +68,21 @@ export default function ProjectsSection({ projects, isLoading = false }: Project
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">{t.projects.subtitle}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
+          {[...projects]
+            .sort((a, b) => {
+              // Sort by ID - higher ID is newer project for the test data
+              if (a.id && b.id) {
+                return b.id - a.id;
+              }
+              return 0;
+            })
+            .map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
         </div>
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href="/projects">{t.projects.cta}</Link>
+            <Link href="/projects/">{t.projects.cta}</Link>
           </Button>
         </div>
       </div>

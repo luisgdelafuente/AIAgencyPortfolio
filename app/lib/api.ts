@@ -36,6 +36,24 @@ export async function fetchBlogPosts() {
   }
 }
 
+export async function fetchBlogPostBySlug(slug: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/blog/${slug}`, {
+      next: { revalidate: 60 }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch blog post with slug: ${slug}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`Error fetching blog post with slug ${slug}:`, error);
+    return null;
+  }
+}
+
 export async function fetchFeaturedProjects() {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/projects/featured`, {

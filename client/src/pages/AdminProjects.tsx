@@ -389,7 +389,7 @@ export default function AdminProjects() {
                           <TableCell>
                             <div className="flex space-x-2">
                               <Button variant="outline" size="icon" asChild>
-                                <a href={`/projects/${project.slug}`} target="_blank" rel="noopener noreferrer">
+                                <a href={`/projects/${project.slug}/`} target="_blank" rel="noopener noreferrer">
                                   <Eye className="h-4 w-4" />
                                   <span className="sr-only">View</span>
                                 </a>

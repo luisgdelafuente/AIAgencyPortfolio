@@ -1,8 +1,9 @@
-import { fetchBlogPosts } from '../../lib/api';
+import { fetchBlogPosts, fetchBlogPostBySlug } from '../../lib/api';
 import { formatDate } from '@shared/utils';
 import { marked } from 'marked';
 import { Metadata, ResolvingMetadata } from 'next';
 import Link from 'next/link';
+import HeadMetadataWrapper from '@/components/HeadMetadataWrapper';
 
 type Props = {
   params: { slug: string }
@@ -13,9 +14,8 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // Fetch all blog posts and find the one with matching slug
-  const posts = await fetchBlogPosts();
-  const post = posts.find(post => post.slug === params.slug);
+  // Fetch the blog post with the matching slug directly
+  const post = await fetchBlogPostBySlug(params.slug);
   
   // If no post is found, return default metadata
   if (!post) {
@@ -27,23 +27,34 @@ export async function generateMetadata(
   
   // Return metadata based on the post
   return {
-    title: `${post.title} | HAL149 Blog`,
+    title: `${post.title} | HAL149`,
     description: post.excerpt,
     keywords: `${post.title}, HAL149 blog, AI insights`,
     openGraph: {
-      title: post.title,
+      title: `${post.title} | HAL149`,
+      description: post.excerpt,
+      images: post.imageUrl ? [post.imageUrl] : undefined,
+      type: 'article',
+      url: `https://hal149.com/blog/${post.slug}/`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${post.title} | HAL149`,
       description: post.excerpt,
       images: post.imageUrl ? [post.imageUrl] : undefined,
     },
+    alternates: {
+      canonical: `https://hal149.com/blog/${post.slug}/`,
+    }
   };
 }
 
 export default async function BlogPost({ params }: Props) {
-  // Fetch all blog posts
-  const posts = await fetchBlogPosts();
+  // Fetch the blog post with the matching slug directly
+  const post = await fetchBlogPostBySlug(params.slug);
   
-  // Find the post with matching slug
-  const post = posts.find(post => post.slug === params.slug);
+  // Fetch all blog posts for related posts
+  const posts = await fetchBlogPosts();
   
   // If post doesn't exist, show a not found message
   if (!post) {
@@ -100,9 +111,9 @@ export default async function BlogPost({ params }: Props) {
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <div 
-              className="prose prose-lg max-w-none"
+              className="prose prose-lg max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-gray-700 prose-a:text-blue-600 prose-img:rounded-lg"
               dangerouslySetInnerHTML={{ 
-                __html: marked.parse(post.content)
+                __html: marked.parse(post.content, { sanitize: false })
               }}
             />
           </div>

@@ -84,9 +84,6 @@ export default async function ProjectPage({ params }: Props) {
         )}
         <div className="relative max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="max-w-3xl">
-            <span className="inline-block px-3 py-1 text-xs font-medium bg-white/20 text-white rounded-full mb-4">
-              {project.category}
-            </span>
             <h1 className="text-4xl font-bold sm:text-5xl mb-4">
               {project.title}
             </h1>
@@ -127,9 +124,9 @@ export default async function ProjectPage({ params }: Props) {
         <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <div 
-              className="prose prose-lg max-w-none"
+              className="prose prose-lg max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-gray-700 prose-a:text-blue-600 prose-img:rounded-lg prose-li:text-gray-700"
               dangerouslySetInnerHTML={{ 
-                __html: marked.parse(project.content)
+                __html: marked.parse(project.content, { sanitize: false })
               }}
             />
           </div>
@@ -158,27 +155,23 @@ export default async function ProjectPage({ params }: Props) {
                       {relatedProject.category}
                     </span>
                     <h3 className="text-xl font-bold mb-2 line-clamp-2">
-                      <Link href={`/projects/${relatedProject.slug}`} className="hover:text-gray-600 transition-colors">
+                      <Link 
+                        href={`/projects/${relatedProject.slug}/`} 
+                        className="hover:text-gray-600 transition-colors"
+                        aria-label={`Read more about ${relatedProject.title} project`}
+                        title={`View details for ${relatedProject.title}`}
+                      >
                         {relatedProject.title}
                       </Link>
                     </h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{relatedProject.description}</p>
-                    <Link
-                      href={`/projects/${relatedProject.slug}`}
-                      className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-600"
-                    >
-                      View Project
-                      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
                   </div>
                 </article>
               ))}
             </div>
             <div className="text-center mt-10">
               <Link 
-                href="/projects" 
+                href="/projects/" 
                 className="inline-flex items-center justify-center h-12 px-6 font-medium border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 View All Projects
@@ -196,7 +189,7 @@ export default async function ProjectPage({ params }: Props) {
             Contact us to discuss how we can build a custom AI solution tailored to your specific business needs.
           </p>
           <Link 
-            href="/contact" 
+            href="/contact/" 
             className="inline-flex items-center justify-center h-12 px-6 font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
           >
             Contact Us

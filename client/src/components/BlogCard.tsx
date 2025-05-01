@@ -10,30 +10,35 @@ interface BlogCardProps {
 
 export default function BlogCard({ post }: BlogCardProps) {
   return (
-    <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <img 
-        src={post.imageUrl} 
-        alt={post.title} 
-        className="w-full h-48 object-cover"
-        loading="lazy"
-      />
+    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group">
+      <div className="relative overflow-hidden">
+        <img 
+          src={post.imageUrl} 
+          alt={post.title} 
+          className="w-full h-64 object-cover transform transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
+      </div>
       <div className="p-6">
-        <span className="text-sm text-gray-500">{formatDate(post.publishedAt)}</span>
-        <h3 className="mt-2 text-xl font-semibold text-gray-900">
-          <Link href={`/blog/${post.slug}/`}>
+        <div className="mb-3">
+          <span className="text-sm text-gray-500">
+            {formatDate(post.publishedAt)}
+          </span>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-3">
+          <Link 
+            href={`/blog/${post.slug}/`}
+            aria-label={`Read more about ${post.title} article`}
+            title={`Read more about ${post.title}`}
+            className="hover:text-gray-600 transition-colors"
+          >
             {post.title}
           </Link>
         </h3>
-        <p className="mt-2 text-gray-600 line-clamp-2">
+        <p className="text-gray-600 mb-4 line-clamp-3">
           {post.excerpt}
         </p>
-        <Link 
-          href={`/blog/${post.slug}/`} 
-          className="mt-4 inline-block text-gray-900 hover:text-gray-800"
-        >
-          Read More →
-        </Link>
       </div>
-    </article>
+    </div>
   );
 }

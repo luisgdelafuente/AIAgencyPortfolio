@@ -33,7 +33,7 @@ export default function Hero({ content = {}, isLoading = false }: { content?: an
     <div className="relative overflow-hidden bg-gray-900 text-white">
       <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-8">
         <div className="max-w-3xl">
-          <h1 className="block text-4xl font-bold sm:text-5xl lg:text-6xl">
+          <h1 className="block text-[calc(1rem+2px)] font-bold sm:text-[calc(1.5rem+2px)] lg:text-[calc(2.25rem+2px)] max-w-[80%] mx-auto">
             {content.heroTitle || t.hero.title}
           </h1>
           <p className="mt-6 text-lg text-gray-300">

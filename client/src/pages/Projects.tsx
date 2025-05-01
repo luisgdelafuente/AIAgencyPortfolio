@@ -73,7 +73,7 @@ export default function Projects() {
               )}
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {isLoading ? (
                 // Skeleton loaders while data is loading
                 Array(4).fill(0).map((_, i) => (
@@ -88,12 +88,20 @@ export default function Projects() {
                   </div>
                 ))
               ) : projects && projects.length > 0 ? (
-                // Display projects
-                projects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))
+                // Display projects sorted by most recent first
+                [...projects]
+                  .sort((a, b) => {
+                    // Get newest project at the top - lower ID means newer project in test data
+                    if (a.id && b.id) {
+                      return b.id - a.id;
+                    }
+                    return 0;
+                  })
+                  .map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))
               ) : (
-                <div className="col-span-2 text-center py-12">
+                <div className="col-span-3 text-center py-12">
                   <p className="text-gray-500">No projects available yet.</p>
                 </div>
               )}

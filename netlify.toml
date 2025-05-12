@@ -5,8 +5,3 @@
 [context.production.environment]
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
-[[plugins]]
-  package = "@netlify/plugin-ignore"
-
-# Optional: You can use this plugin to ignore .next-related expectations entirely.
-# It's a no-op plugin and safe to include to suppress auto-injections.

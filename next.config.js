@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable static file serving
-  output: 'standalone',
+  output: 'export',
   
   // Configure images domains for loading from external sources
   images: {
